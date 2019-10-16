@@ -10,7 +10,11 @@ dbconnect = sqlite3.connect("/home/pi/Documents/Team_Project/dataBases/plantNurs
 dbconnect.row_factory = sqlite3.Row;
 cursor = dbconnect.cursor();
 
-ser = serial.Serial("/dev/ttyACM1", 9600)
+try:
+    ser = serial.Serial("/dev/ttyACM1", 9600)
+except: 
+    ser = serial.Serial("/dev/ttyACM0", 9600)
+    
 ser.baudrate=9600
 def blink(pin):
     GPIO.output(pin,GPIO.HIGH)  
@@ -27,8 +31,8 @@ while True:
     data=ser.readline().decode().strip('\r\n').split(",")
     print(data)
     
-    cursor.execute("insert into sensorData values (" + str(data[0]) + ", 'arduino', " + "'light', " + str(data[1]) + ", '" + tdate + "', '" + ttime + "')");
-    cursor.execute("insert into sensorData values (" + str(data[0]) + ", 'arduino', " + "'temperature', " + str(data[2]) + ", '" + tdate + "', '" + ttime + "')");
-    cursor.execute("insert into sensorData values (" + str(data[0]) + ", 'arduino', " + "'moisture', " + str(data[3]) + ", '" + tdate + "', '" + ttime + "')");
+    #Database table: <RoomID>, <Light>, <Humidity>, <Temperature>, <Heat Index>, <Date>, <Time>
+    
+    cursor.execute("insert into sensorData values (" + str(data[0]) + ", '" + str(data[1]) + "', '" + str(data[2]) + "', '" + str(data[3]) + "', '" + str(data[4]) + "', '" + date + "', '" + ttime + "')");
     
     dbconnect.commit();
