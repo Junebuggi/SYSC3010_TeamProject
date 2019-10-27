@@ -1,0 +1,5 @@
+(sym_lib_table
+  (lib (name I2C_1602)(type Legacy)(uri ${KIPRJMOD}/I2C_1602.lib)(options "")(descr ""))
+  (lib (name Team_W4)(type Legacy)(uri ${KIPRJMOD}/RPi_Sensor_Schematic/Team_W4.lib)(options "")(descr ""))
+  (lib (name RPi_Sensor_Schematic-rescue)(type Legacy)(uri ${KIPRJMOD}/RPi_Sensor_Schematic-rescue.lib)(options "")(descr ""))
+)

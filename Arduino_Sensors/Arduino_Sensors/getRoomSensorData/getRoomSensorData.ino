@@ -1,81 +1,82 @@
-#include "DHT.h"
-#include <Wire.h>
-#include <LiquidCrystal_I2C.h>
-
 #define serialPi Serial
-#define DHTPIN 2 //Digital pin connected to the DHT sensor
-#define DHTTYPE DHT22 // DHT 22 (AM2302)
 
 // Initialize DHT sensor
-DHT dht(DHTPIN, DHTTYPE);
+
 
 //Function prototypes
-void getDHT(void);
+
 void getLDR(void);
+void getWaterLevel(void);
+void getSoilMoisture(void);
 
 //Declare global and constant variables
 const int potID = 1;
 int ldrStatus;
-const int ledPin = 13;
+const int ldrLED = 13;
+const int distanceLED = 11;
 const int ldrPin = A0;
 const double ldrLower = 390;
 const double ldrUpper = 685;
 const double ldrRange = ldrUpper-ldrLower;
-
-LiquidCrystal_I2C lcd(0x20, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);
+const int trigPin = 10;
+const int echoPin = 9;
+const int soilMoisturePin = A2;
+const int soilMoistureLED = 8; 
+int sensorValue;  
+const int limit = 300;
+// defines variables
+long duration;
+float distance;
 
 void setup() {
-  pinMode(ledPin, OUTPUT);
+  pinMode(ldrLED, OUTPUT);
+  pinMode(distanceLED, OUTPUT);
+  pinMode(soilMoistureLED, OUTPUT);
   pinMode(ldrPin, INPUT);
-  dht.begin();
+  pinMode(soilMoisturePin, INPUT);
+  pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
+  pinMode(echoPin, INPUT); // Sets the echoPin as an Input
+  
   
   serialPi.begin(9600);
 
-  lcd.begin(16, 2);
-  lcd.clear();
 }
 
 void loop() {
-    serialPi.print(potID);
-    serialPi.print(",");
-    getLDR();
-    getDHT();
-
-    serialPi.println("");
-    
+  
+  getWaterLevel();
+  getLDR();
+  getSoilMoisture();
+  serialPi.println();
+  
 
   delay(2000);
 }
 
-void getDHT(void){
-  // Reading temperature or humidity takes about 250 milliseconds
-  float h = dht.readHumidity();
-  serialPi.print(h); //print the humidity to the serial port
-  serialPi.print(",");
-  
-  // Reads temperature as Celsius
-  float t = dht.readTemperature();
-  serialPi.print(t); //print the temperature to the serial port
-  serialPi.print(",");
-  
-  // Compute heat index in Celsius (isFahreheit = false)
-  float hic = dht.computeHeatIndex(t, h, false);
-  serialPi.print(hic); //print the heat index to the serial port
+void getWaterLevel(void){
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  // Sets the trigPin on HIGH state for 10 micro seconds
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  // Reads the echoPin, returns the sound wave travel time in microseconds
+  duration = pulseIn(echoPin, HIGH);
+  // Calculating the distance
+  distance= duration*0.034/2;
+  // Prints the distance on the Serial Monitor
 
-  // The lcd displays the temperature and humidity values
-  lcd.setCursor(0,0);
-  lcd.clear();
-  lcd.print("Temp: ");
-  lcd.print(t);
-  lcd.print((char)223);
-  lcd.print("C");
-  lcd.setCursor(0,1);
-  lcd.print("Humidity: ");
-  lcd.print(h);
-  lcd.print("%");
+  serialPi.print(distance);
+  serialPi.print(",");
 
-  return;
+  if(abs(distance - 0) < 0.01){
+    digitalWrite(distanceLED, HIGH);
+  }
+  else{
+    digitalWrite(distanceLED, LOW);   
+  }
 }
+
 
 void getLDR(void){
   ldrStatus = analogRead(ldrPin);
@@ -85,8 +86,20 @@ void getLDR(void){
    
    //If the light is detected to be below 64% turn on the LED
    if ((ldrStatus-ldrLower)/ldrRange <= 0.64) {
-    digitalWrite(ledPin, HIGH);
+    digitalWrite(ldrLED, HIGH);
    } else {
-    digitalWrite(ledPin, LOW);
+    digitalWrite(ldrLED, LOW);
    }
+}
+
+void getSoilMoisture(void){
+  sensorValue = analogRead(soilMoisturePin); 
+  serialPi.print(sensorValue);
+  serialPi.print(",");
+
+  if (analogRead(soilMoisturePin) == 0){
+    digitalWrite(soilMoistureLED, HIGH);
+  } else{
+    digitalWrite(soilMoistureLED, LOW);
+  }
 }

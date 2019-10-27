@@ -1,0 +1,504 @@
+EESchema Schematic File Version 4
+LIBS:Arduino_Schematics-cache
+EELAYER 30 0
+EELAYER END
+$Descr User 11138 7874
+encoding utf-8
+Sheet 1 1
+Title "The Plant Nanny's Arduino Sensors "
+Date "2019-10-18"
+Rev "2"
+Comp "Carleton University: Team W4"
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Device:R R
+U 1 1 5DA619C0
+P 11700 -4150
+F 0 "R" H 11770 -4104 50  0000 L CNN
+F 1 "R" H 11770 -4195 50  0000 L CNN
+F 2 "" V 11630 -4150 50  0001 C CNN
+F 3 "~" H 11700 -4150 50  0001 C CNN
+	1    11700 -4150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9000 -4450 11300 -4450
+Wire Wire Line
+	8050 -1800 11600 -1800
+$Comp
+L I2C_1602:I2C_LCD_MODEL_V1.2 U
+U 1 1 5DAB5A09
+P 12850 -3000
+F 0 "U" H 13280 -2954 50  0000 L CNN
+F 1 "I2C_LCD_MODEL_V1.2" H 13280 -3045 50  0000 L CNN
+F 2 "Display:EA_T123X-I2C" H 12850 -3600 50  0001 C CNN
+F 3 "http://www.lcd-module.de/pdf/doma/t123-i2c.pdf" H 12850 -3500 50  0001 C CNN
+	1    12850 -3000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	11600 -3900 11700 -3900
+Wire Wire Line
+	11700 -3900 11700 -4000
+Wire Wire Line
+	11300 -4200 11300 -4450
+Wire Wire Line
+	11700 -4300 11700 -4450
+Wire Wire Line
+	11700 -4450 11300 -4450
+Connection ~ 11300 -4450
+Connection ~ 11600 -3900
+Wire Wire Line
+	11600 -3900 11600 -1800
+Wire Wire Line
+	11300 -3600 11300 -2050
+Wire Wire Line
+	11900 -2900 9300 -2900
+Wire Wire Line
+	11900 -2800 9300 -2800
+Wire Wire Line
+	9850 -2050 11300 -2050
+Wire Wire Line
+	12850 -2500 12850 -1950
+Wire Wire Line
+	12400 -2050 11300 -2050
+Connection ~ 11300 -2050
+Wire Wire Line
+	11700 -4450 12400 -4450
+Wire Wire Line
+	12400 -4450 12400 -3600
+Connection ~ 11700 -4450
+$Comp
+L Sensor:DHT11 U
+U 1 1 5DA64394
+P 11300 -3900
+F 0 "U" H 11056 -3854 50  0000 R CNN
+F 1 "DHT11" H 11056 -3945 50  0000 R CNN
+F 2 "Sensor:Aosong_DHT11_5.5x12.0_P2.54mm" H 11300 -4300 50  0001 C CNN
+F 3 "http://akizukidenshi.com/download/ds/aosong/DHT11.pdf" H 11450 -3650 50  0001 C CNN
+	1    11300 -3900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	950  3850 1100 3850
+Wire Wire Line
+	950  4500 950  3850
+Wire Wire Line
+	1800 2150 1800 2000
+Wire Wire Line
+	1700 4400 1700 4250
+Wire Wire Line
+	1700 2150 1700 1850
+Wire Wire Line
+	2650 1850 2650 2700
+Wire Wire Line
+	3350 3000 3350 3050
+$Comp
+L Device:R R2
+U 1 1 5DA64EA5
+P 2650 3950
+F 0 "R2" H 2580 3904 50  0000 R CNN
+F 1 "10KΩ" H 2580 3995 50  0000 R CNN
+F 2 "" V 2580 3950 50  0001 C CNN
+F 3 "~" H 2650 3950 50  0001 C CNN
+	1    2650 3950
+	-1   0    0    1   
+$EndComp
+$Comp
+L Device:LED D1
+U 1 1 5DA65A7F
+P 3350 2850
+F 0 "D1" V 3389 2733 50  0000 R CNN
+F 1 "LED" V 3298 2733 50  0000 R CNN
+F 2 "" H 3350 2850 50  0001 C CNN
+F 3 "~" H 3350 2850 50  0001 C CNN
+	1    3350 2850
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:R_PHOTO R1
+U 1 1 5DA83B79
+P 2650 2850
+F 0 "R1" H 2720 2896 50  0000 L CNN
+F 1 "R_PHOTO" H 2720 2805 50  0000 L CNN
+F 2 "" V 2700 2600 50  0001 L CNN
+F 3 "~" H 2650 2800 50  0001 C CNN
+	1    2650 2850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3350 4500 950  4500
+Wire Wire Line
+	3350 1850 3350 2700
+$Comp
+L Device:R R3
+U 1 1 5DA8EBD0
+P 3350 3200
+F 0 "R3" H 3280 3154 50  0000 R CNN
+F 1 "330Ω" H 3280 3245 50  0000 R CNN
+F 2 "" V 3280 3200 50  0001 C CNN
+F 3 "~" H 3350 3200 50  0001 C CNN
+	1    3350 3200
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	1700 4400 2350 4400
+Wire Wire Line
+	3350 3350 3350 4500
+Connection ~ 2650 3800
+Wire Wire Line
+	2650 3800 2650 3850
+Wire Wire Line
+	2650 4100 2650 4400
+Wire Wire Line
+	2650 3000 2650 3150
+Connection ~ 2650 3150
+Wire Wire Line
+	1700 1850 2650 1850
+Wire Wire Line
+	2650 1850 3350 1850
+Connection ~ 2650 1850
+Wire Wire Line
+	4250 3250 4100 3250
+Connection ~ 2650 4400
+Wire Wire Line
+	850  4600 850  3550
+Wire Wire Line
+	850  3550 1100 3550
+Wire Wire Line
+	1000 1700 1000 3450
+Wire Wire Line
+	1000 3450 1100 3450
+Wire Wire Line
+	6700 3000 7000 3000
+Wire Wire Line
+	6700 3100 7000 3100
+Wire Wire Line
+	5850 2950 5650 2950
+Wire Wire Line
+	5850 3050 5650 3050
+Wire Wire Line
+	5650 4400 4100 4400
+Wire Wire Line
+	5550 3450 5550 3150
+Wire Wire Line
+	5550 3150 5850 3150
+$Comp
+L Team_W4:4-Channel_Relay U3
+U 1 1 5DAF1A94
+P 8250 2550
+F 0 "U3" H 8625 2515 50  0000 C CNN
+F 1 "4-Channel_Relay" H 8625 2424 50  0000 C CNN
+F 2 "" H 8250 2550 50  0001 C CNN
+F 3 "" H 8250 2550 50  0001 C CNN
+	1    8250 2550
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR?
+U 1 1 5DAEF814
+P 9650 1800
+F 0 "#PWR?" H 9650 1650 50  0001 C CNN
+F 1 "+5V" H 9665 1973 50  0000 C CNN
+F 2 "" H 9650 1800 50  0001 C CNN
+F 3 "" H 9650 1800 50  0001 C CNN
+	1    9650 1800
+	1    0    0    -1  
+$EndComp
+$Comp
+L Motor:Motor_DC M1
+U 1 1 5DAEEE1B
+P 9650 2600
+F 0 "M1" H 9808 2596 50  0000 L CNN
+F 1 "5V DC Water Pump" H 9808 2505 50  0000 L CNN
+F 2 "" H 9650 2510 50  0001 C CNN
+F 3 "~" H 9650 2510 50  0001 C CNN
+	1    9650 2600
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5650 2950 5650 2000
+Wire Wire Line
+	9650 2400 9650 1800
+Wire Wire Line
+	9650 2900 9650 2950
+Wire Wire Line
+	9650 2950 9100 2950
+$Comp
+L power:Earth #PWR?
+U 1 1 5DB2042B
+P 9350 3150
+F 0 "#PWR?" H 9350 2900 50  0001 C CNN
+F 1 "Earth" H 9350 3000 50  0001 C CNN
+F 2 "" H 9350 3150 50  0001 C CNN
+F 3 "~" H 9350 3150 50  0001 C CNN
+	1    9350 3150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9350 3150 9350 3100
+Wire Wire Line
+	9350 3100 9100 3100
+Wire Wire Line
+	8150 2900 7950 2900
+Wire Wire Line
+	7950 2900 7950 2000
+Wire Wire Line
+	7950 2000 5650 2000
+Connection ~ 5650 2000
+Wire Wire Line
+	8150 3200 7950 3200
+Wire Wire Line
+	7950 3200 7950 4400
+Wire Wire Line
+	7950 4400 5650 4400
+Connection ~ 5650 4400
+Wire Wire Line
+	8150 3050 7800 3050
+Wire Wire Line
+	7800 3050 7800 4700
+$Comp
+L Device:R R5
+U 1 1 5DB67FD1
+P 3650 3750
+F 0 "R5" H 3720 3796 50  0000 L CNN
+F 1 "1KΩ" H 3720 3705 50  0000 L CNN
+F 2 "" V 3580 3750 50  0001 C CNN
+F 3 "~" H 3650 3750 50  0001 C CNN
+	1    3650 3750
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R R6
+U 1 1 5DB6BB8C
+P 3650 4150
+F 0 "R6" H 3720 4196 50  0000 L CNN
+F 1 "1KΩ" H 3720 4105 50  0000 L CNN
+F 2 "" V 3580 4150 50  0001 C CNN
+F 3 "~" H 3650 4150 50  0001 C CNN
+	1    3650 4150
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R R4
+U 1 1 5DB721F4
+P 3800 3150
+F 0 "R4" V 3593 3150 50  0000 C CNN
+F 1 "1KΩ" V 3684 3150 50  0000 C CNN
+F 2 "" V 3730 3150 50  0001 C CNN
+F 3 "~" H 3800 3150 50  0001 C CNN
+	1    3800 3150
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	3650 4350 3650 4400
+Connection ~ 3650 4400
+Wire Wire Line
+	3650 4400 2650 4400
+Wire Wire Line
+	3650 3900 3650 4000
+Connection ~ 3650 4000
+Wire Wire Line
+	3650 4000 3650 4050
+Wire Wire Line
+	4250 3150 3950 3150
+Wire Wire Line
+	4100 3250 4100 4400
+Wire Wire Line
+	3650 4400 4100 4400
+Connection ~ 4100 4400
+Wire Wire Line
+	1800 2000 4050 2000
+Wire Wire Line
+	700  4700 7800 4700
+Wire Wire Line
+	3650 3150 3650 1700
+Connection ~ 3650 3150
+Wire Wire Line
+	3650 1700 1000 1700
+Wire Wire Line
+	4050 2950 4050 2000
+Wire Wire Line
+	4050 2950 4250 2950
+Connection ~ 4050 2000
+Wire Wire Line
+	4050 2000 5650 2000
+Wire Wire Line
+	4250 3050 4050 3050
+Wire Wire Line
+	4050 3050 4050 4600
+Wire Wire Line
+	850  4600 4050 4600
+Wire Wire Line
+	2650 3150 2650 3800
+$Comp
+L Team_W4:HC-SR04 U1
+U 1 1 5DAD8A79
+P 4000 2550
+F 0 "U1" H 5128 2096 50  0000 L CNN
+F 1 "HC-SR04" H 5128 2005 50  0000 L CNN
+F 2 "" H 4000 2550 50  0001 C CNN
+F 3 "" H 4000 2550 50  0001 C CNN
+	1    4000 2550
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3650 3150 3650 3600
+Wire Wire Line
+	5650 3050 5650 4400
+Wire Wire Line
+	2100 3150 2650 3150
+Wire Wire Line
+	5550 3450 2300 3450
+Wire Wire Line
+	2300 3450 2300 3350
+Wire Wire Line
+	2300 3350 2100 3350
+Text Notes 2700 2700 0    50   ~ 0
+Photo\nResistor
+Text Notes 3400 2700 0    50   ~ 0
+LDR\nDebugging\nLED
+$Comp
+L Device:R R7
+U 1 1 5DAAB800
+P 1900 5250
+F 0 "R7" H 1830 5204 50  0000 R CNN
+F 1 "330Ω" H 1830 5295 50  0000 R CNN
+F 2 "" V 1830 5250 50  0001 C CNN
+F 3 "~" H 1900 5250 50  0001 C CNN
+	1    1900 5250
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:LED D2
+U 1 1 5DAAE279
+P 1350 5250
+F 0 "D2" V 1389 5133 50  0000 R CNN
+F 1 "LED" V 1298 5133 50  0000 R CNN
+F 2 "" H 1350 5250 50  0001 C CNN
+F 3 "~" H 1350 5250 50  0001 C CNN
+	1    1350 5250
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	2050 5250 2350 5250
+Wire Wire Line
+	2350 5250 2350 4400
+Connection ~ 2350 4400
+Wire Wire Line
+	2350 4400 2650 4400
+Wire Wire Line
+	1750 5250 1500 5250
+Wire Wire Line
+	700  4700 700  3250
+Wire Wire Line
+	700  3250 1100 3250
+Wire Wire Line
+	1200 5250 600  5250
+Wire Wire Line
+	600  5250 600  3650
+Wire Wire Line
+	600  3650 1100 3650
+Text Notes 1400 5600 0    50   ~ 0
+Ultrasonic \nDebugging\nLED
+Wire Wire Line
+	2050 6100 2350 6100
+Wire Wire Line
+	1750 6100 1500 6100
+Text Notes 1400 6450 0    50   ~ 0
+Soil Moisture\nDebugging\nLED
+Wire Wire Line
+	2350 6100 2350 5250
+Connection ~ 2350 5250
+Wire Wire Line
+	1200 6100 800  6100
+Wire Wire Line
+	800  6100 800  3350
+Wire Wire Line
+	800  3350 1100 3350
+$Comp
+L Device:LED D3
+U 1 1 5DAC2813
+P 1350 6100
+F 0 "D3" V 1389 5983 50  0000 R CNN
+F 1 "LED" V 1298 5983 50  0000 R CNN
+F 2 "" H 1350 6100 50  0001 C CNN
+F 3 "~" H 1350 6100 50  0001 C CNN
+	1    1350 6100
+	-1   0    0    1   
+$EndComp
+$Comp
+L Device:R R8
+U 1 1 5DAC280D
+P 1900 6100
+F 0 "R8" H 1830 6054 50  0000 R CNN
+F 1 "330Ω" H 1830 6145 50  0000 R CNN
+F 2 "" V 1830 6100 50  0001 C CNN
+F 3 "~" H 1900 6100 50  0001 C CNN
+	1    1900 6100
+	0    1    1    0   
+$EndComp
+$Comp
+L Team_W4:SoilHumidity_Sensor U2
+U 1 1 5DAE7489
+P 5950 2600
+F 0 "U2" H 6792 2565 50  0000 C CNN
+F 1 "SoilHumidity_Sensor" H 6792 2474 50  0000 C CNN
+F 2 "" H 5950 2600 50  0001 C CNN
+F 3 "" H 5950 2600 50  0001 C CNN
+	1    5950 2600
+	1    0    0    -1  
+$EndComp
+$Comp
+L MCU_Module:Arduino_UNO_R3 A1
+U 1 1 5DA664D2
+P 1600 3150
+F 0 "A1" H 1600 4331 50  0000 C CNN
+F 1 "Arduino_UNO_R3" H 1600 4240 50  0000 C CNN
+F 2 "Module:Arduino_UNO_R3" H 1750 2100 50  0001 L CNN
+F 3 "https://www.arduino.cc/en/Main/arduinoBoardUno" H 1400 4200 50  0001 C CNN
+	1    1600 3150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2050 6800 2350 6800
+Wire Wire Line
+	1750 6800 1500 6800
+$Comp
+L Device:LED D4
+U 1 1 5DAAA1B3
+P 1350 6800
+F 0 "D4" V 1389 6683 50  0000 R CNN
+F 1 "LED" V 1298 6683 50  0000 R CNN
+F 2 "" H 1350 6800 50  0001 C CNN
+F 3 "~" H 1350 6800 50  0001 C CNN
+	1    1350 6800
+	-1   0    0    1   
+$EndComp
+$Comp
+L Device:R R8
+U 1 1 5DAAA1B9
+P 1900 6800
+F 0 "R8" H 1830 6754 50  0000 R CNN
+F 1 "330Ω" H 1830 6845 50  0000 R CNN
+F 2 "" V 1830 6800 50  0001 C CNN
+F 3 "~" H 1900 6800 50  0001 C CNN
+	1    1900 6800
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	2350 6800 2350 6100
+Connection ~ 2350 6100
+Wire Wire Line
+	650  6800 650  3150
+Wire Wire Line
+	650  3150 1100 3150
+Wire Wire Line
+	650  6800 1200 6800
+Text Notes 1400 7150 0    50   ~ 0
+Water Pump\nDebugging\nLED
+$EndSCHEMATC
