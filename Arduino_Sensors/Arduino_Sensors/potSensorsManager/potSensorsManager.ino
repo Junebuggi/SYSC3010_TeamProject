@@ -1,53 +1,56 @@
 #define serialPi Serial
+#include <ArduinoJson.h>
+
+
 
 //Declare constant variables
 const int potID = 1;
-const double ldrLower = 390;
-const double ldrUpper = 685;
+const double ldrLower = 390; //the value when the LDR is complete darkness
+const double ldrUpper = 685; //the value when the LDR is in complete brightness
 const double ldrRange = ldrUpper-ldrLower;
-const int limit = 300;
-String packet;
-int nPacket = 0;
-int timerIterations;
-int waitFor = 10; //the number of seconds to wait for. A multiple of 5
+const int waitFor = 10; //the number of seconds to wait for. A multiple of 5 to avoid race conditions. 
 
-int timer1_counter;
-
-//Declare Sensor Pins
+//Declare Sensor and Pump Pins
 const int ldrPin = A0;
 const int trigPin = 10;
 const int echoPin = 9;
 const int soilMoisturePin = A2;
-
-boolean resendPacket = false;
-//Receiving Acknowledgments
-String opcode = "";
-String packetRec = "";
+const int pumpPin = 7;
 
 //Declare debugging LED pins
 const int ldrLED = 13;
 const int distanceLED = 11;
 const int soilMoistureLED = 8; 
+const int pumpLED = 6;
 
-// defines variables
+// Define sensor variables
 int ldrValue;
 long duration;
 float distance;
 int sensorValue;  
+
+//Receiving Acknowledgments variables
+String opcode = "";
+String packetRec = "";
+String packet;
+int nPacket = 0;
+int timerIterations;
+int timer1_counter;
+boolean resendPacket = false;
 
 
 //Debugging LED statuses
 boolean waterDistanceStatus;
 boolean ldrStatus;
 boolean soilMoistureStatus;
+boolean waterPumpStatus;
 
 //Function prototypes
 void getLDR(void);
 void getWaterLevel(void);
 void getSoilMoisture(void);
-
+void waterPumpManager(void);
 void setup() {
-  
 
   pinMode(ldrLED, OUTPUT);
   pinMode(distanceLED, OUTPUT);
@@ -65,17 +68,14 @@ void setup() {
   TCCR1B = 0;
 
   // Set timer1_counter to the correct value for our interrupt interval
-  //timer1_counter = 64911;   // preload timer 65536-16MHz/256/100Hz
-  //timer1_counter = 64286;   // preload timer 65536-16MHz/256/50Hz
-  //timer1_counter = 0;   // preload timer 65536-16MHz/256/2Hz
   timer1_counter = 3124; 
   TCNT1 = timer1_counter;   // preload timer
   // Set CS11 bit for 8 prescaler
   TCCR1B |= (1 << CS12) | (1 << CS10);  
   interrupts();
-  TIMSK1 &= ~(1 << TOIE1); 
+  TIMSK1 &= ~(1 << TOIE1); //Disable timer1 interrupts
   
-  serialPi.begin(9600);
+  serialPi.begin(9600); //begin serial on port 9600
 
 }
 
@@ -145,10 +145,10 @@ void getLDR(void){
    
    //If the light is detected to be below 64% turn on the LED
    if ((ldrValue-ldrLower)/ldrRange <= 0.64) {
-    //digitalWrite(ldrLED, HIGH);
+    digitalWrite(ldrLED, HIGH);
     ldrStatus = true;
    } else {
-    //digitalWrite(ldrLED, LOW);
+    digitalWrite(ldrLED, LOW);
     ldrStatus = false;
    }
   packet += ldrStatus;
@@ -182,7 +182,6 @@ ISR(TIMER1_OVF_vect){
     String n = serialPi.readStringUntil('\0');
 
     if(ack == "00" && n == String(nPacket)){// && packetRec.toInt() == nPacket){
-      digitalWrite(ldrLED, digitalRead(ldrLED) ^ 1);
       TIMSK1 &= ~(1 << TOIE1);
     }
     else{
