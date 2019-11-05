@@ -16,10 +16,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Notifications"/>
-        <activity android:name=".Notes"/>
-
-
+        <activity android:name=".NotesActivity"/>
+        <activity android:name=".NotificationActivity"/>
 
 
     </application>
