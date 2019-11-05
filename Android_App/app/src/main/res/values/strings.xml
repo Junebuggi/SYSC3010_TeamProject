@@ -2,4 +2,8 @@
     <string name="app_name">PlantNursery</string>
     <string name="enter_plantID">Enter Pot ID</string>
     <string name="addNotes">Notes</string>
+    <string name="enter_roomID">Enter Room ID</string>
+    <string name="enter_roomName">Enter Room Name</string>
+    <string name="enter_plantName">Enter Plant Name</string>
+    <string name="enter_ArduinoID">Enter Arduino ID</string>
 </resources>

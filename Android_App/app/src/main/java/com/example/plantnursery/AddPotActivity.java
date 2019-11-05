@@ -1,4 +1,14 @@
 package com.example.plantnursery;
 
-public class AddPotActivity {
+import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+public class AddPotActivity extends AppCompatActivity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_addpot);
+
+    }
 }

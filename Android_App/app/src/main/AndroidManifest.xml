@@ -18,6 +18,9 @@
         </activity>
         <activity android:name=".NotesActivity"/>
         <activity android:name=".NotificationActivity"/>
+        <activity android:name=".AddPotActivity"/>
+        <activity android:name=".AddRoomActivity"/>
+        <activity android:name=".ViewDataActivity"/>
 
 
     </application>
