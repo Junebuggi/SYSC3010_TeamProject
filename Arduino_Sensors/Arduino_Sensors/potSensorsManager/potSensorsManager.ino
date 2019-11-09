@@ -1,8 +1,9 @@
 #define serialPi Serial
 #include <ArduinoJson.h>
 
+const float criticalDistance = 20;
 
-
+float initialDistance;
 //Declare constant variables
 const int potID = 1;
 const double ldrLower = 390; //the value when the LDR is complete darkness
@@ -55,6 +56,8 @@ void setup() {
   pinMode(ldrLED, OUTPUT);
   pinMode(distanceLED, OUTPUT);
   pinMode(soilMoistureLED, OUTPUT);
+  pinMode(pumpLED, OUTPUT);
+  pinMode(pumpPin, OUTPUT);
   
   //Set the sensor pins
   pinMode(ldrPin, INPUT);
@@ -72,8 +75,19 @@ void setup() {
   TCNT1 = timer1_counter;   // preload timer
   // Set CS11 bit for 8 prescaler
   TCCR1B |= (1 << CS12) | (1 << CS10);  
+//initialize timer2
+  TCCR2A = 0;
+  TCCR2B = 0;
+
+  // Set timer1_counter to the correct value for our interrupt interval
+  //timer2_counter = 3124; 
+  //TCNT2 = timer2_counter;   // preload timer
+  // Set CS11 bit for 8 prescaler
+  TCCR2B |= (1 << CS12) | (1 << CS10);  
   interrupts();
   TIMSK1 &= ~(1 << TOIE1); //Disable timer1 interrupts
+  TIMSK2 &= ~(1 << TOIE1); //Disable timer2 interrupts
+
   
   serialPi.begin(9600); //begin serial on port 9600
 
@@ -84,9 +98,10 @@ void loop() {
   packet = "";
   packet += 0x08; //The OpCode for the data packet
   packet += ",";
-  packet += nPacket;
+  packet += 0x0C;
   packet += ",";
-  
+
+  waterPumpManager();
   getWaterLevel();
   getLDR();
   getSoilMoisture();
@@ -103,6 +118,30 @@ void loop() {
   delay((waitFor - (timerIterations * 5)) * 1000); //waitFor the remaining time left in the delay
   nPacket = (nPacket + 1) % 100;
   
+}
+
+void waterPumpManager(void){
+  waterPumpStatus = true;
+  //write if for if there is enough water in the tank
+//  if(abs(distance - criticalDistance) <= 0.01 && TIMSK2 & (1 << TOIE1)){ //Turn pump off and disable the interrupt if there is not enough water
+//    digitalWrite(pumpPin, LOW); 
+//    TIMSK2 &= ~(1 << TOIE1);   
+ // }
+  if(serialPi.available() > 0 && serialPi.peek() == 'C' ){ // Don't read unless there is data and its the startWaterPump opcode
+    digitalWrite(pumpPin, HIGH);
+    //digitalWrite(soilMoistureLED, !digitalRead(soilMoistureLED));
+    String opcode = serialPi.readStringUntil(",");
+    int waterPumpDuration = serialPi.readStringUntil("\0").toInt();
+//    if (// distance > criticalDistance){ //if the water pump message is not correct then stop algorithm
+//      packet += waterPumpStatus;
+//      return;
+//    }
+    initialDistance = distance; //find the initial water level
+    TCNT2 = 3124;
+    TIMSK2 |= (1 << TOIE1);  
+  }
+  packet += waterPumpStatus;
+  packet += ",";
 }
 
 void getWaterLevel(void){
@@ -163,10 +202,10 @@ void getSoilMoisture(void){
 
   //If no voltage is supplied to the moisture sensor then turn on the debugging LED 
   if (analogRead(soilMoisturePin) == 0){ 
-    digitalWrite(soilMoistureLED, HIGH);
+    //digitalWrite(soilMoistureLED, HIGH);
     soilMoistureStatus = false;
   } else{
-    digitalWrite(soilMoistureLED, LOW);
+    //digitalWrite(soilMoistureLED, LOW);
     soilMoistureStatus = true;
   }
   packet += soilMoistureStatus;
@@ -177,23 +216,30 @@ ISR(TIMER1_OVF_vect){
   timerIterations++;
   //serialPi.println("made it to ISR\nIteration: " + timerIterations);
   
-  while(serialPi.available() > 0 ){ // Don't read unless there is data 
+  if(serialPi.available() > 0 && serialPi.peek() == '0'){ // Don't read unless there is data 
     String ack = serialPi.readStringUntil(',');
     String n = serialPi.readStringUntil('\0');
 
-    if(ack == "00" && n == String(nPacket)){// && packetRec.toInt() == nPacket){
-      TIMSK1 &= ~(1 << TOIE1);
-    }
-    else{
-      resendPacket = true;
-    }
-    }
+//    if(ack == "00" && n == String(nPacket)){// && packetRec.toInt() == nPacket){
+//      TIMSK1 &= ~(1 << TOIE1);
+//    }
+//    else{
+//      resendPacket = true;
+//    }
+   }
     
     if(timerIterations >= waitFor / 5){
       TIMSK1 &= ~(1 << TOIE1); //disable timer
     }
  
-    
-    
+}
+
+ISR(TIMER2_OVF_vect){
+  TIMSK2 &= ~(1 << TOIE1);
+  digitalWrite(pumpPin, LOW);
+//  if(abs(initialDistance - distance) >= 0.01){
+//    digitalWrite(pumpLED, HIGH);
+//    packet["waterPumpStatus"] = false;
+//  }
   
 }
