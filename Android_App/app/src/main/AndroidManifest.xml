@@ -21,8 +21,9 @@
         <activity android:name=".AddPotActivity"/>
         <activity android:name=".AddRoomActivity"/>
         <activity android:name=".ViewDataActivity"/>
-
-
+        <activity android:name=".ViewStatusActivity"/>
     </application>
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 </manifest>

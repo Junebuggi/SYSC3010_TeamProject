@@ -22,10 +22,7 @@ public class NotesActivity extends AppCompatActivity {
             @Override
             //when clicked everything in this will get executed
             public void onClick(View v) {
-                //Log.d(TAG, "onClick: hey there!");
-                //message at bottom of screen
-                //length short--. how long u want it to show for
-                Toast.makeText(NotesActivity.this, "Clicked!!", Toast.LENGTH_SHORT).show();//mini notification
+                Toast.makeText(NotesActivity.this, "Clicked!!", Toast.LENGTH_SHORT).show();//mini b_notification
                 //startActivity(new Intent(Notes.this, Notifications.class));
             }
         });
