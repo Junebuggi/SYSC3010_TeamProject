@@ -1,5 +1,4 @@
 #define serialPi Serial
-#include <ArduinoJson.h>
 
 const float criticalDistance = 20;
 
