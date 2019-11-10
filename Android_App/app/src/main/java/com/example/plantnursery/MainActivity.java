@@ -83,11 +83,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
         b_addPot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                UDPSender udpSender = new UDPSender();
                 Toast.makeText(MainActivity.this, "add a pot", Toast.LENGTH_SHORT).show();//mini b_notification
+
                 startActivity(new Intent(MainActivity.this, AddPotActivity.class));
+
             }
         });
 
@@ -109,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         try{
+            //UDPSender udpSender = new UDPSender();
             UDPReceiver udpReceiver = new UDPReceiver();
             udpReceiver.start();
             Log.d("User","Thread start...");

@@ -51,9 +51,13 @@ public class UDPReceiver extends Thread {
                 }
                 //CloseSocket(client);
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        catch(IOException e)
-        {}
+//        catch(IOException e)
+//        {} catch (JSONException e) {
+//            e.printStackTrace();
+//        }
     }
 
     private void CloseSocket(DatagramSocket socket) throws IOException{

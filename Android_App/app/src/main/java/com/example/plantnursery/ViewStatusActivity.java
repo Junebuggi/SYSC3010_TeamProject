@@ -44,22 +44,25 @@ public class ViewStatusActivity extends AppCompatActivity {
 //                JSONObject obj = null; //cast to JSON
 //                try {
 //                    obj = new JSONObject("msgString");
-//                    String temp = obj.getString("temp"); //get string associated with JSON
-//                    String humidity = obj.getString("humidity"); //get string associated with JSON
-//                    String light = obj.getString("light");
-//                    String waterLevel = obj.getString("waterLevel");
-//                    String soil = obj.getString("soil");
+//                    String temperature = obj.getJSONObject("message").getString("temp"); //get string associated with JSON
+//                    String humidity = obj.getJSONObject("message").getString("humidity"); //get string associated with JSON
+//                    String light = obj.getJSONObject("message").getString("light");
+//                    String waterLevel = obj.getJSONObject("message").getString("waterLevel");
+//                    String soilMoisture = obj.getJSONObject("message").getString("soil");
+//
+//                    tTemp.setText("" + temperature);
+//                    tHumidity.setText("Recieved: " + humidity);
+//                    tWaterLevel.setText("Recieved: " + light);
+//                    tLight.setText("Recieved: " + waterLevel);
+//                    tSoil.setText("Recieved: " + soilMoisture);
 //                } catch (JSONException e) {
 //                    e.printStackTrace();
 //                }
 
                 Log.d("Handler","Now in Handler");
-
-                tTemp.setText("Recieved: " + msgString);
-                tHumidity.setText("Recieved: " + msgString);
-                tWaterLevel.setText("Recieved: " + msgString);
                 tLight.setText("Recieved: " + msgString);
-                tSoil.setText("Recieved: " + msgString);
+
+
             }
         };
 

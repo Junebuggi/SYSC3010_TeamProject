@@ -11,16 +11,14 @@ import java.net.UnknownHostException;
 
 public class UDPSender extends Thread {
 
-    //port = 8008 from receiver
-    //input should be JSON file in the future
-    public static void run(String str, int port){
+
+
+    public void run(String strIP, String str, int port){
         DatagramSocket socket = null;
         try
         {
             socket = new DatagramSocket();
-           // InetAddress serverAddress = InetAddress.getByName(strIP);
-            InetAddress serverAddress = InetAddress.getByName("127.0.0.1");
-
+            InetAddress serverAddress = InetAddress.getByName(strIP);
             Log.d("IP Address", serverAddress.toString());
 
             DatagramPacket packet;
