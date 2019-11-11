@@ -66,12 +66,6 @@ public class ViewStatusActivity extends AppCompatActivity {
             }
         };
 
-
-
-
-
-
-
     }//end OnCreate
 
 }

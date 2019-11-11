@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
 
    // viewable by everything in the package
@@ -21,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     Button b_notes;
     Button b_addPot;
     Button b_addRoom;
+    static ArrayList<String> notificationHistory= new ArrayList<>(); //keep track of notifications
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

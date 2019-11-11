@@ -8,6 +8,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Date;
 
 import org.json.*;
 
@@ -19,24 +20,25 @@ public class UDPReceiver extends Thread {
 
     public UDPReceiver() throws IOException {
         server = new DatagramSocket(PORT);
-        Log.d("User","new server socket");
+        Log.d("User", "new server socket");
     }
-    public void run(){
+
+    public void run() {
 
         byte[] byte1024 = new byte[1024];
         //Message msg = new Message();
         //Bundle data = new Bundle();
         DatagramPacket dPacket = new DatagramPacket(byte1024, 100);
         String txt;
-        try{
-            Log.d("User","runing run()");
-            while(true){
+        try {
+            Log.d("User", "runing run()");
+            while (true) {
                 server.receive(dPacket);
-                while(true)
-                {
+                while (true) {
                     txt = new String(byte1024, 0, dPacket.getLength());
                     String data = new String(dPacket.getData()).trim();
-                    ViewStatusActivity.exHandler.sendMessage(ViewStatusActivity.exHandler.obtainMessage(1,txt));
+                    MainActivity.notificationHistory.add(data);
+                    //ViewStatusActivity.exHandler.sendMessage(ViewStatusActivity.exHandler.obtainMessage(1, txt));
 //                    JSONObject obj = new JSONObject("data"); //cast to JSON
 //                    String opCode = obj.getString("OpCode"); //get string associated with JSON
 //                    switch (opCode) {
@@ -46,8 +48,8 @@ public class UDPReceiver extends Thread {
 //                            //NotificationActivity.exHandler.sendMessage(NotificationActivity.exHandler.obtainMessage(1,txt));
 //                    }
 
-                    Log.d("User","Handler send Message");
-                    if(true) break;
+                    Log.d("User", "Handler send Message");
+                    if (true) break;
                 }
                 //CloseSocket(client);
             }
@@ -60,7 +62,7 @@ public class UDPReceiver extends Thread {
 //        }
     }
 
-    private void CloseSocket(DatagramSocket socket) throws IOException{
+    private void CloseSocket(DatagramSocket socket) throws IOException {
         socket.close();
     }
 }
