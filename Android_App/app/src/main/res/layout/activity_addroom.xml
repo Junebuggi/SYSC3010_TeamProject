@@ -11,7 +11,7 @@
         android:layout_height="50dp"
         android:layout_marginStart="24dp"
         android:layout_marginLeft="24dp"
-        android:text="Room ID"
+        android:text="RPi ID"
         android:textSize="18sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/editText3"
         app:layout_constraintStart_toStartOf="parent" />
@@ -37,7 +37,7 @@
         android:layout_marginEnd="24dp"
         android:layout_marginRight="24dp"
         android:ems="10"
-        android:hint="@string/enter_roomID"
+        android:hint="@string/enter_RPiID"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView"
