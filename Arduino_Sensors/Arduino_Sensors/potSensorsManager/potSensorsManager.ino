@@ -1,13 +1,11 @@
 #define serialPi Serial
-// #include <ArduinoJson.h>
-
-const float criticalDistance = 20;
 
 //Declare constant variables
 const int potID = 1;
 const double ldrLower = 390; //the value when the LDR is complete darkness
 const double ldrUpper = 685; //the value when the LDR is in complete brightness
 const double ldrRange = ldrUpper-ldrLower;
+const float criticalDistance = 20;
 
 //Declare Sensor and Pump Pins
 const int ldrPin = A0;
@@ -24,36 +22,22 @@ const int pumpLED = 6;
 const int ackLED = 5;
 
 // Define sensor variables
-int ldrValue;
-long duration;
-float distance;
-int sensorValue;  
+  
 float initialDistance;
 int waterPumpDuration;
-int seconds = 0;
-boolean waterPumpMessageIntercept = false;
-
-//Receiving Acknowledgments variables
-String opcode = "";
-String packetRec = "";
-String packet;
-int nPacket = 0;
-int timerIterations;
-int timer1_counter;
-boolean resendPacket = false;
-
-
-//Debugging LED statuses
-boolean waterDistanceStatus;
-boolean ldrStatus;
-boolean soilMoistureStatus;
 boolean waterPumpStatus;
+int seconds = 0;
+
+String packet;
 
 //Function prototypes
+void getSensorData(void);
+float readUltraSonic(void);
 void getLDR(void);
 void getWaterLevel(void);
 void getSoilMoisture(void);
 void waterPumpManager(void);
+
 void setup() {
 
   pinMode(ldrLED, OUTPUT);
@@ -70,92 +54,62 @@ void setup() {
   pinMode(echoPin, INPUT); // Sets the echoPin as an Input
   digitalWrite(pumpPin, HIGH);
 
- // initialize timer1 
- cli(); // disable global interrupts
-TCCR1A = 0; // set entire TCCR1A register to 0
-TCCR1B = 0; // same for TCCR1B
-
-// set compare match register to desired timer count:
-OCR1A = 15624;
-// turn on CTC mode:
-TCCR1B |= (1 << WGM12);
-// Set CS10 and CS12 bits for 1024 prescaler:
-TCCR1B |= (1 << CS10);
-TCCR1B |= (1 << CS12);
-// enable timer compare interrupt:
-TIMSK1 |= (1 << OCIE1A);
-// enable global interrupts:
-sei();
-
-TIMSK1 &= ~(1 << OCIE1A);
-
-
+  // Initialize timer1 for the water pump
+  cli(); // disable global interrupts
+  TCCR1A = 0; // set entire register to 0
+  TCCR1B = 0; // set entire register to 0
+  OCR1A = 15624; // set compare match register for 1 second
+  TCCR1B |= (1 << WGM12); // turn on CTC mode 
+  TCCR1B |= (1 << CS10) | (1 << CS12); // Set CS10 and CS12 bits for 1024 prescaler
+  sei(); // enable global interrupts
+  TIMSK1 &= ~(1 << OCIE1A); // disable timer compare interrupt
 
   serialPi.begin(9600); //begin serial on port 9600
 
 }
 
+/*
+ * The arduino checks if the serial is available. When a message is sent from the roomPi, the arduino reads
+ * the opcode and executes the appropriate commands. If the "E" opcode is received then the arduino sends the
+ * potSensorData in a JSON format. If the "C" opcode is received the arduino turns on the water pump for the 
+ * specified time.
+ */
 void loop() {
   
   boolean flag = false;
-  if(serialPi.available() > 0){
-    
+  if(serialPi.available() > 0){ 
     String opcode = serialPi.readStringUntil(',');
-    
     if (opcode == "E") { // The roomPi is requesting potSensorData
-      getSensorData();
-      waterDistanceStatus = true;
-      int startWaitingTime = millis();
-      flag = true;
-      while (serialPi.available() > 0 && millis() < startWaitingTime + 1000 && flag){
-        String opcode = serialPi.readStringUntil(',');
-        if (opcode == "0") {
-          digitalWrite(pumpLED, !digitalRead(pumpLED));
-          flag = false; // Exit nested loop
+      getSensorData(); 
+      waterPumpStatus = true; //reset the waterPumpStatus if it was set to false
+      int startWaitingTime = millis(); 
+      ackRec = false; // ACK received flag 
+      while (millis() < startWaitingTime + 1000 && !ackRec){ //Try for 1 second to resend the packet if no ACK from roomPi
+        delay(100); //Allow time for the roomPi to send the ACK
+        if (serialPi.available() > 0 ) { 
+          opcode = serialPi.readStringUntil(',');
+          if (opcode == "0") {
+            digitalWrite(ackLED, !digitalRead(ackLED));
+            ackRec = true; // The acknowledgment was received from the roomPi, set flag
+          }
         }
         else {
-          serialPi.println(packet);
+          serialPi.println(packet); //If no ACK was received resend the packet
         }
       }
+    }
 
-      }
-//      while(millis() < startWaitingTimer + 1000){ // Wait 
-//          if(serialPi.available() > 0) {
-//            String opcode = serialPi.readStringUntil(',');
-//            
-//            if (opcode == "0") {
-//              digitalWrite(ackLED, !digitalRead(ackLED));
-//              flag = true; // Exit nested loop
-//              break;
-//            }
-//            else if (opcode == "C") {
-//              waterPumpDuration = serialPi.readStringUntil('\n'); // Read the rest of the string
-//              waterPumpMessageIntercept = true; //Set the flag so the pumpManager function knows a waterPump message has been intercepted
-//            }
-//          }
-//          serialPi.flush();
-//          if (flag == true){
-//          
-//            break;
-//          
-//          }
-//      }
-//    }
-
-    else if (opcode = "C") { //|| waterPumpMessageIntercept) { // The roomPi is requesting for the water pump to be turned on
+    else if (opcode = "C") { // The roomPi is requesting for the water pump to be turned on
       
-      //if (!waterPumpMessageIntercept) {
         waterPumpDuration = serialPi.readStringUntil('\n').toInt();
+        
         if(waterPumpDuration >= 1) {
-                  digitalWrite(pumpLED, HIGH);
-       
-      //}
-      digitalWrite(pumpPin, LOW);
-      initialDistance = distance; // Find the initial water level
-      TIMSK1 |= (1 << OCIE1A); // Enable the timer
-    
+          digitalWrite(pumpLED, HIGH); //For testing purposes, remove later
+          digitalWrite(pumpPin, LOW);
+          initialDistance = readUltraSonic(); // Find the initial water level
+          TIMSK1 |= (1 << OCIE1A); // Enable the timer for the water pump
         }
- waterPumpMessageIntercept = false; // Reset the flag
+        
     }
   }
 
@@ -177,18 +131,10 @@ void getSensorData(void) {
 }
 
 void getWaterLevel(void){
-  digitalWrite(trigPin, LOW);
-  delayMicroseconds(2);
-  // Sets the trigPin on HIGH state for 10 micro seconds
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);
-  // Reads the echoPin, returns the sound wave travel time in microseconds
-  duration = pulseIn(echoPin, HIGH);
-  // Calculating the distance
-  distance= duration*0.034/2;
-  // Prints the distance on the Serial Monitor
 
+  float distance = readUltraSonic();
+  boolean waterDistanceStatus;
+  
   packet += "\"waterDistance\": " + String(distance);
   packet += ",";
 
@@ -206,7 +152,8 @@ void getWaterLevel(void){
 
 
 void getLDR(void){
-  ldrValue = analogRead(ldrPin);
+   int ldrValue = analogRead(ldrPin);
+   boolean ldrStatus;
 
    packet += "\"light\": " + String(((ldrValue-ldrLower)/ldrRange * 100)) + ",";
    
@@ -222,9 +169,21 @@ void getLDR(void){
   packet += "\"ldrStatus\": " + String(ldrStatus) + ",";
    
 }
-
+float readUltraSonic(void){
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  // Sets the trigPin on HIGH state for 10 micro seconds
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  // Reads the echoPin, returns the sound wave travel time in microseconds
+  long duration = pulseIn(echoPin, HIGH);
+  // Calculating the distance
+  return (duration*0.034/2);
+}
 void getSoilMoisture(void){
-  sensorValue = analogRead(soilMoisturePin); 
+  int sensorValue = analogRead(soilMoisturePin); 
+  boolean soilMoistureStatus;
   packet += "\"soilMoisture\": " + String(sensorValue) + ",";
 
   //If no voltage is supplied to the moisture sensor then turn on the debugging LED 
@@ -243,12 +202,10 @@ ISR(TIMER1_COMPA_vect){
   seconds++;
   if (seconds >= waterPumpDuration) {
     digitalWrite(pumpPin, HIGH);
-    //delay(100);
     TIMSK1 &= ~(1 << OCIE1A);
     seconds = 0;
-    //serialPi.println("Pump Finished");
     if ( (initialDistance - distance) <= 0.1) {
-      waterDistanceStatus = false; // The water levels did not decrease when the pump was suppose to be on
+      waterPumpStatus = false; // The water levels did not decrease when the pump was suppose to be on
     }
   } 
 }
