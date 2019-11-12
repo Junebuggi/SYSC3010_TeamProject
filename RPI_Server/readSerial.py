@@ -2,7 +2,7 @@ import serial
 import time
 import json
 
-ser = serial.Serial('/dev/tty.usbmodem146101', 9600, timeout = 5)
+ser = serial.Serial('/dev/tty.usbmodem146101', 9600, timeout = 0.1)
 
 ser.baudrate = 9600
 ser.flushInput()
@@ -22,18 +22,21 @@ while True:
         ser.write((pumpString).encode("utf-8"))  # start water pump message
     elif (message[0] == 'E'):
         ser.write(("E,").encode("utf-8"))  # start water pump message
-        while (ser.inWaiting()):
-            x = 1
-        data = ser.readline().decode().strip('\r\n')
+        flag = True
+        startTime = time.time()
+        while flag and (time.time() < startTime + 2):
+            data = ser.readline()
+            if (len(data) > 0):
+                data = data.decode().strip('\r\n')
+                flag = False
+                ser.write(("0,").encode("utf-8"))
+                print(data)
+            else:
+                ser.write(("E,").encode("utf-8"))
 
-        if (len(data) > 0):
-            ser.write(("0,").encode("utf-8"))
-            print(data)
 
-
-    ser.flushInput()
     time.sleep(0.2)
-
+    ser.flushInput()
 
 S
         

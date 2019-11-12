@@ -105,16 +105,19 @@ void loop() {
     if (opcode == "E") { // The roomPi is requesting potSensorData
       getSensorData();
       waterDistanceStatus = true;
-      int startWaitingTimer = millis();
-      while (serialPi.available() < 0 ){
+      int startWaitingTime = millis();
+      flag = true;
+      while (serialPi.available() > 0 && millis() < startWaitingTime + 1000 && flag){
+        String opcode = serialPi.readStringUntil(',');
+        if (opcode == "0") {
+          digitalWrite(pumpLED, !digitalRead(pumpLED));
+          flag = false; // Exit nested loop
+        }
+        else {
+          serialPi.println(packet);
+        }
       }
-      if(serialPi.available() > 0) { serialPi.readString(); } //Flush any leftover values
-      
-            
-            if (opcode == "0") {
-              digitalWrite(ackLED, !digitalRead(ackLED));
-              flag = true; // Exit nested loop
-            }
+
       }
 //      while(millis() < startWaitingTimer + 1000){ // Wait 
 //          if(serialPi.available() > 0) {
@@ -156,7 +159,7 @@ void loop() {
     }
   }
 
- if(serialPi.available() > 0) { serialPi.readString(); } //Flush any leftover values
+ //while(serialPi.available() > 0) { serialPi.read(); } //Flush any leftover values
   
 }
 
