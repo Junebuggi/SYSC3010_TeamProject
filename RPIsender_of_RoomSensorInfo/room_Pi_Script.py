@@ -47,7 +47,11 @@ def setRoomPi():
 
 
 def startWaterPump(pumpDuration):
-    ser.write(bytes(str(data[1]), 'utf-8'))
+    if type(pumpDuration) is int and pumpDuration >= 1: 
+        pumpMessage = "C," + pumpDuration + "\n"
+        ser.write((pumpString).encode("utf-8")) 
+    else:
+        raise ValueError("Pump duration must be an integer AND must be greater than or equal to 1")
     return
 
 def pumpFinished():
@@ -132,6 +136,21 @@ def sendSensoryData():
 def sendAck(address):
     sender('{"opcode" : "0"}')
     return
+
+def requestPotData(): #Ask the arduino for the potData
+    ser.write(("E,").encode("utf-8"))
+    flag = True
+    startTime = time.time()
+    while flag and (time.time() < startTime + 2):
+        potData = ser.readline()
+        if (len(data) > 0):
+            potData = potData.decode().strip('\r\n')
+            flag = False
+            ser.write(("0,").encode("utf-8"))
+            return potData
+        else:
+            ser.write(("E,").encode("utf-8"))
+    return #TODO return JSON with null values
 
 setRoomPi()
 #Repeat
