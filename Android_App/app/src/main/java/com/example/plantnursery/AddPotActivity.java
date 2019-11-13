@@ -12,12 +12,15 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class AddPotActivity extends AppCompatActivity {
 //private Button addPot;
 
     public static Handler exHandler;
     private Button addPot;
-    private  EditText piID, arduinoID, plantName, waterAmount;
+    private  EditText piID, arduinoID, plantName, waterAmount, rmName;
     private UDPSender udpsender;
     private String ipAddress = "192.168.1.94";
     private String str;
@@ -38,19 +41,32 @@ public class AddPotActivity extends AppCompatActivity {
         plantName = (EditText)findViewById(R.id.editText9);
         waterAmount = (EditText)findViewById(R.id.editText5);
         addPot = (Button)findViewById(R.id.button8);
+        rmName = findViewById(R.id.editText15);
+
 
         //create JSON object here
 
-
-       // str = "" + piID.getText().toString()+ arduinoID.getText().toString() + plantName.getText().toString() + waterAmount.getText().toString();
 
         addPot.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(AddPotActivity.this, "add a plantzzzz", Toast.LENGTH_SHORT).show();
                 //System.out.println("~~~~~~~~\n\n\ni am here " + str );
-                str = "" + piID.getText().toString()+ arduinoID.getText().toString() + plantName.getText().toString() + waterAmount.getText().toString();
-                udpsender.run(ipAddress, str, 8008);
+                //0x02 [‘opcode’: ‘2’, ‘roomID’: Integer, ‘roomName’: String, ‘potID: integer, ‘plantName’: String, ‘owner’:String]
+                JSONObject newPot = new JSONObject();
+                try {
+                    newPot.put("opcode", "2");
+                    newPot.put("roomID", piID.getText().toString());
+                    newPot.put("roomName", rmName.getText().toString()); //getting rid of rmName?
+                    newPot.put("potID",arduinoID.getText().toString());
+                    newPot.put("plantName", plantName.getText().toString()); //getting rid of plant name?
+                    newPot.put("owner", waterAmount.getText().toString()); //r we adding ater amount or just owner?
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                //str = "" + piID.getText().toString()+ arduinoID.getText().toString() + plantName.getText().toString() + waterAmount.getText().toString();
+                udpsender.run(ipAddress, newPot, 8008);
             }
         });
 

@@ -37,7 +37,29 @@ public class UDPReceiver extends Thread {
                 while (true) {
                     txt = new String(byte1024, 0, dPacket.getLength());
                     String data = new String(dPacket.getData()).trim();
-                    MainActivity.notificationHistory.add(data);
+//                    MainActivity.notificationHistory.add(data);
+
+                    JSONObject obj = new JSONObject(data);
+                    String opcode = obj.getString("Opcode");
+                    switch (opcode){
+                        case "D":
+                            //process the array, add the data
+                            String errors = obj.getString("sensorArray");
+                            MainActivity.notificationHistory.add(data);
+                        case "0":
+                            //ACK
+                        case "6":
+                            //stats are sent
+                            //ViewDataActivity.exHandler.sendMessage(ViewDataActivity.exHandler.obtainMessage(1, txt));
+                        case "E":
+                            ViewStatusActivity.exHandler.sendMessage(ViewStatusActivity.exHandler.obtainMessage(1, txt));
+
+
+                    }
+
+
+                    System.out.println(obj.toString());
+
                     //ViewStatusActivity.exHandler.sendMessage(ViewStatusActivity.exHandler.obtainMessage(1, txt));
 //                    JSONObject obj = new JSONObject("data"); //cast to JSON
 //                    String opCode = obj.getString("OpCode"); //get string associated with JSON
@@ -54,6 +76,8 @@ public class UDPReceiver extends Thread {
                 //CloseSocket(client);
             }
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
             e.printStackTrace();
         }
 //        catch(IOException e)

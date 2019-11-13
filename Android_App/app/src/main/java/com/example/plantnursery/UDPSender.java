@@ -2,6 +2,8 @@ package com.example.plantnursery;
 
 import android.util.Log;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -13,7 +15,7 @@ public class UDPSender extends Thread {
 
 
 
-    public void run(String strIP, String str, int port){
+    public void run(String strIP, JSONObject str, int port){
         DatagramSocket socket = null;
         try
         {
@@ -24,7 +26,7 @@ public class UDPSender extends Thread {
             DatagramPacket packet;
 
             //send socket
-            packet=new DatagramPacket(str.getBytes(),str.length(),serverAddress,port);
+            packet=new DatagramPacket(str.toString().getBytes(),str.length(),serverAddress,port);
             socket.send(packet);
 
         }
