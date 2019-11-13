@@ -139,18 +139,17 @@ def sendAck(address):
 
 def requestPotData(): #Ask the arduino for the potData
     ser.write(("E,").encode("utf-8"))
-    flag = True
     startTime = time.time()
-    while flag and (time.time() < startTime + 2):
+    while time.time() < (startTime + 2):
         potData = ser.readline()
-        if (len(data) > 0):
+        if (len(potData) > 0):
             potData = potData.decode().strip('\r\n')
-            flag = False
             ser.write(("0,").encode("utf-8"))
             return potData
         else:
             ser.write(("E,").encode("utf-8"))
-    return #TODO return JSON with null values
+    return('{"opcode": null, "potID": null,"waterPumpStatus": null,"waterDistance": null,"waterDistanceStatus": null,"light": null,"ldrStatus": null,"soilMoisture": null,"soilMoistureStatus": null}')
+
 
 setRoomPi()
 #Repeat

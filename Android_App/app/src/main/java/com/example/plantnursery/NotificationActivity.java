@@ -32,17 +32,6 @@ public class NotificationActivity extends AppCompatActivity {
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         //notificationHistory = new ArrayList<>();
 
-        //fill arraylist with notifications.... should already be filled with notifications
-//        for(int i =0; i <20; i++){
-//            //create notification
-//            NotificationStorage j = new NotificationStorage("type" + i, "msg" + i, new Date());
-//            String str = j.toString();
-//            //add to arraylist
-//            notificationHistory.add(count++, str);
-//        }
-
-
-
         //Recycler View looks
         mLayoutManager = new LinearLayoutManager(this);
         //mRecyclerView.setHasFixedSize(false);

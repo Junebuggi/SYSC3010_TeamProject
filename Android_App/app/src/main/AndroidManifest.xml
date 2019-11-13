@@ -22,6 +22,7 @@
         <activity android:name=".AddRoomActivity"/>
         <activity android:name=".ViewDataActivity"/>
         <activity android:name=".ViewStatusActivity"/>
+        <activity android:name=".AddThresholdsActivity"/>
 
     </application>
 

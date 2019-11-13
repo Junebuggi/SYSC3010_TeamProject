@@ -41,31 +41,32 @@ public class ViewStatusActivity extends AppCompatActivity {
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
                 String msgString = (String)msg.obj;
-//                JSONObject obj = null; //cast to JSON
-//                try {
-//                    obj = new JSONObject("msgString");
-//                    String temperature = obj.getJSONObject("message").getString("temp"); //get string associated with JSON
-//                    String humidity = obj.getJSONObject("message").getString("humidity"); //get string associated with JSON
-//                    String light = obj.getJSONObject("message").getString("light");
-//                    String waterLevel = obj.getJSONObject("message").getString("waterLevel");
-//                    String soilMoisture = obj.getJSONObject("message").getString("soil");
-//
-//                    tTemp.setText("" + temperature);
-//                    tHumidity.setText("Recieved: " + humidity);
-//                    tWaterLevel.setText("Recieved: " + light);
-//                    tLight.setText("Recieved: " + waterLevel);
-//                    tSoil.setText("Recieved: " + soilMoisture);
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
+
+                JSONObject obj = null; //cast to JSON
+                try {
+                    obj = new JSONObject("msgString");
+                    String temperature = obj.getJSONObject("message").getString("temp"); //get string associated with JSON
+                    String humidity = obj.getJSONObject("message").getString("humidity"); //get string associated with JSON
+                    String light = obj.getJSONObject("message").getString("light");
+                    String waterLevel = obj.getJSONObject("message").getString("waterLevel");
+                    String soilMoisture = obj.getJSONObject("message").getString("soil");
+
+                    tTemp.setText("" + temperature);
+                    tHumidity.setText("Recieved: " + humidity);
+                    tWaterLevel.setText("Recieved: " + light);
+                    tLight.setText("Recieved: " + waterLevel);
+                    tSoil.setText("Recieved: " + soilMoisture);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
                 Log.d("Handler","Now in Handler");
-                tLight.setText("Recieved: " + msgString);
+//                tLight.setText("Recieved: " + msgString);
 
 
             }
         };
 
-    }//end OnCreate
+    }
 
 }
