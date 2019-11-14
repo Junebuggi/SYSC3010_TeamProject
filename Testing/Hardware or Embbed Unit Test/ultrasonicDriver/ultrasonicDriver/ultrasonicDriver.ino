@@ -1,4 +1,15 @@
 
+/**
+  SYSC 3010 Team Project: The Plant Nursery
+  Team W4
+  Name: ultrasonicDriver
+  Purpose: A driver to test the hardware of the
+           ultrasonic sensor
+
+  @author Emma Boulay
+  @version 1.3 14/11/19
+*/
+
 #include <math.h>
 
 const int promptLED = 5; // Will blink to let you know you have 5 seconds until the next test
@@ -14,16 +25,10 @@ const int promptTime = 5; //The number of seconds the promptLED blinks before th
 int nPass = 0;
 int nFail = 0;
 
-float readUltraSonic(void);
-void runTest(int n, int trialDistance);
-float runTrial(int n);
-float getAverage(float arr[], int n);
-float getMinimum(float arr[], int n);
-float getMaximum(float arr[], int n);
-float getVar(float arr[], int n, float mean);
-float getStdDev(float mean);
-void blinkN(int n, int LED);
-
+/*
+ * The modes for the pins are set. Each test distance is run for n trials. 
+ * After all the tests are run a Test Report Summary is outputed.
+ */
 void setup() {
   //Set the modes for the LEDs
   pinMode(promptLED, OUTPUT);
@@ -43,12 +48,12 @@ void setup() {
     runTest(nTrials, distancesToTest[i]);
   }
 
-  Serial.println("================ Test Report ================");
+  Serial.println("================ Test Report Summary ================");
   Serial.println("Total number of tests: " + String(nPass + nFail));
   Serial.println("Number of Successes: " + String(nPass));
   Serial.println("Number of Fails: " + String(nFail));
   Serial.println("Success Rate: " + String((double) nPass / nFail * 100) + "%"); 
-  
+   
 }
 
 void loop(){}
@@ -71,10 +76,17 @@ float readUltraSonic(void) {
   return (duration * 0.034 / 2); //The distance to the water
 }
 
+/*
+ * Runs the test for n trials. If the average distance is within an 
+ * acceptable margin of error to the test distance than the test passes
+ * and a green LED will blink. Otherwise the test failed and a red LED 
+ * will blink.
+ */
 void runTest(int n, int trialDistance){
   static int testNumber = 0;
   ++testNumber;
    Serial.println("================ Test " + String(testNumber) + ": " + String(trialDistance) + "cm ================");
+   //Warn the user that the next test is about to begin
    blinkN(promptLED, promptTime);
    float avg = runTrial(n);
    //The test passes
@@ -83,6 +95,7 @@ void runTest(int n, int trialDistance){
     nPass++;
     Serial.println("Test Passed\n");
    }
+   //The test fails
    else{
       blinkN(1, failLED);
       nFail++;
@@ -91,6 +104,15 @@ void runTest(int n, int trialDistance){
    
 }
 
+/*
+ * Runs all the trials for the test and outputs statistics output the 
+ * data and its spread. Statistics include: Average, Maximum, Minimum,
+ * Variance and Standard Deviation. These are indicators if the accuracy 
+ * of the ultrasonic sensor
+ * 
+ * @param n the number of trials
+ * @return the average distance in cm, represented as a float
+ */
 float runTrial(int n){
   float distanceArray[n];
   
@@ -112,6 +134,13 @@ float runTrial(int n){
   
 }
 
+/*
+ * Computes the average of an array
+ * 
+ * @param arr the float array 
+ * @param n the size of the array
+ * @return the average of an array
+ */
 float getAverage(float arr[], int n) {
   float sum = 0.0;               
    for (int i = 0; i < n; ++i) {
@@ -119,7 +148,13 @@ float getAverage(float arr[], int n) {
    }
    return sum / n; //the average
 }
-
+/*
+ * Computes the minimum of an array
+ * 
+ * @param arr the float array 
+ * @param n the size of the array
+ * @return the minimum value of an array
+ */
 float getMinimum(float arr[], int n){
   float min = arr[0];
   for(int i = 0; i < n; ++i){
@@ -130,6 +165,13 @@ float getMinimum(float arr[], int n){
   return min;
 }
 
+/*
+ * Computes the maximum of an array
+ * 
+ * @param arr the float array 
+ * @param n the size of the array
+ * @return the maximum value of an array
+ */
 float getMaximum(float arr[], int n){
   float max = arr[0];
   for(int i = 0; i < n; ++i){
@@ -140,6 +182,14 @@ float getMaximum(float arr[], int n){
   return max;
 }
 
+/*
+ * Computes the variance of an array
+ * 
+ * @param arr the float array 
+ * @param n the size of the array
+ * @param mean the average of the array
+ * @return the variance of the array
+ */
 float getVar(float arr[], int n, float mean){
   float sumSquares = 0.0;
   for(int i = 0; i < n; ++i){
@@ -148,10 +198,22 @@ float getVar(float arr[], int n, float mean){
   return sumSquares / n;
 }
 
+ /*
+ * Computes the standard deviation of an array
+ * 
+ * @param var the variance of the array
+ * @return the standard deviation of an array
+ */
 float getStdDev(float var){
   return sqrt(var);
 }
 
+/*
+ * An LED is blinked n times at the speed of 0.5 seconds per state (ON or OFF)
+ * 
+ * @param n the number of times to blink the LED
+ * @param LED the LED to be blinked
+ */
 void blinkN(int n, int LED){
   for(int i = 0; i < n*2; i++){
     digitalWrite(LED, !digitalRead(LED));
