@@ -15,7 +15,7 @@ public class UDPSender extends Thread {
 
 
 
-    public void run(String strIP, JSONObject str, int port){
+    public void run(String strIP, String str, int port){
         DatagramSocket socket = null;
         try
         {
@@ -27,8 +27,9 @@ public class UDPSender extends Thread {
 
             //send socket
             packet=new DatagramPacket(str.toString().getBytes(),str.length(),serverAddress,port);
+            System.out.println("~~~~~~~~~~~~/n/n/nsendinggggggggg");
             socket.send(packet);
-
+            System.out.println("~~~~~/n/n/nsent");
         }
         catch(SocketException e)
         {

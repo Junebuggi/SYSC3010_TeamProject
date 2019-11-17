@@ -22,8 +22,9 @@ public class AddPotActivity extends AppCompatActivity {
     private Button addPot;
     private  EditText piID, arduinoID, plantName, waterAmount, rmName;
     private UDPSender udpsender;
-    private String ipAddress = "192.168.1.94";
+    private String ipAddress = "169.254.171.154";
     private String str;
+    private static final int PORT = 1001;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,8 +66,8 @@ public class AddPotActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                //str = "" + piID.getText().toString()+ arduinoID.getText().toString() + plantName.getText().toString() + waterAmount.getText().toString();
-                udpsender.run(ipAddress, newPot, 8008);
+                str = "" + piID.getText().toString()+ arduinoID.getText().toString() + plantName.getText().toString() + waterAmount.getText().toString();
+                udpsender.run(ipAddress, newPot.toString(), PORT);
             }
         });
 

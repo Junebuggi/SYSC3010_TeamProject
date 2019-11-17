@@ -35,7 +35,7 @@ public class ViewStatusActivity extends AppCompatActivity {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
-        //Get JSON file and process it
+
         exHandler=new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -43,25 +43,26 @@ public class ViewStatusActivity extends AppCompatActivity {
                 String msgString = (String)msg.obj;
 
                 JSONObject obj = null; //cast to JSON
-                try {
-                    obj = new JSONObject("msgString");
-                    String temperature = obj.getJSONObject("message").getString("temp"); //get string associated with JSON
-                    String humidity = obj.getJSONObject("message").getString("humidity"); //get string associated with JSON
-                    String light = obj.getJSONObject("message").getString("light");
-                    String waterLevel = obj.getJSONObject("message").getString("waterLevel");
-                    String soilMoisture = obj.getJSONObject("message").getString("soil");
-
-                    tTemp.setText("" + temperature);
-                    tHumidity.setText("Recieved: " + humidity);
-                    tWaterLevel.setText("Recieved: " + light);
-                    tLight.setText("Recieved: " + waterLevel);
-                    tSoil.setText("Recieved: " + soilMoisture);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    obj = new JSONObject("msgString");
+//                    String temperature = obj.getJSONObject("message").getString("temp"); //get string associated with JSON
+//                    String humidity = obj.getJSONObject("message").getString("humidity"); //get string associated with JSON
+//                    String light = obj.getJSONObject("message").getString("light");
+//                    String waterLevel = obj.getJSONObject("message").getString("waterLevel");
+//                    String soilMoisture = obj.getJSONObject("message").getString("soil");
+//
+//                    tTemp.setText("" + temperature);
+//                    tHumidity.setText("Recieved: " + humidity);
+//                    tWaterLevel.setText("Recieved: " + light);
+//                    tLight.setText("Recieved: " + waterLevel);
+                    tSoil.setText("Recieved: " + msgString);
+                    System.out.println("~~~~~~~~~set text");
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
 
                 Log.d("Handler","Now in Handler");
-//                tLight.setText("Recieved: " + msgString);
+                tLight.setText("Recieved: " + msgString);
 
 
             }

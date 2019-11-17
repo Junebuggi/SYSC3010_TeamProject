@@ -20,7 +20,8 @@ public class NotesActivity extends AppCompatActivity {
     private EditText plantID, notes;
     private String str;
     private UDPSender udpSender;
-    private static final String ipAddress = "192.168.1.94";
+    private static final String ipAddress = "192.168.137.101";
+    private static final int PORT = 1001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,10 +53,10 @@ public class NotesActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                str = "1" + "" + plantID.getText().toString()+ " " + notes.getText().toString();
-                //System.out.println("~~~~~~~~\n\n\ni am here ");
-                        System.out.println(addNotes.toString());
-                udpSender.run(ipAddress, addNotes, 8008);
+                //str = "1" + "" + plantID.getText().toString()+ " " + notes.getText().toString();
+                //System.out.println("~~~~~~~~\n\n\ni am here " + PORT);
+                System.out.println(addNotes.toString());
+                udpSender.run(ipAddress, addNotes.toString(), PORT);
             }
         });
 

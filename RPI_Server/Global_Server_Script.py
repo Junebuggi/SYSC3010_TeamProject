@@ -62,7 +62,7 @@ def setPlantNurseryApp():
     global app_s_send, app_addrs_send
     
     app_s_send = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    app_addrs_send = ('172.17.63.157', 1000)
+    app_addrs_send = ('172.17.32.101', 8008)
     return
  
     

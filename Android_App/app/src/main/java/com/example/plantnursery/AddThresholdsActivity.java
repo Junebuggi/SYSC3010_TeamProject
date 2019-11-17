@@ -5,6 +5,8 @@ import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +17,9 @@ public class AddThresholdsActivity extends AppCompatActivity {
 
     private UDPSender udpSender;
     private Button setThreshold;
+    private EditText tempThreshold, lightThreshold, humidityThreshold, soilThreshold;
+    private CheckBox tLess, tGreater, lLess, lGreater, hLess, hGreater, sLess, sGreater;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,6 +34,19 @@ public class AddThresholdsActivity extends AppCompatActivity {
         //findViewById
         setThreshold = findViewById(R.id.button13);
 
+        tempThreshold = findViewById(R.id.editText6);
+        lightThreshold = findViewById(R.id.editText13);
+        humidityThreshold = findViewById(R.id.editText14);
+        soilThreshold = findViewById(R.id.editText10);
+
+        tLess = findViewById(R.id.checkBox);
+        tGreater = findViewById(R.id.checkBox2);
+        hLess = findViewById(R.id.checkBox6);
+        hGreater = findViewById(R.id.checkBox7);
+        lLess = findViewById(R.id.checkBox3);
+        lGreater = findViewById(R.id.checkBox4);
+        sLess = findViewById(R.id.checkBox5);
+        sGreater = findViewById(R.id.checkBox8);
 
 
         setThreshold.setOnClickListener(new Button.OnClickListener() {

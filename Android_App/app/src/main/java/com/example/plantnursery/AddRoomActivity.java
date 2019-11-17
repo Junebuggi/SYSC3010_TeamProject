@@ -19,6 +19,7 @@ public class AddRoomActivity extends AppCompatActivity {
     private String strToSend;
     private UDPSender udpSender;
     private String ipAddress = "192.168.1.94";
+    private static final int PORT = 1001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +53,8 @@ public class AddRoomActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                //strToSend = "7" + "" + roomID.getText().toString()+ " " + roomName.getText().toString();
-                udpSender.run(ipAddress, newRoom, 8008);
+                strToSend = "7" + "" + roomID.getText().toString()+ " " + roomName.getText().toString();
+                udpSender.run(ipAddress, newRoom.toString() , PORT);
             }
         });
 
