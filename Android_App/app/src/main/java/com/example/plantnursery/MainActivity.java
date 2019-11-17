@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.os.StrictMode;
 import android.util.Log;
@@ -18,6 +17,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+
 
    // viewable by everything in the package
     Button b_status, b_notification, b_data, b_notes, b_addPot, b_addRoom, b_thresholds;
@@ -108,14 +108,14 @@ public class MainActivity extends AppCompatActivity {
 
                 //send request to globalServer
                 //[‘opcode’: ‘5’, ‘sensorType’: comma separated string, ‘rowNumbers’: integer]
-//                JSONObject request = new JSONObject();
-//                try {
-//                    request.put("opcode", "5");
-//                    request.put("sensorType", "'light', 'temperature', 'humidity', 'soilMoisture' "); //did we decide no water supply?
-//                    request.put("rowNumbers", 1);
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
+                JSONObject request = new JSONObject();
+                try {
+                    request.put("opcode", "5");
+                    request.put("sensorType", "'light', 'temperature', 'humidity', 'soilMoisture' "); //did we decide no water supply?
+                    request.put("rowNumbers", 1);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
                 startActivity(new Intent(MainActivity.this, ViewStatusActivity.class));
             }

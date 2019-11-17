@@ -39,32 +39,37 @@ public class ViewStatusActivity extends AppCompatActivity {
         exHandler=new Handler() {
             @Override
             public void handleMessage(Message msg) {
+                System.out.println("~~~~~~~~`in exhandler");
                 super.handleMessage(msg);
-                String msgString = (String)msg.obj;
+                //String msgString = (String)msg.obj;
 
                 JSONObject obj = null; //cast to JSON
-//                try {
-//                    obj = new JSONObject("msgString");
-//                    String temperature = obj.getJSONObject("message").getString("temp"); //get string associated with JSON
-//                    String humidity = obj.getJSONObject("message").getString("humidity"); //get string associated with JSON
-//                    String light = obj.getJSONObject("message").getString("light");
-//                    String waterLevel = obj.getJSONObject("message").getString("waterLevel");
-//                    String soilMoisture = obj.getJSONObject("message").getString("soil");
-//
-//                    tTemp.setText("" + temperature);
-//                    tHumidity.setText("Recieved: " + humidity);
-//                    tWaterLevel.setText("Recieved: " + light);
-//                    tLight.setText("Recieved: " + waterLevel);
-                    tSoil.setText("Recieved: " + msgString);
+                try {
+                    obj = new JSONObject((String) msg.obj);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    System.out.println("~~~~~~~~~~json object created");
+                    //obj = new JSONObject(msgString);
+                    String temperature = obj.getString("temp"); //get string associated with JSON
+                    String humidity = obj.getString("humidity"); //get string associated with JSON
+                    String light = obj.getString("light");
+                    String waterLevel = obj.getString("waterLevel");
+                    String soilMoisture = obj.getString("soil");
+
+                    System.out.println("~~~~~~~setting text");
+                    tTemp.setText("" + temperature);
+                    tHumidity.setText("Recieved: " + humidity);
+                    tWaterLevel.setText("Recieved: " + light);
+                    tLight.setText("Recieved: " + waterLevel);
+                    tSoil.setText("Recieved: " + soilMoisture);
                     System.out.println("~~~~~~~~~set text");
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
                 Log.d("Handler","Now in Handler");
-                tLight.setText("Recieved: " + msgString);
-
-
             }
         };
 
