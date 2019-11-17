@@ -2,7 +2,7 @@ import serial
 import time
 import json
 
-ser = serial.Serial('/dev/tty.usbmodem144101', 9600, timeout = 0.1)
+ser = serial.Serial('/dev/tty.usbmodem146101', 9600, timeout = 0.1)
 
 ser.baudrate = 9600
 ser.flushInput()
@@ -39,10 +39,10 @@ while n < 20:
     # message = input("C,waterPumpDuration or E? ")
 
     n = n + 1
-    #print(n)
+    print(n)
     data = requestPotData()
     #data = json.loads(data)
-    #print(data['waterDistance'])
+    print(data)
     time.sleep(0.5)
     startWaterPump(3)
     #ser.write(("C,5\n").encode("utf-8"))  # start water pump message

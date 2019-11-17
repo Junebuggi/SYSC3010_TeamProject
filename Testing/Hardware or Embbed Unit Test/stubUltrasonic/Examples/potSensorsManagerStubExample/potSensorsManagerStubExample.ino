@@ -1,6 +1,7 @@
 #define serialPi Serial
+#include <stubUltrasonic.h> //Include the stub class
 
-#include <stubUltrasonic.h>
+stubUltrasonic stub; //Declare a stubUltrasonic object
 
 //Declare constant variables
 const int potID = 1; //Each pot has its own unique identifier hardcoded
@@ -41,8 +42,6 @@ void getWaterLevel(void);
 void getSoilMoisture(void);
 void waterPumpManager(void);
 void(* resetFunc) (void) = 0; 
-
-stubUltrasonic stub;
 
 
 void setup() {
@@ -114,7 +113,7 @@ void loop() {
     }
 
     else if (opcode = "C") { // The roomPi is requesting for the water pump to be turned on
-      initialDistance = stub.getStubWaterDistance(); //readUltraSonic(); // Find the initial water level
+      initialDistance = stub.getStubWaterDistance(); // read the current water distance of the stub object
       waterPumpDuration = serialPi.readStringUntil('\n').toInt();
       if (waterPumpDuration >= 1 && (initialDistance + 0.1 < criticalDistance) ) {
         static int timerCount = 0; //Initialize timerCount to 0 first time through
@@ -154,7 +153,7 @@ String getSensorData(void) {
 */
 void getWaterLevel(void) {
 
-  float distance = stub.getStubWaterDistance(); //readUltraSonic();
+  float distance = stub.getStubWaterDistance(); //read the current water distance of the stub object
   boolean waterDistanceStatus;
 
   packet += "\"waterDistance\": " + String(distance);
@@ -195,23 +194,6 @@ void getLDR(void) {
   packet += "\"ldrStatus\": " + String(ldrStatus) + ",";
 
 }
-/**
-   Polls the ultraSonic sensor
-
-   @return the waterDistance in cm, represented as a float
-*/
-float readUltraSonic(void) {
-  digitalWrite(trigPin, LOW);
-  delayMicroseconds(2);
-  // Sets the trigPin on HIGH state for 10 micro seconds
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);
-  // Reads the echoPin, returns the sound wave travel time in microseconds
-  long duration = pulseIn(echoPin, HIGH);
-  // Calculating the distance
-  return (duration * 0.034 / 2); //The distance to the water
-}
 
 /**
    Polls the soil moisture sensor to get the soilMoisture and adds this to the
@@ -239,9 +221,9 @@ void getSoilMoisture(void) {
    if there is not enough water in the tank.
 */
 ISR(TIMER1_COMPA_vect) {
-  //stub.setMockWaterDispensed();
+  stub.setStubWaterDispensed();//increment the water distance of the stub object
   timerCount++;
-  float distance = stub.getStubWaterDistance(); //readUltraSonic();
+  float distance = stub.getStubWaterDistance(); // read the current water distance of the stub object
   if (distance + 0.1 > criticalDistance) { //Turn the pump off if there isn't enough water
     digitalWrite(pumpPin, HIGH);
     TIMSK1 &= ~(1 << OCIE1A); //Disable the timer
