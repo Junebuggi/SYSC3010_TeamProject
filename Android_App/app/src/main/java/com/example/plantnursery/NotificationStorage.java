@@ -13,9 +13,9 @@ public class NotificationStorage {
     private Date date;
 //    private String time;
 
-    public NotificationStorage(String typeOfNotification, String msg, Date dateReceived) {
+    public NotificationStorage(String typeOfNotification, Date dateReceived) {
         type = typeOfNotification;
-        message = msg;
+        //message = msg;
         date = dateReceived;
 //        time = timeReceived;
     }
@@ -25,9 +25,9 @@ public class NotificationStorage {
         return type;
     }
 
-    public String getMessage() {
-        return message;
-    }
+//    public String getMessage() {
+//        return message;
+//    }
 
     public Date getDate() {
         return date;
@@ -38,7 +38,7 @@ public class NotificationStorage {
 //    }
 
     public String toString() {
-        return "" + this.getType() + this.getMessage() + this.getDate();
+        return "" + this.getType() + " " + this.getDate();
     }
 
 }

@@ -14,7 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ViewStatusActivity extends AppCompatActivity {
-    public static Handler exHandler;
+    public static Handler exHandler = null;
 
 
     @Override
@@ -52,7 +52,7 @@ public class ViewStatusActivity extends AppCompatActivity {
                 try {
                     System.out.println("~~~~~~~~~~json object created");
                     //obj = new JSONObject(msgString);
-                    String temperature = obj.getString("temp"); //get string associated with JSON
+                    String temperature = obj.getString("temperature"); //get string associated with JSON
                     String humidity = obj.getString("humidity"); //get string associated with JSON
                     String light = obj.getString("light");
                     String waterLevel = obj.getString("waterLevel");
@@ -60,10 +60,10 @@ public class ViewStatusActivity extends AppCompatActivity {
 
                     System.out.println("~~~~~~~setting text");
                     tTemp.setText("" + temperature);
-                    tHumidity.setText("Recieved: " + humidity);
-                    tWaterLevel.setText("Recieved: " + light);
-                    tLight.setText("Recieved: " + waterLevel);
-                    tSoil.setText("Recieved: " + soilMoisture);
+                    tHumidity.setText(humidity);
+                    tWaterLevel.setText(light);
+                    tLight.setText(waterLevel);
+                    tSoil.setText(soilMoisture);
                     System.out.println("~~~~~~~~~set text");
                 } catch (JSONException e) {
                     e.printStackTrace();

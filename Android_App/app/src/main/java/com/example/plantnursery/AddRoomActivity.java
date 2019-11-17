@@ -14,12 +14,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class AddRoomActivity extends AppCompatActivity {
-    private EditText roomID, roomName;
+    private String ipAddress = "192.168.1.94";
+    private static final int PORT = 1000;
+    private EditText roomID, ownerID;
     private Button sendRoom;
     private String strToSend;
     private UDPSender udpSender;
-    private String ipAddress = "192.168.1.94";
-    private static final int PORT = 1001;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +35,7 @@ public class AddRoomActivity extends AppCompatActivity {
 
         sendRoom = findViewById(R.id.button4);
         roomID = findViewById(R.id.editText3);
-        roomName = findViewById(R.id.editText4);
+        ownerID = findViewById(R.id.editText4);
 
 
         sendRoom.setOnClickListener(new Button.OnClickListener() {
@@ -47,13 +48,12 @@ public class AddRoomActivity extends AppCompatActivity {
                 try {
                     newRoom.put("opcode", "7");
                     newRoom.put("roomID", roomID.getText().toString());
-                    newRoom.put("roomName", roomName.getText().toString());
+                    newRoom.put("ownerID", ownerID.getText().toString());
 
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
-                strToSend = "7" + "" + roomID.getText().toString()+ " " + roomName.getText().toString();
                 udpSender.run(ipAddress, newRoom.toString() , PORT);
             }
         });

@@ -13,22 +13,22 @@ import java.util.ArrayList;
  * Created by danielmalone on 4/9/17.
  */
 
-public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
+public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
 
     private ArrayList<String> mDataset;
 
-    public MainAdapter(ArrayList<String> dataset) {
+    public NotificationAdapter(ArrayList<String> dataset) {
         mDataset = dataset;
     }
 
     @Override
-    public MainAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public NotificationAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row, parent, false);
         return new ViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(MainAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(NotificationAdapter.ViewHolder holder, int position) {
         holder.mTitle.setText(mDataset.get(position));
     }
 

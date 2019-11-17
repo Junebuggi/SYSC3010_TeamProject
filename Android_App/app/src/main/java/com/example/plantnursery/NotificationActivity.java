@@ -20,7 +20,7 @@ public class NotificationActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.Adapter mAdapter;
-    //static ArrayList<String> notificationHistory;
+    //static ArrayList<String> notificationHistory = new ArrayList<>();;
     //private ArrayList<String> notificationHistory;
 
     @SuppressLint("HandlerLeak")
@@ -35,7 +35,7 @@ public class NotificationActivity extends AppCompatActivity {
         //Recycler View looks
         mLayoutManager = new LinearLayoutManager(this);
         //mRecyclerView.setHasFixedSize(false);
-        mAdapter = new MainAdapter(MainActivity.notificationHistory);
+        mAdapter = new NotificationAdapter(MainActivity.notificationHistory);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
 

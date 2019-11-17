@@ -18,10 +18,11 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-
-   // viewable by everything in the package
+    private String ipAddress = "192.168.1.94";
+    private static final int PORT = 1000;
     Button b_status, b_notification, b_data, b_notes, b_addPot, b_addRoom, b_thresholds;
     static ArrayList<String> notificationHistory= new ArrayList<>(); //keep track of notifications
+    private UDPSender udpSender;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +33,18 @@ public class MainActivity extends AppCompatActivity {
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
+        }
+
+        //this is here for notifications purposes
+        try{
+            udpSender = new UDPSender();
+            UDPReceiver udpReceiver = new UDPReceiver();
+            udpReceiver.start();
+            Log.d("User","Thread start...");
+        }catch(Exception e)
+        {
+            String str = e.toString();
+            Log.e("Error by User", str);
         }
 
         //receive text
@@ -111,8 +124,9 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject request = new JSONObject();
                 try {
                     request.put("opcode", "5");
-                    request.put("sensorType", "'light', 'temperature', 'humidity', 'soilMoisture' "); //did we decide no water supply?
+                    request.put("sensorType", "light, temperature, humidity, soilMoisture"); //did we decide no water supply?
                     request.put("rowNumbers", 1);
+                    udpSender.run(ipAddress, request.toString() , PORT);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -131,16 +145,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        //this is here for notifications purposes
-        try{
-            //UDPSender udpSender = new UDPSender();
-            UDPReceiver udpReceiver = new UDPReceiver();
-            udpReceiver.start();
-            Log.d("User","Thread start...");
-        }catch(Exception e)
-        {
-            String str = e.toString();
-            Log.e("Error by User", str);
-        }
+
     }
 }

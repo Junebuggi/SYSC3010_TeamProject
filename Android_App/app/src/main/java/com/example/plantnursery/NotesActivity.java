@@ -53,9 +53,7 @@ public class NotesActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                //str = "1" + "" + plantID.getText().toString()+ " " + notes.getText().toString();
-                //System.out.println("~~~~~~~~\n\n\ni am here " + PORT);
-                System.out.println(addNotes.toString());
+//                System.out.println(addNotes.toString());
                 udpSender.run(ipAddress, addNotes.toString(), PORT);
             }
         });

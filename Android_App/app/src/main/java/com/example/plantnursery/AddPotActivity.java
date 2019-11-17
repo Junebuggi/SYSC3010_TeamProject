@@ -16,15 +16,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class AddPotActivity extends AppCompatActivity {
-//private Button addPot;
 
-    public static Handler exHandler;
+    private static final int PORT = 1000;
+    private String ipAddress = "169.254.171.154";
     private Button addPot;
     private  EditText piID, arduinoID, plantName, waterAmount, rmName;
     private UDPSender udpsender;
-    private String ipAddress = "169.254.171.154";
     private String str;
-    private static final int PORT = 1001;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,7 +57,7 @@ public class AddPotActivity extends AppCompatActivity {
                 try {
                     newPot.put("opcode", "2");
                     newPot.put("roomID", piID.getText().toString());
-                    newPot.put("roomName", rmName.getText().toString()); //getting rid of rmName?
+                    newPot.put("ownerID", rmName.getText().toString()); //getting rid of rmName?
                     newPot.put("potID",arduinoID.getText().toString());
                     newPot.put("plantName", plantName.getText().toString()); //getting rid of plant name?
                     newPot.put("owner", waterAmount.getText().toString()); //r we adding ater amount or just owner?

@@ -155,7 +155,8 @@
         android:layout_marginLeft="24dp"
         android:layout_marginEnd="24dp"
         android:layout_marginRight="24dp"
-        android:text="Room Name"
+        android:text="Owner ID"
+        android:textSize="18sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/editText15"
         app:layout_constraintEnd_toStartOf="@+id/editText15"
         app:layout_constraintStart_toStartOf="parent" />

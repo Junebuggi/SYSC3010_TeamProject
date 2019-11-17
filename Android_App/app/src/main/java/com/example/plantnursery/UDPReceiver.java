@@ -8,11 +8,13 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.util.Date;
 
 
 class UDPReceiver extends Thread{
     private DatagramSocket server = null;
     private static final int PORT = 8008;
+    private int notificationCount = 0;
 
     public UDPReceiver() throws IOException {
         server = new DatagramSocket(PORT);
@@ -20,15 +22,13 @@ class UDPReceiver extends Thread{
     }
     public void run(){
 
-        try {
-            //ensures handler is initialized first before thread is executed
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            //ensures handler is initialized first before thread is executed
+//            Thread.sleep(100);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         byte[] byte1024 = new byte[1024];
-        //Message msg = new Message();
-        //Bundle data = new Bundle();
         DatagramPacket dPacket = new DatagramPacket(byte1024, 100);
         String txt;
         try{
@@ -38,23 +38,75 @@ class UDPReceiver extends Thread{
                 while(true)
                 {
                     txt = new String(byte1024, 0, dPacket.getLength());
-                    System.out.println("this is the string" + txt);
+                    System.out.println("~~~~~~~~this is the string" + txt);
+                    //MainActivity.notificationHistory.add(notificationCount++ +"Threshold" + ": " + "light threshold is met" + " " + new Date());
+                    //MainActivity.notificationHistory.add(txt);
                     //ViewStatusActivity.exHandler.sendMessage(ViewStatusActivity.exHandler.obtainMessage(1,txt));
 
                     JSONObject obj = new JSONObject(txt);
                     String opcode = obj.getString("opcode");
                     switch (opcode){
                         case "D":
+                            //send an ACK here
+                            //{"opcode" : "D", "sensorArray" : "0,0,0,0,0,0,1,0,0,0,0"}
                             //process the array, add the data
-                            String errors = obj.getString("sensorArray");
-                            MainActivity.notificationHistory.add(txt);
+                            String sensorArray = obj.getString("sensorArray");
+                            String[] values = sensorArray.split(",");
+                            Integer[] sensors = new Integer[values.length];
+                            //create list of ints
+                            for(int i = 0; i < values.length; i++) {
+                                sensors[i] = Integer.parseInt(values[i].trim());
+                            }
+
+                            if (sensors[0] == 1) {
+                                MainActivity.notificationHistory.add(0, "#" + notificationCount++ +" Threshold" + ": " + "Light threshold is met" + " " + new Date());
+                            }
+                            if (sensors[1] == 1) {
+                                MainActivity.notificationHistory.add(0, "#" + notificationCount++ +" Threshold" + ": " + "Humidity threshold is met" + " " + new Date());
+                            }
+                            if (sensors[2] == 1) {
+                                MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" Threshold" + ": " + "Temperature threshold is met" + " " + new Date());
+                            }
+                            if (sensors[3] == 1) {
+                                MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" Threshold" + ": " + "Soil moisture threshold is met" + " " + new Date());
+                            }
+                            if (sensors[4] == 1) {
+                                MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" Threshold" + ": " + "Water supply is low, please refill" + " " + new Date());
+                            }
+                            if (sensors[5] == 1) {
+                                MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" ERROR" + ": " + "Light sensor error" + " " + new Date());
+                            }
+                            if (sensors[6] == 1) {
+                                MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" ERROR" + ": " + "Humidity sensor error" + " " + new Date());
+                            }
+                            if (sensors[7] == 1) {
+                                MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" ERROR" + ": " + "Soil Moisture sensor error" + " " + new Date());
+                            }
+                            if (sensors[8] == 1) {
+                                MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" ERROR" + ": " + "Ultrasonic sensor error" + " " + new Date());
+                            }
+                            if (sensors[9] == 1) {
+                                MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" ERROR" + ": " + "Water pump wrror" + " " + new Date());
+                            }
+
                         case "0":
                             //ACK
                         case "6":
                             //stats are sent
                             //ViewDataActivity.exHandler.sendMessage(ViewDataActivity.exHandler.obtainMessage(1, txt));
                         case "E":
-                            ViewStatusActivity.exHandler.sendMessage(ViewStatusActivity.exHandler.obtainMessage(2, txt));
+
+                            try {
+                                //ensures handler is initialized first before thread is executed
+                                Thread.sleep(1000);
+                                ViewStatusActivity.exHandler.sendMessage(ViewStatusActivity.exHandler.obtainMessage(1, txt));
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            } catch (NullPointerException nullPointerException){
+                                System.out.println("Catch the Nullpointer exception");
+                            }
+
+                            //ViewStatusActivity.exHandler.sendMessage(ViewStatusActivity.exHandler.obtainMessage(1, txt));
                     }
 
 
@@ -64,10 +116,10 @@ class UDPReceiver extends Thread{
                 //CloseSocket(client);
             }
         }
-        catch(IOException e)
-        {} catch (JSONException e) {
-            e.printStackTrace();
-        }
+        catch(IOException e) {}
+      catch (JSONException e) {
+         e.printStackTrace();
+      }
     }
 
     private void CloseSocket(DatagramSocket socket) throws IOException{
