@@ -18,8 +18,9 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    private String ipAddress = "192.168.1.94";
     private static final int PORT = 1000;
+    private static final String ipAddress = "192.168.137.101";
+
     Button b_status, b_notification, b_data, b_notes, b_addPot, b_addRoom, b_thresholds;
     static ArrayList<String> notificationHistory= new ArrayList<>(); //keep track of notifications
     private UDPSender udpSender;
@@ -125,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     request.put("opcode", "5");
                     request.put("sensorType", "light, temperature, humidity, soilMoisture"); //did we decide no water supply?
-                    request.put("rowNumbers", 1);
+                    request.put("rowNumbers", 0);
                     udpSender.run(ipAddress, request.toString() , PORT);
                 } catch (JSONException e) {
                     e.printStackTrace();

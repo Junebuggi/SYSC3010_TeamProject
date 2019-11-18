@@ -5,7 +5,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.StrictMode;
 import android.util.Log;
-import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,66 +12,72 @@ import androidx.appcompat.app.AppCompatActivity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * This class is used to display the current soil moisture, temperature,
+ * humidity, light, and water level of a pot in the Plant Nursery
+ */
 public class ViewStatusActivity extends AppCompatActivity {
+
+    /**
+     * these variables correspond with the output views used to display the sensory data
+     */
+    private TextView textTemp, textHumidity, textLight, textWaterLevel, textSoil;
+
+    /**
+     * initialize handler that will be used when app receives the data from UDPReceiver.java
+     */
     public static Handler exHandler = null;
 
 
     @Override
+    /**
+     * method invoked when ViewStatusActivity is created
+     */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //set the view of the app to the activity_viewstatus.xml layout in resources
         setContentView(R.layout.activity_viewstatus);
 
-        //initialize textViews
-        final TextView tTemp = findViewById(R.id.textView11);
-        final TextView tHumidity = findViewById(R.id.textView10);
-        final TextView tLight = findViewById(R.id.textView13);
-        final TextView tWaterLevel = findViewById(R.id.textView9);
-        final TextView tSoil = findViewById(R.id.textView12);
-        TextView tIPAddress = findViewById(R.id.textView4);
+        //find the textviews that are of interest in the layout
+        textTemp = findViewById(R.id.textView11);
+        textHumidity = findViewById(R.id.textView10);
+        textLight = findViewById(R.id.textView13);
+        textWaterLevel = findViewById(R.id.textView9);
+        textSoil = findViewById(R.id.textView12);
 
-        //compatibility
+
+        //checks for compatibility
+        //sets policy for UDPReceiver.java thread
         if (android.os.Build.VERSION.SDK_INT > 9) {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                    .permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
 
-        exHandler=new Handler() {
+        //Handles the JSON received from UDPReceiver.java so it
+        // may be displayed correctly on the layout
+        exHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
-                System.out.println("~~~~~~~~`in exhandler");
                 super.handleMessage(msg);
-                //String msgString = (String)msg.obj;
 
-                JSONObject obj = null; //cast to JSON
+                JSONObject obj = null;
                 try {
+                    //cast string to JSON
                     obj = new JSONObject((String) msg.obj);
+
+                    //interpret JSON and set text of textviews to corresponding values
+                    textTemp.setText(obj.getString("roomTemperature"));
+                    textHumidity.setText(obj.getString("roomHumidity"));
+                    textWaterLevel.setText(obj.getString("waterDistance"));
+                    textLight.setText(obj.getString("light"));
+                    textSoil.setText(obj.getString("soilMoisture"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                try {
-                    System.out.println("~~~~~~~~~~json object created");
-                    //obj = new JSONObject(msgString);
-                    String temperature = obj.getString("temperature"); //get string associated with JSON
-                    String humidity = obj.getString("humidity"); //get string associated with JSON
-                    String light = obj.getString("light");
-                    String waterLevel = obj.getString("waterLevel");
-                    String soilMoisture = obj.getString("soil");
-
-                    System.out.println("~~~~~~~setting text");
-                    tTemp.setText("" + temperature);
-                    tHumidity.setText(humidity);
-                    tWaterLevel.setText(light);
-                    tLight.setText(waterLevel);
-                    tSoil.setText(soilMoisture);
-                    System.out.println("~~~~~~~~~set text");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                Log.d("Handler","Now in Handler");
+                Log.d("Handler", "Now in Handler");
             }
         };
-
     }
-
 }

@@ -18,7 +18,8 @@ import org.json.JSONObject;
 public class AddPotActivity extends AppCompatActivity {
 
     private static final int PORT = 1000;
-    private String ipAddress = "169.254.171.154";
+    private static final String ipAddress = "192.168.137.101";
+
     private Button addPot;
     private  EditText piID, arduinoID, plantName, waterAmount, rmName;
     private UDPSender udpsender;
@@ -38,7 +39,6 @@ public class AddPotActivity extends AppCompatActivity {
 
         piID = (EditText)findViewById(R.id.editText7);
         arduinoID = (EditText)findViewById(R.id.editText8);
-        plantName = (EditText)findViewById(R.id.editText9);
         waterAmount = (EditText)findViewById(R.id.editText5);
         addPot = (Button)findViewById(R.id.button8);
         rmName = findViewById(R.id.editText15);
@@ -59,13 +59,12 @@ public class AddPotActivity extends AppCompatActivity {
                     newPot.put("roomID", piID.getText().toString());
                     newPot.put("ownerID", rmName.getText().toString()); //getting rid of rmName?
                     newPot.put("potID",arduinoID.getText().toString());
-                    newPot.put("plantName", plantName.getText().toString()); //getting rid of plant name?
                     newPot.put("owner", waterAmount.getText().toString()); //r we adding ater amount or just owner?
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
-                str = "" + piID.getText().toString()+ arduinoID.getText().toString() + plantName.getText().toString() + waterAmount.getText().toString();
+//                str = "" + piID.getText().toString()+ arduinoID.getText().toString() + plantName.getText().toString() + waterAmount.getText().toString();
                 udpsender.run(ipAddress, newPot.toString(), PORT);
             }
         });

@@ -17,17 +17,6 @@
         app:layout_constraintBaseline_toBaselineOf="@+id/editText11"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <TextView
-        android:id="@+id/textView20"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:text="Room ID"
-        android:textSize="18sp"
-        app:layout_constraintBaseline_toBaselineOf="@+id/editText12"
-        app:layout_constraintStart_toStartOf="parent" />
-
     <EditText
         android:id="@+id/editText11"
         android:layout_width="wrap_content"

@@ -16,12 +16,14 @@ import org.json.JSONObject;
 
 public class NotesActivity extends AppCompatActivity {
 
+    private static final int PORT = 1000;
+    private static final String ipAddress = "192.168.137.101";
+
     private ImageButton sendNotes;
     private EditText plantID, notes;
     private String str;
     private UDPSender udpSender;
-    private static final String ipAddress = "192.168.137.101";
-    private static final int PORT = 1001;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
