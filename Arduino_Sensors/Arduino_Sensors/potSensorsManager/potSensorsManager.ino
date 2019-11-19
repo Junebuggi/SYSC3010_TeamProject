@@ -2,11 +2,16 @@
   SYSC 3010 Team Project: The Plant Nursery
   Team W4
   Name: potSensorsManager
-  Purpose: A driver to test the hardware of the
-           ultrasonic sensor
+  Purpose: The arduino monitors a plant and its pot conditions and
+           takes orders from the roomPi through a serial channel. 
+           Whenever the roomPi asks for the potData, the arduino 
+           polls all the sensors and reports back to the roomPi. If 
+           the roomPi asks for the water pump to be turned on, then
+           the arduino turns it on for the specified time and turns 
+           it off using a timer.
 
   @author Emma Boulay
-  @version 1.7 15/11/19
+  @version 1.8 15/11/19
 */
 
 #define serialPi Serial
@@ -40,7 +45,7 @@ boolean waterPumpStatus = true; // Set to false in timer ISR if no water was dis
 int timerCount = 0;
 int pumpIterations = 0; 
 
-String packet; //Declared globally so the inner functions can access it
+String packet; //The packet to be sent to the roomPi
 
 //Function prototypes
 String getSensorData(void);
@@ -51,7 +56,7 @@ void getSoilMoisture(void);
 void waterPumpManager(void);
 
 /*
- * Starts the sketch from the beginning and declares the reset 
+ * Starts the sketch from the beginning by declaring the reset 
  * function to be at address 0
  */
 void(* resetFunc) (void) = 0;
@@ -72,7 +77,6 @@ void setup() {
   pinMode(echoPin, INPUT); // Sets the echoPin as an Input
   digitalWrite(pumpPin, HIGH); //Initially turned off, pump is active low
   pinMode(pumpPin, OUTPUT); // Must be declared after the above line so relay doesn't turn on at reset
-
 
   // Initialize timer1 for the water pump
   cli(); // disable global interrupts
