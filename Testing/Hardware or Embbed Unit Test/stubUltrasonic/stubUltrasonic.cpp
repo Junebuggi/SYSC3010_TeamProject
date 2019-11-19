@@ -7,6 +7,7 @@
 
 stubUltrasonic::stubUltrasonic(){
     currentIndex = 0;
+    n = sizeof(waterDistances)/sizeof(arr[waterDistances]);
 }
 
 float stubUltrasonic::getStubWaterDistance(){

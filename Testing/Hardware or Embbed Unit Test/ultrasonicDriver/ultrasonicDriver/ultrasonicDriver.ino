@@ -42,7 +42,7 @@ void setup() {
   Serial.begin(9600); //begin serial on port 9600
   
   //The ultra sonic sensor has a range of 2 to 400cm
-  int distancesToTest[] = {400, 350, 300, 250, 200, 150, 100, 50, 2};
+  int distancesToTest[] = {150, 130, 110, 90, 70, 50, 30, 10, 2};
 
   for(int i = 0; i < 9; i++){
     runTest(nTrials, distancesToTest[i]);
@@ -117,6 +117,7 @@ float runTrial(int n){
   float distanceArray[n];
   
   for(int i = 0; i < n; i++){
+    delayMicroseconds(10);
     float distance = readUltraSonic();
     Serial.println("Trial " + String(i+1) + ": " + String(distance) + "cm"); 
     distanceArray[i] = distance; 
