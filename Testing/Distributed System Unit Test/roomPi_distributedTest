@@ -1,0 +1,11 @@
+import serial
+
+ser = serial.Serial("/dev/ttyusbmodem144010")
+
+print("=====================Distributed System Testing=====================\n\n")
+print("***************************************************************************************\n")
+print("=====================Test 1=====================")
+print("Description: roomPi requests potData from Arduino over serial")
+
+
+
