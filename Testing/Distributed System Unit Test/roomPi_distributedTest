@@ -1,11 +1,121 @@
 import serial
+import socket
+import time
+import random
+import json
 
-ser = serial.Serial("/dev/ttyusbmodem144010")
+trialN = 0
 
-print("=====================Distributed System Testing=====================\n\n")
+
+global s_receive, s_send, server_addrs_receive, room_addrs_send
+#Intializing and setting sockets and ports
+s_receive = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+port = 1000
+server_addrs_receive = ('', port)
+s_receive.bind(server_addrs_receive)
+
+s_send = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+room_addrs_send = ('127.0.0.1', 1010)
+    
+def receiver():
+    global data, address
+    data, address = s_receive.recvfrom(port)
+        
+    return data.decode()
+
+def sender(jsonstr, addrs_send):
+    print("SENDING: " + jsonstr + ", TO: " + str(addrs_send))
+    s_send.sendto(jsonstr, addrs_send)
+    return
+
+def sendSocketAck(address):
+    sender('{"opcode" : "0"}', address)
+    return
+
+def startWaterPump(startPump):
+    global room_addrs_send
+    sender(startPump, room_addrs_send)
+    testReceiveAck(receiver())
+    return
+
+def testReceiveAck(buf):
+    if(buf == "ack"):
+        print("RECEIVED: " + buf)
+        return
+    else:
+        #notifyUser("00000000001")
+        return
+
+ser = serial.Serial('/dev/pts/4', timeout = 0.01)
+
+print("\t=====================Distributed System Testing=====================\n")
 print("***************************************************************************************\n")
-print("=====================Test 1=====================")
+print("\t=====================Test 1=====================")
 print("Description: roomPi requests potData from Arduino over serial")
 
+def assertJSON(expectedJSON, actualJSON, n):
+    exp = json.loads(expectedJSON)
+    act = json.loads(actualJSON)
+    
+    assert act.get('opcode') == "9"
+    assert act.get('roomID') == 0
+    assert act.get('potID') == 1
+    assert act.get('temperature') == 55
+    assert act.get('humidity') == 65
+    assert act.get('DHT22Status') == 1
+    assert act.get('waterDistance') == exp.get('waterDistance')
+    assert act.get('waterDistanceStatus') == 1
+    assert act.get('light') == exp.get('light')
+    assert act.get('ldrStatus') == 1
+    assert act.get('soilMoisture') == exp.get('soilMoisture')
+    assert act.get('soilMoistureStatus') == 1
+    assert act.get('waterPumpStatus') == 1
+    
+
+def assertPumpMessageRec(expected, actual, n):
+    assert dataToArduino[0] == expected[0]
+    assert dataToArduino[1] == expected[1]
+    return "Trial " + str(n) + " passed!"
+
+n = 0
+nSendPotData = 5
+while n < nSendPotData:
+    data = ser.readline()
+    
+    if(len(data) > 0):
+        dataRoomPi = data.decode().strip('\r\n')
+        if dataRoomPi == "E,":
+            messageFromArduino = '{"opcode": 8, "potID": 1,"waterPumpStatus": 1,"waterDistance":' + str(random.randint(1,100)) + ',"waterDistanceStatus": 1,"light":' + str(random.randint(1,100)) + ',"ldrStatus": 1,"soilMoisture":' + str(random.randint(1,100)) + ',"soilMoistureStatus": 1}'
+            ser.write(messageFromArduino.encode("utf-8"))
+            dataPi = receiver()
+            sendSocketAck(room_addrs_send)
+            n = n + 1
+            sucssesMessage = assertJSON(messageFromArduino, dataPi, n)
+            print(sucssesMessage)
+            print(dataPi)
+            #print('Received from RoomPi: ' + dataPi)
+
+print("Test 1 PASSES!")
+
+print("\t=====================Test 2=====================")
+print("Description: globalServer makes a request to the roomPi to turn on\nthe water pump and the roomPi passes the request to the arduino")
+ser.flushInput()
+nStartWaterPump = 5
+n = 0
+while n < nStartWaterPump:
+    pumpDuration = str(random.randint(1,10))
+    startPumpStr = '{"opcode" : "4", "pumpDuration" : "' + pumpDuration + '"}'
+    startWaterPump(startPumpStr) #sends to room pi receives ack
+    data = ser.readline()
+    
+    if(len(data) > 0):
+        n = n +1
+        dataToArduino = data.decode().strip('\r\n')
+        dataToArduino = dataToArduino.split(",")
+        succssesMessage = assertPumpMessageRec(["C", pumpDuration], dataToArduino, n)
+        print(succssesMessage)
+
+print("Test 2 PASSES!")
+    
 
 
