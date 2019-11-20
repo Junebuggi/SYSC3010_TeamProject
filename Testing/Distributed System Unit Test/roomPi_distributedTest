@@ -183,7 +183,7 @@ while n < nStartWaterPump:
 print("Test 4 PASSED!")
 
 print("\t=====================Test 5=====================")
-print("Description: Arduino's errors has sensors and the roomPi forwards this to the globalServer")
+print("Description: Arduino's sensors has errors and the roomPi forwards this to the globalServer")
 ser.flushInput()
 time.sleep(1)
 nErrorDetectedArduino = 5
