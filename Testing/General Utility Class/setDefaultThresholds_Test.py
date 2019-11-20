@@ -364,11 +364,7 @@ def setDefaultThresholds_SetDefaultRoomTemperatureTest():
           
           
 setDefaultThresholds_noPotIDParameterTest()
-input("")
 setDefaultThresholds_SetDefaultLightTest()
-input("")
 setDefaultThresholds_SetDefaultSoilMoistureTest()
-input("")
 setDefaultThresholds_SetDefaultRoomHumidityTest()
-input("")
 setDefaultThresholds_SetDefaultRoomTemperatureTest()
