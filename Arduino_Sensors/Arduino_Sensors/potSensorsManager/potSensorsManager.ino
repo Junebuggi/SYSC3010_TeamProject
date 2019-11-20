@@ -1,6 +1,20 @@
-#define serialPi Serial
+/**
+  SYSC 3010 Team Project: The Plant Nursery
+  Team W4
+  Name: potSensorsManager
+  Purpose: The arduino monitors a plant and its pot conditions and
+           takes orders from the roomPi through a serial channel. 
+           Whenever the roomPi asks for the potData, the arduino 
+           polls all the sensors and reports back to the roomPi. If 
+           the roomPi asks for the water pump to be turned on, then
+           the arduino turns it on for the specified time and turns 
+           it off using a timer.
 
-#include <stubUltrasonic.h>
+  @author Emma Boulay
+  @version 1.8 15/11/19
+*/
+
+#define serialPi Serial
 
 //Declare constant variables
 const int potID = 1; //Each pot has its own unique identifier hardcoded
@@ -27,11 +41,11 @@ const int ackLED = 5;
 // Define global variables for waterPump
 float initialDistance; // The initial waterDistance when the pump begins to run
 int waterPumpDuration; // How long in seconds the pump is set to run for
-boolean waterPumpStatus = true; // Set to false in timer ISR no water was dispensed, otherwise true
+boolean waterPumpStatus = true; // Set to false in timer ISR if no water was dispensed, otherwise true
 int timerCount = 0;
 int pumpIterations = 0; 
 
-String packet; //Declared globally so the inner functions can access it
+String packet; //The packet to be sent to the roomPi
 
 //Function prototypes
 String getSensorData(void);
@@ -40,13 +54,14 @@ void getLDR(void);
 void getWaterLevel(void);
 void getSoilMoisture(void);
 void waterPumpManager(void);
-void(* resetFunc) (void) = 0; 
 
-stubUltrasonic stub;
-
+/*
+ * Starts the sketch from the beginning by declaring the reset 
+ * function to be at address 0
+ */
+void(* resetFunc) (void) = 0;
 
 void setup() {
-
 
   //Set the modes for the debuggin LEDs as outputs
   pinMode(ldrLED, OUTPUT);
@@ -63,7 +78,6 @@ void setup() {
   digitalWrite(pumpPin, HIGH); //Initially turned off, pump is active low
   pinMode(pumpPin, OUTPUT); // Must be declared after the above line so relay doesn't turn on at reset
 
-
   // Initialize timer1 for the water pump
   cli(); // disable global interrupts
   TCCR1A = 0; // set entire register to 0
@@ -76,8 +90,6 @@ void setup() {
 
   serialPi.begin(9600); //begin serial on port 9600
 
-
-  
 }
 
 /*
@@ -87,7 +99,6 @@ void setup() {
    specified time.
 */
 void loop() {
-  
   String opcode = "";
   boolean flag = false;
   if (serialPi.available() > 0) {
@@ -114,7 +125,7 @@ void loop() {
     }
 
     else if (opcode = "C") { // The roomPi is requesting for the water pump to be turned on
-      initialDistance = stub.getStubWaterDistance(); //readUltraSonic(); // Find the initial water level
+      initialDistance = readUltraSonic(); // Find the initial water level
       waterPumpDuration = serialPi.readStringUntil('\n').toInt();
       if (waterPumpDuration >= 1 && (initialDistance + 0.1 < criticalDistance) ) {
         static int timerCount = 0; //Initialize timerCount to 0 first time through
@@ -154,7 +165,7 @@ String getSensorData(void) {
 */
 void getWaterLevel(void) {
 
-  float distance = stub.getStubWaterDistance(); //readUltraSonic();
+  float distance = readUltraSonic();
   boolean waterDistanceStatus;
 
   packet += "\"waterDistance\": " + String(distance);
@@ -239,9 +250,8 @@ void getSoilMoisture(void) {
    if there is not enough water in the tank.
 */
 ISR(TIMER1_COMPA_vect) {
-  //stub.setMockWaterDispensed();
   timerCount++;
-  float distance = stub.getStubWaterDistance(); //readUltraSonic();
+  float distance = readUltraSonic();
   if (distance + 0.1 > criticalDistance) { //Turn the pump off if there isn't enough water
     digitalWrite(pumpPin, HIGH);
     TIMSK1 &= ~(1 << OCIE1A); //Disable the timer
