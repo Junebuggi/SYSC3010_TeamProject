@@ -306,7 +306,7 @@ def setDefaultThresholds_SetDefaultRoomTemperatureTest():
     "roomHumidityLessGreaterThan" : "-",
     "roomTemperatureThreshold" : "-",
     "roomTemperatureLessGreaterThan" : "-", "tdate" : tdate, "ttime" : ttime}
-    expectedOuput = ["70", ">"]
+    expectedOuput = ["80", ">"]
 
     output = setDefaultThresholds(testInput1, testInput2)
     output = [str(output.get("roomTemperatureThreshold")), str(output.get("roomTemperatureLessGreaterThan")), str(output.get("SQLRoomTemperature"))]
