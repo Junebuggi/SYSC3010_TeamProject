@@ -228,17 +228,10 @@ def checkUserThresholds_SoilMoistureLowTest():
     return
 
 checkUserThresholds_LightHighTest()
-input("")
 checkUserThresholds_LightLowTest()
-input("")
 checkUserThresholds_RoomHumidityHighTest()
-input("")
 checkUserThresholds_RoomHumidityLowTest()
-input("")
 checkUserThresholds_RoomTemperatureHighTest()
-input("")
 checkUserThresholds_RoomTemperatureLowTest()
-input("")
 checkUserThresholds_SoilMoistureHighTest()
-input("")
 checkUserThresholds_SoilMoistureLowTest()
