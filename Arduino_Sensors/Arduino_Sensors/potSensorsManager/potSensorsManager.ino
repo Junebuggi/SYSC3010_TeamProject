@@ -29,7 +29,7 @@ const int ldrPin = A0;
 const int trigPin = 10;
 const int echoPin = 9;
 const int soilMoisturePin = A2;
-const int pumpPin = 2;
+const int pumpPin = 7;
 
 //Declare debugging LED pins
 const int ldrLED = 13;
@@ -148,7 +148,7 @@ void loop() {
 */
 String getSensorData(void) {
 
-  packet = "{\"opcode\": 8, \"potID\": " + String(potID);
+  packet = "{\"opcode\": \"8\", \"potID\": " + String(potID);
   packet += ",";
   packet += "\"waterPumpStatus\": " + String(waterPumpStatus) + ",";
   getWaterLevel();
@@ -258,17 +258,19 @@ ISR(TIMER1_COMPA_vect) {
     timerCount = 0; //Reset timerCount for the next time
     return;
   }
+  pumpIterations++;
   if (timerCount >= waterPumpDuration) {
     digitalWrite(pumpPin, HIGH);
     TIMSK1 &= ~(1 << OCIE1A); //Disable the timer
     timerCount = 0; //Reses timerCount for the next time
-    pumpIterations++;
+    
     if ( (distance - initialDistance) >= 0.5) { //acceptable error of 0.5cm
       // The water levels did not decrease when the pump was suppose to be on
       waterPumpStatus = false;
     }
-    if (pumpIterations == 5) { // The relay can cause problems with normal arduino processes 
-      resetFunc();             // after multiple runs. To prevent this the arduino resets after
-    }                          // 5 successful pump runs.
   }
+    
+ if (pumpIterations == 5) { // The relay can cause problems with normal arduino processes 
+      resetFunc();             // after multiple runs. To prevent this the arduino resets after
+  }                          // 3 successful pump runs.
 }

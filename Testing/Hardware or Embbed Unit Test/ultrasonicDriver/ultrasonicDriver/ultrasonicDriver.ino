@@ -90,7 +90,7 @@ void runTest(int n, int trialDistance){
    blinkN(promptLED, promptTime);
    float avg = runTrial(n);
    //The test passes
-   if(abs((float) trialDistance - avg ) <= 0.5*1000){
+   if(abs((float) trialDistance - avg) <= 0.5*4){
     blinkN(1, passLED);
     nPass++;
     Serial.println("Test Passed\n");

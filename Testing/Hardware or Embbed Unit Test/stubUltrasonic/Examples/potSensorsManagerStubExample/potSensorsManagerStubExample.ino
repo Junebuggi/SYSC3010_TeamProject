@@ -1,6 +1,5 @@
 #define serialPi Serial
 #include <stubUltrasonic.h> //Include the stub class
-
 stubUltrasonic stub; //Declare a stubUltrasonic object
 
 //Declare constant variables
@@ -16,7 +15,7 @@ const int ldrPin = A0;
 const int trigPin = 10;
 const int echoPin = 9;
 const int soilMoisturePin = A2;
-const int pumpPin = 2;
+const int pumpPin = 7;
 
 //Declare debugging LED pins
 const int ldrLED = 13;
@@ -240,7 +239,7 @@ ISR(TIMER1_COMPA_vect) {
       waterPumpStatus = false;
     }
     if (pumpIterations == 5) { // The relay can cause problems with normal arduino processes 
-      resetFunc();             // after multiple runs. To prevent this the arduino resets after
+      //resetFunc();             // after multiple runs. To prevent this the arduino resets after
     }                          // 5 successful pump runs.
   }
 }
