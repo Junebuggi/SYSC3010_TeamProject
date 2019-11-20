@@ -3,6 +3,7 @@ import socket
 import time
 import random
 import json
+import ast
 
 #IMPORTANT to run virtual serial
 #socat -d -d pty, raw,echo=0 pty, raw,echo=0
@@ -49,7 +50,7 @@ def testReceiveAck(buf):
         #notifyUser("00000000001")
         return
 
-ser = serial.Serial('/dev/pts/4', timeout = 0.01)
+ser = serial.Serial('/dev/pts/2', timeout = 0.01)
 
 
 def assertJSON(expectedJSON, actualJSON, n):
@@ -63,15 +64,20 @@ def assertJSON(expectedJSON, actualJSON, n):
     assert act.get('humidity') == 65
     assert act.get('DHT22Status') == 1
     assert act.get('waterDistance') == exp.get('waterDistance')
-    assert act.get('waterDistanceStatus') == 1
     assert act.get('light') == exp.get('light')
-    assert act.get('ldrStatus') == 1
     assert act.get('soilMoisture') == exp.get('soilMoisture')
-    assert act.get('soilMoistureStatus') == 1
-    assert act.get('waterPumpStatus') == 1
     
     return "\tTrial " + str(n) + " passed!"
-   
+
+def assertErrorArray(expectedJSON, actualArray, n):
+    exp = json.loads(expectedJSON)
+    print(actualArray)
+    assert actualArray[8] != exp.get('waterDistanceStatus')
+    assert exp.get('ldrStatus') != actualArray[5]
+    assert exp.get('soilMoistureStatus') != actualArray[7]
+    assert exp.get('waterPumpStatus') != actualArray[9]
+    
+    return "\tTrial " + str(n) + " passed!"
 
 def assertPumpMessageRec(expected, actual, n):
     assert dataToArduino[0] == expected[0]
@@ -151,14 +157,8 @@ while n < nSendAllSensorData:
             n = n + 1
             sucssesMessage = assertJSON(messageFromArduino, dataPi, n)
             print(sucssesMessage)
-            #print(dataPi)
             time.sleep(0.01)
-#         sendSocketAck(room_addrs_send)
-#         n = n + 1
-#         sucssesMessage = assertJSON(messageFromArduino, dataPi, n)
-#         print(sucssesMessage)
-#         print(dataPi)
-            #print('Received from RoomPi: ' + dataPi)
+
 
 print("Test 3 PASSED!")
 
@@ -182,6 +182,32 @@ while n < nStartWaterPump:
         print(succssesMessage)
 
 print("Test 4 PASSED!")
-    
+
+print("\t=====================Test 5=====================")
+print("Description: Arduino's errors has sensors and the roomPi forwards this to the globalServer")
+ser.flushInput()
+time.sleep(1)
+nErrorDetectedArduino = 5
+n = 0
+while n < nErrorDetectedArduino:
+    data = ser.readline()
+    if(len(data) > 0):
+        dataRoomPi = data.decode().strip('\r\n')
+        if dataRoomPi == "E,":
+            messageFromArduino = '{"opcode": 8, "potID": 1,"waterPumpStatus":' + str(random.randint(0,1)) + ',"waterDistance":' + str(random.randint(1,100)) + ',"waterDistanceStatus":' + str(random.randint(0,1)) + ',"light":' + str(random.randint(1,100)) + ',"ldrStatus":' + str(random.randint(0,1)) + ',"soilMoisture":' + str(random.randint(1,100)) + ',"soilMoistureStatus":0}'
+            ser.write(messageFromArduino.encode("utf-8"))
+            time.sleep(0.1)
+            n = n + 1
+            dataPiError = receiver()
+            sendSocketAck(room_addrs_send)
+            sucssesMessage = assertErrorArray(messageFromArduino, map(int, str(dataPiError)), n)
+            print(sucssesMessage)
+            time.sleep(0.1)
+            dataPi = receiver()
+            sendSocketAck(room_addrs_send)
+            assertJSON(messageFromArduino, dataPi, n)
+            time.sleep(0.01)
+
+print("Test 5 PASSED!")
 
 
