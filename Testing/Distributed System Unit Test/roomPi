@@ -61,7 +61,7 @@ def pumpFinished():
     return
 
 def sender(jsonstr, addrs_send):
-    print("SENDING: " + jsonstr + ", TO: " + str(addrs_send) + "\n")
+    #print("SENDING: " + jsonstr + ", TO: " + str(addrs_send) + "\n")
     s_send.sendto(jsonstr.encode(), addrs_send)
     return
     
@@ -72,7 +72,7 @@ def receiver():
 
 def testReceiveAck(buf):
     if (buf.get("opcode") == "0"):
-        print("ACKNOWLEGDED", buf)
+        #print("ACKNOWLEGDED", buf)
         return
     else:
         errorDetected('{"opcode" : "D", "sensorArray" : "0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1"}')
@@ -107,7 +107,7 @@ def testRoomSensors():
         DHT22Status = 1
     else:
         #If no data was retrieved blink Red LED to represent an error 
-        print("Failed to retrieve data from humidity sensor")
+        #print("Failed to retrieve data from humidity sensor")
         errorDetected('{"opcode" : "D", "sensorArray" : "0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0"}')
         GPIO.output(14, True)  
         time.sleep(1)  
@@ -139,31 +139,47 @@ def sendSensoryData():
 def sendAck(address):
     sender('{"opcode" : "0"}', address)
     return
-
+global potDataCall
+potDataCall = 0
 def requestPotData(): #Ask the arduino for the potData
+    global potDataCall
+    potDataCall = potDataCall + 1
+    print("Pot Call: " + str(potDataCall))
     ser.write(("E,").encode("utf-8"))
     startTime = time.time()
     while time.time() < (startTime + 2):
+        time.sleep(0.2)
         potData = ser.readline()
         if (len(potData) > 0):
             potData = potData.decode().strip('\r\n')
             ser.write(("0,").encode("utf-8"))
+            print("Send ACK")
+            time.sleep(0.1)
             return potData
         else:
             ser.write(("E,").encode("utf-8"))
+            time.sleep(0.1)
     return('{"opcode": null, "potID": null,"waterPumpStatus": null,"waterDistance": null,"waterDistanceStatus": null,"light": null,"ldrStatus": null,"soilMoisture": null,"soilMoistureStatus": null}')
 
 
 setRoomPi()
 #Repeat
+
 n = 0
-while n < 5:
+print(ser.readline())
+ser.flushInput()
+print("Starting test 3")  
+while n < 15:
     data = requestPotData()
+    ser.flushInput()
     print(data)
     getPotData(json.loads(data))
     sendSensoryData()
     n = n + 1
-n = 0    
+time.sleep(1)
+n = 0
+ser.flushInput()
+n = 0 
 while n < 5:
     message = receiver()
     if (message.get('opcode') == "4"): #2 startwaterpump
