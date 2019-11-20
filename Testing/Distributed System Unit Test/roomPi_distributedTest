@@ -71,7 +71,6 @@ def assertJSON(expectedJSON, actualJSON, n):
 
 def assertErrorArray(expectedJSON, actualArray, n):
     exp = json.loads(expectedJSON)
-    print(actualArray)
     assert actualArray[8] != exp.get('waterDistanceStatus')
     assert exp.get('ldrStatus') != actualArray[5]
     assert exp.get('soilMoistureStatus') != actualArray[7]
