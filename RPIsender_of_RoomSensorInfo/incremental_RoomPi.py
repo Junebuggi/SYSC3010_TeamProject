@@ -107,28 +107,7 @@ def startWaterPump(pumpDuration):
         raise ValueError("Pump duration must be an integer AND must be greater than or equal to 1")
     return
 
-def checkPotDataForErrors():
-    errorArray = [0] * 11
-    errorFlag = False
-    if ldrStatus == 0:
-        errorArray[5] = 1
-        errorFlag = True
-    if soilMoistureStatus == 0:
-        errorArray[7] = 1
-        errorFlag = True
-    if waterDistanceStatus == 0:
-        errorArray[8] = 1
-        errorFlag = True
-    if waterPumpStatus == 0:
-        errorArray[9] = 1
-        errorFlag = True
-    if errorFlag:    
-        return errorArray
-    else:
-        return False
-       
 setRoomPi()
-
 
 message = requestPotData()
 ser.flushInput()
