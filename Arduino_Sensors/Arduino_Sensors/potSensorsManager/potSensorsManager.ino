@@ -16,27 +16,27 @@
 
 #define serialPi Serial
 
-//Declare constant variables
-const int potID = 1; //Each pot has its own unique identifier hardcoded
-const double ldrLower = 390; //the value when the LDR is complete darkness
-const double ldrUpper = 685; //the value when the LDR is in complete brightness
-const double ldrRange = ldrUpper - ldrLower; //Used to map a percentage of light detected
-const float criticalDistance = 9.00; // The pump will not turn on to prevent hardware damages
-                                     // if the waterDistance is below critical levels
+//Define constant variables
+#define potID 1 //Each pot has its own unique identifier hardcoded
+#define ldrLower 390 //the value when the LDR is complete darkness
+#define ldrUpper 685 //the value when the LDR is in complete brightness
+#define ldrRange ldrLower-ldrUpper //Used to map a percentage of light detected
+#define criticalDistance 9.00 // The pump will not turn on to prevent hardware damages
+                              // if the waterDistance is below critical levels
                                      
-//Declare Sensor and Pump Pins
-const int ldrPin = A0;
-const int trigPin = 10;
-const int echoPin = 9;
-const int soilMoisturePin = A2;
-const int pumpPin = 7;
+//Define Sensor and Pump Pins
+#define ldrPin A0
+#define trigPin 10
+#define echoPin 9
+#define soilMoisturePin A2
+#define pumpPin 7
 
-//Declare debugging LED pins
-const int ldrLED = 13;
-const int distanceLED = 11;
-const int soilMoistureLED = 8;
-const int pumpLED = 6;
-const int ackLED = 5;
+//Define debugging LED pins
+#define ldrLED 13
+#define distanceLED 11
+#define soilMoistureLED 8
+#define pumpLED 6
+#define ackLED 5
 
 // Define global variables for waterPump
 float initialDistance; // The initial waterDistance when the pump begins to run
@@ -61,6 +61,10 @@ void waterPumpManager(void);
  */
 void(* resetFunc) (void) = 0;
 
+/*
+ * Sets the modes for all of the pins and initializes timer1 for the
+ * water pump
+ */
 void setup() {
 
   //Set the modes for the debuggin LEDs as outputs
@@ -271,6 +275,6 @@ ISR(TIMER1_COMPA_vect) {
   }
     
  if (pumpIterations == 5) { // The relay can cause problems with normal arduino processes 
-      resetFunc();             // after multiple runs. To prevent this the arduino resets after
-  }                          // 3 successful pump runs.
+      resetFunc();          // after multiple runs. To prevent this the arduino resets after
+  }                         // 3 successful pump runs.
 }
