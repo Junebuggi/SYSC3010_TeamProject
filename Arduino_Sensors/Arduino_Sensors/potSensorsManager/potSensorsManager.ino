@@ -20,7 +20,7 @@
 #define potID 1 //Each pot has its own unique identifier hardcoded
 #define ldrLower 390 //the value when the LDR is complete darkness
 #define ldrUpper 685 //the value when the LDR is in complete brightness
-#define ldrRange ldrLower-ldrUpper //Used to map a percentage of light detected
+#define ldrRange (ldrLower-ldrUpper) //Used to map a percentage of light detected
 #define criticalDistance 9.00 // The pump will not turn on to prevent hardware damages
                               // if the waterDistance is below critical levels
                                      
