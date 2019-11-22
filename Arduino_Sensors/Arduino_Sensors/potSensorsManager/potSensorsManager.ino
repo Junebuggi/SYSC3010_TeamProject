@@ -11,7 +11,7 @@
            it off using a timer.
 
   @author Emma Boulay
-  @version 1.8 15/11/19
+  @version 1.10 21/11/19
 */
 
 #define serialPi Serial
@@ -55,11 +55,6 @@ void getWaterLevel(void);
 void getSoilMoisture(void);
 void waterPumpManager(void);
 
-/*
- * Starts the sketch from the beginning by declaring the reset 
- * function to be at address 0
- */
-void(* resetFunc) (void) = 0;
 
 /*
  * Sets the modes for all of the pins and initializes timer1 for the
@@ -105,6 +100,7 @@ void setup() {
 void loop() {
   String opcode = "";
   boolean flag = false;
+  
   if (serialPi.available() > 0) {
     opcode = serialPi.readStringUntil(',');
     if (opcode == "E") { // The roomPi is requesting potSensorData
@@ -127,22 +123,18 @@ void loop() {
         }
       }
     }
-
+    
     else if (opcode = "C") { // The roomPi is requesting for the water pump to be turned on
       initialDistance = readUltraSonic(); // Find the initial water level
       waterPumpDuration = serialPi.readStringUntil('\n').toInt();
       if (waterPumpDuration >= 1 && (initialDistance + 0.1 < criticalDistance) ) {
         static int timerCount = 0; //Initialize timerCount to 0 first time through
-        digitalWrite(pumpLED, HIGH); //For testing purposes, remove later
-        digitalWrite(pumpPin, LOW);
-        
+        pumpIterations++;
+        digitalWrite(pumpPin, LOW); //Turn on pump: the relay the pump is connected to is active low
         TIMSK1 |= (1 << OCIE1A); // Enable the timer for the water pump
       }
     }
   }
-
-  //if(serialPi.available() > 0) { serialPi.readString(); } //Flush any leftover values
-
 }
 /**
    Polls all the sensors and adds the data into a string in the JSON format to be
@@ -163,6 +155,10 @@ String getSensorData(void) {
 
 }
 
+void waterPumpManager(void) {
+  
+}
+
 /**
    Polls the ultraSonic sensor to get the waterDistance and adds this to the
    String to be sent to the roomPi
@@ -171,6 +167,7 @@ void getWaterLevel(void) {
 
   float distance = readUltraSonic();
   boolean waterDistanceStatus;
+  boolean waterLow;
 
   packet += "\"waterDistance\": " + String(distance);
   packet += ",";
@@ -184,7 +181,14 @@ void getWaterLevel(void) {
     digitalWrite(distanceLED, LOW);
     waterDistanceStatus = true;
   }
+  if (distance > criticalDistance) {
+    waterLow = false;
+  }
+  else {
+    waterLow = true;
+  }
   packet += "\"waterDistanceStatus\": " + String(waterDistanceStatus) + ",";
+  packet += "\"waterLow\": " + String(waterLow) + ",";
 }
 
 /**
@@ -249,32 +253,23 @@ void getSoilMoisture(void) {
 }
 
 /**
-   The timer ISR used to turn off the water pump. When the water pump is turned on the
+   The timer ISR is used to turn off the water pump. When the water pump is turned on the
    ISR runs every second and turns off the pump if it has ran for pumpDuration seconds or
    if there is not enough water in the tank.
 */
 ISR(TIMER1_COMPA_vect) {
   timerCount++;
-  float distance = readUltraSonic();
-  if (distance + 0.1 > criticalDistance) { //Turn the pump off if there isn't enough water
+  float distance = readUltraSonic(); 
+  
+  //Turn the pump off if there isn't enough water or timer is done!
+  if (timerCount >= waterPumpDuration || distance + 0.1 > criticalDistance) {
     digitalWrite(pumpPin, HIGH);
     TIMSK1 &= ~(1 << OCIE1A); //Disable the timer
     timerCount = 0; //Reset timerCount for the next time
-    return;
-  }
-  pumpIterations++;
-  if (timerCount >= waterPumpDuration) {
-    digitalWrite(pumpPin, HIGH);
-    TIMSK1 &= ~(1 << OCIE1A); //Disable the timer
-    timerCount = 0; //Reses timerCount for the next time
     
     if ( (distance - initialDistance) >= 0.5) { //acceptable error of 0.5cm
       // The water levels did not decrease when the pump was suppose to be on
       waterPumpStatus = false;
     }
   }
-    
- if (pumpIterations == 5) { // The relay can cause problems with normal arduino processes 
-      resetFunc();          // after multiple runs. To prevent this the arduino resets after
-  }                         // 3 successful pump runs.
 }

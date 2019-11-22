@@ -12,7 +12,10 @@ nPacket = 0
 start = time.time()
 
 def requestPotData(): #Ask the arduino for the potData
+    if (ser.isOpen() == False):
+        ser.open()
     ser.write(("E,").encode("utf-8"))
+
     startTime = time.time()
     while time.time() < (startTime + 2):
         potData = ser.readline()
