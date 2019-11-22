@@ -45,11 +45,6 @@ def setPlantNurseryApp():
     app_addrs_send = (app_ip_address, port)
     return
 
-def notifyUser(message):
-    global app_addrs_send, app_s_send
-    app_s_send.sendto(message, app_addrs_send)
-    return
-
    
 def updateUserThresholdsTable(threshold):
     global cursor, dbconnect
@@ -203,29 +198,29 @@ def checkUserThresholds():
    
     if lightLessGreaterThan == ">":
         if light > lightThreshold:
-            notifyUser('{"opcode" : "D", "sensorArray" : "1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"}')
+            notifyUser('{"opcode" : "D", "sensorArray" : "1, 0, 0, 0, 0, 0, 0, 0, 0, 0"}')
     elif lightLessGreaterThan == "<":
         if light < lightThreshold:
             print("ENTERED")
-            notifyUser('{"opcode" : "D", "sensorArray" : "1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"}')
+            notifyUser('{"opcode" : "D", "sensorArray" : "1, 0, 0, 0, 0, 0, 0, 0, 0, 0"}')
     if roomHumidityLessGreaterThan == ">":
         if humidity > roomHumidityThreshold:
-            notifyUser('{"opcode" : "D", "sensorArray" : "0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0"}')
+            notifyUser('{"opcode" : "D", "sensorArray" : "0, 1, 0, 0, 0, 0, 0, 0, 0, 0"}')
     elif roomHumidityLessGreaterThan == "<":
         if humidity < roomHumidityThreshold:
             print("ENTERED")
-            notifyUser('{"opcode" : "D", "sensorArray" : "0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0"}')            
+            notifyUser('{"opcode" : "D", "sensorArray" : "0, 1, 0, 0, 0, 0, 0, 0, 0, 0"}')            
     if roomTemperatureLessGreaterThan == ">":
         if temperature > roomTemperatureThreshold:
-            notifyUser('{"opcode" : "D", "sensorArray" : "0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0"}')
+            notifyUser('{"opcode" : "D", "sensorArray" : "0, 0, 1, 0, 0, 0, 0, 0, 0, 0"}')
     elif roomTemperatureLessGreaterThan == "<":
         if temperature < roomTemperatureThreshold:
             print("ENTERED")
-            notifyUser('{"opcode" : "D", "sensorArray" : "0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0"}')
+            notifyUser('{"opcode" : "D", "sensorArray" : "0, 0, 1, 0, 0, 0, 0, 0, 0, 0"}')
     if soilMoistureLessGreaterThan == ">":
         if soilMoisture > soilMoistureThreshold:
             print("entered")
-            notifyUser('{"opcode" : "D", "sensorArray" : "0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0"}')
+            notifyUser('{"opcode" : "D", "sensorArray" : "0, 0, 0, 1, 0, 0, 0, 0, 0, 0"}')
             waterPumpDuration = 2
             startPumpStr = '{"opcode" : "4", "pumpDuration" : "' + waterPumpDuration + '"}'
             startWaterPump(startPumpStr) #sends to room pi receives ack
@@ -233,7 +228,7 @@ def checkUserThresholds():
     elif soilMoistureLessGreaterThan == "<":
         if soilMoisture < soilMoistureThreshold:
             print("entered")
-            notifyUser('{"opcode" : "D", "sensorArray" : "0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0"}')
+            notifyUser('{"opcode" : "D", "sensorArray" : "0, 0, 0, 1, 0, 0, 0, 0, 0, 0"}')
             waterPumpDuration = 10
             startPumpStr = '{"opcode" : "4", "pumpDuration" : "' + str(waterPumpDuration) + '"}'
             startWaterPump(startPumpStr) #sends to room pi receives ack
@@ -244,6 +239,11 @@ def startWaterPump(startPump):
     global s_send, room_addrs_send
     print(startPump + " TO: " + str(room_addrs_send))
     s_send.sendto(startPump, room_addrs_send)
+    return
+
+def notifyUser(message):
+    global app_addrs_send, app_s_send
+    app_s_send.sendto(message, app_addrs_send)
     return
 
 setGlobalServer()
@@ -260,6 +260,8 @@ while True:
         setUserThresholds(message.get("potID"))
     if (message.get('opcode') == "3"): #setting thresholds
         updateUserThresholdsTable(message)
+    if (message.get('opcode') == "D"): #setting thresholds
+        notifyUser(message)
     if (message.get('opcode') == "9"): #all data
         print(message)
         #sendSocketAck(room_addrs_send) #send ack
