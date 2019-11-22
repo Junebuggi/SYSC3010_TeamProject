@@ -57,7 +57,8 @@ def sendSensoryData():
 def collectRoomData():
     global humidity, temperature, DHT_SENSOR, DHT_PIN
     humidity, temperature = Adafruit_DHT.read_retry(DHT_SENSOR, DHT_PIN);
-    print((humidity, temperature))
+    print("humidity: " + str(humidity))    
+    print("temperature: " + str(temperature))
     return
 
 def requestPotData(): #Ask the arduino for the potData
@@ -85,18 +86,31 @@ def getPotData(potData):
     waterPumpStatus = potData.get('waterPumpStatus')
 
     print("POTID: " + str(potID))
-    print(waterDistance)
-    print(waterDistanceStatus)
-    print(light)
-    print(ldrStatus)
-    print(soilMoisture)
-    print(soilMoistureStatus)
-    print(waterPumpStatus)
+    print("waterDistance: " + str(waterDistance))
+    print("waterDistanceStatus: " + str(waterDistanceStatus))
+    print("light: " + str(light)
+    print("ldrStatus: " + str(ldrStatus))
+    print("soilMoisture: " + str(soilMoisture))
+    print("soilMoistureStatus: " + str(soilMoistureStatus))
+    print("waterPumpStatus: " + str(waterPumpStatus))
+    print("waterLow: " + str(waterLow))
+    
+    if ldrStatus == 0:
+       errorDetected('{"opcode" : "D", "sensorArray" : "0, 0, 0, 0, 0, 1, 0, 0, 0, 0"}')
+    if soilMoistureStatus == 0:
+       errorDetected('{"opcode" : "D", "sensorArray" : "0, 0, 0, 0, 0, 0, 0, 1, 0, 0"}')
+    if waterDistanceStatus == 0:
+       errorDetected('{"opcode" : "D", "sensorArray" : "0, 0, 0, 0, 0, 0, 0, 0, 1, 0"}')
+    if waterPumpStatus == 0:
+       errorDetected('{"opcode" : "D", "sensorArray" : "0, 0, 0, 0, 0, 0, 0, 0, 0, 1"}')
+    if waterLow == 0:
+       errorDetected('{"opcode" : "D", "sensorArray" : "0, 0, 0, 0, 1, 0, 0, 0, 0, 0"}')
     return
 
 def receiver():
     global s_receive
     buf, address = s_receive.recvfrom(8008)
+    print("Received!")
     return (buf)
 
 def startWaterPump(pumpDuration):
@@ -105,6 +119,21 @@ def startWaterPump(pumpDuration):
         ser.write((pumpMessage).encode("utf-8"))
     else:
         raise ValueError("Pump duration must be an integer AND must be greater than or equal to 1")
+    return
+
+def testRoomSensors():
+    global DHT22Status, temperature, humidity
+    if humidity is not None and temperature is not None:
+    else:
+        print("Failed to retrieve data from humidity sensor")
+        errorDetected('{"opcode" : "D", "sensorArray" : "0, 0, 0, 0, 0, 0, 1, 0, 0, 0"}')
+        temperature = 0
+        humidity = 0
+    return
+
+def errorDetected(error):
+    global s_send, server_addrs_send
+    s_send.sendto(error, server_addrs_send)
     return
 
 setRoomPi()
@@ -116,7 +145,7 @@ message = json.loads(message)
 if message.get('opcode') == '8':
     getPotData(message) #puts data into variables
     collectRoomData() #collect room data and puts into variables
-    #testRoomSensors() #test room sensors for errors, if error send error to global (receive ack)
+    testRoomSensors() #test room sensors for errors, if error send error to global (receive ack)
     sendSensoryData() #send the data to global and receive ack
    
 
