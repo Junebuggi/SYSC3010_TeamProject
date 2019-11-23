@@ -1,4 +1,4 @@
-# SYSC3010_TeamProject: The Plant Nursery :sparkles:
+# SYSC3010_TeamProject: The Plant Nursery :sparkles: :seedling:
 Completed on: 06/12/19
 SYSC 3010 The Plant Nursery Project Repository 
 
