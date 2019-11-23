@@ -21,19 +21,19 @@ To operate this system in a similar fashion as we have done, you will require 2 
 
 Additional Hardware used:
 
-*- Capacitive Moisture Sensor
+* Capacitive Moisture Sensor
 
-*- Light Dependent Resistor
+* Light Dependent Resistor
 
-*- Ultrasonic Sensor
+* Ultrasonic Sensor
 
-*- Temperature and Humidity Sensor
+* Temperature and Humidity Sensor
 
-*- DC Water Pump
+* DC Water Pump
 
-*- 5V Relay Module (active low) 
+* 5V Relay Module (active low) 
 
-*- 16x2 LCD 
+* 16x2 LCD 
 
 How to Set-up globalServer
 --------------------------
