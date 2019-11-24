@@ -1,5 +1,5 @@
 #Author: Abeer Rafiq
-#Modified: 11/24/2019 8:38 am
+#Modified: 11/24/2019 9:08 am
 
 #Importing Packages
 import socket, sys, time, json, serial, Adafruit_DHT
@@ -31,7 +31,7 @@ class RoomRPI:
         GPIO.setwarnings(False)
         GPIO.setup(self.__receiveLED, GPIO.OUT)
         GPIO.setup(self.__sendLED, GPIO.OUT)
-        GPIO.setup(self.__rrorLED, GPIO.OUT)
+        GPIO.setup(self.__errorLED, GPIO.OUT)
         #Setting up string for acknowldegements
         self.__ackstr = "{'opcode':'0'}"
         #Setting serial for arduino
@@ -110,12 +110,10 @@ class RoomRPI:
     #To send error to the server
     def errorDetected(self, error):
         #If ack received return
-        if (self.send_server_msg(error) == True):
-            print("\nError sent to server")
-        else:
+        if (self.send_server_msg(error) == False):
             #If no ack received, try sending again
-            self.send_server_msg(error)
             print("\nError sent again to server")
+            self.errorDetected(error)
         return
 
     #To get measurements from DHT22 sensor for humidity and temp
@@ -167,12 +165,10 @@ class RoomRPI:
                   ', "light": ' + str(self.__currentLight) + ', "soilMoisture": ' + \
                   str(self.__currentSoilMoisture) + '}'
         #If ack received return
-        if (self.send_server_msg(alldata) == True):
-            print("\All data sent to server")
-        else:
+        if (self.send_server_msg(alldata) == False):
             #If no ack received, send data again
-            self.send_server_msg(alldata)
             print("\nAll data sent again to server")
+            self.sendSensoryData(potID)
         return
     
     #To communicate to the arduino to send it's sensory data
