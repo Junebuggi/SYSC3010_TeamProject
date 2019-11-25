@@ -21,22 +21,22 @@
 #define ldrLower 390 //the value when the LDR is complete darkness
 #define ldrUpper 685 //the value when the LDR is in complete brightness
 #define ldrRange (ldrLower-ldrUpper) //Used to map a percentage of light detected
-#define criticalDistance 9.00 // The pump will not turn on to prevent hardware damages
+#define criticalDistance 100.00 // The pump will not turn on to prevent hardware damages
                               // if the waterDistance is below critical levels
                                      
 //Define Sensor and Pump Pins
 #define ldrPin A0
-#define trigPin 10
-#define echoPin 9
+#define trigPin 8
+#define echoPin 6
 #define soilMoisturePin A2
-#define pumpPin 7
+#define pumpPin 9
 
 //Define debugging LED pins
 #define ldrLED 13
-#define distanceLED 11
-#define soilMoistureLED 8
-#define pumpLED 6
-#define ackLED 5
+#define distanceLED 12
+#define soilMoistureLED 11
+#define pumpLED 10
+#define ackLED 7
 
 // Define global variables for waterPump
 float initialDistance; // The initial waterDistance when the pump begins to run
@@ -87,8 +87,9 @@ void setup() {
   sei(); // enable global interrupts
   TIMSK1 &= ~(1 << OCIE1A); // disable timer compare interrupt
 
-  serialPi.begin(9600); //begin serial on port 9600
+  Serial.begin(9600); //begin serial on port 9600
 
+  
 }
 
 /*
@@ -98,10 +99,13 @@ void setup() {
    specified time.
 */
 void loop() {
+  
   String opcode = "";
   boolean flag = false;
+
+  opcode = "E";
   
-  if (serialPi.available() > 0) {
+  if (true) {//serialPi.available() > 0) {
     opcode = serialPi.readStringUntil(',');
     if (opcode == "E") { // The roomPi is requesting potSensorData
       packet = getSensorData();
@@ -111,22 +115,23 @@ void loop() {
       boolean ackRec = false; // ACK received flag
       while (millis() < startWaitingTime + 1000 && !ackRec) { //Try for 1 second to resend the packet if no ACK from roomPi
         delay(100); //Allow time for the roomPi to send the ACK
-        if (serialPi.available() > 0 ) {
+        if (Serial.available() > 0 ) {
           opcode = serialPi.readStringUntil(',');
           if (opcode == "0") {
             digitalWrite(ackLED, !digitalRead(ackLED));
             ackRec = true; // The acknowledgment was received from the roomPi, set flag
           }
+          opcode = "C";
         }
         else {
-          serialPi.println(packet); //If no ACK was received resend the packet
+          Serial.println(packet); //If no ACK was received resend the packet
         }
       }
     }
     
     else if (opcode = "C") { // The roomPi is requesting for the water pump to be turned on
       initialDistance = readUltraSonic(); // Find the initial water level
-      waterPumpDuration = serialPi.readStringUntil('\n').toInt();
+      waterPumpDuration = 3;//serialPi.readStringUntil('\n').toInt();
       if (waterPumpDuration >= 1 && (initialDistance + 0.1 < criticalDistance) ) {
         static int timerCount = 0; //Initialize timerCount to 0 first time through
         pumpIterations++;
@@ -135,6 +140,8 @@ void loop() {
       }
     }
   }
+
+  delay(10000);
 }
 /**
    Polls all the sensors and adds the data into a string in the JSON format to be
