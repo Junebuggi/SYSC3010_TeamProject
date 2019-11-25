@@ -1,6 +1,5 @@
 # SYSC3010_TeamProject: The Plant Nursery :sparkles: :seedling:
-Completed on: 06/12/19
-SYSC 3010 The Plant Nursery Project Repository 
+Completed on: 06/12/19\nSYSC 3010 The Plant Nursery Project Repository 
 
 							The Plant Nursery 
 					An automated plant watering and monitering system				
