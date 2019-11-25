@@ -18,10 +18,10 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int PORT = 1000;
+    public static final int PORT = 1000;
     private static final String ipAddress = "192.168.137.101";
 
-    Button b_status, b_notification, b_data, b_notes, b_addPot, b_addRoom, b_thresholds;
+    Button b_status, b_notification, b_data, b_notes, b_addPot, b_thresholds;
     static ArrayList<String> notificationHistory= new ArrayList<>(); //keep track of notifications
     private UDPSender udpSender;
 
@@ -39,8 +39,8 @@ public class MainActivity extends AppCompatActivity {
         //this is here for notifications purposes
         try{
             udpSender = new UDPSender();
-            UDPReceiver udpReceiver = new UDPReceiver();
-            udpReceiver.start();
+//            UDPReceiver udpReceiver = new UDPReceiver();
+//            udpReceiver.start();
             Log.d("User","Thread start...");
         }catch(Exception e)
         {
@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         b_data = findViewById(R.id.button2); //view data
         b_notes = findViewById(R.id.button3); //add notes
         b_addPot = findViewById(R.id.button5); //add pot
-        b_addRoom = findViewById(R.id.button15); //add room
+
 
         //when buttons are clicked
         b_notification.setOnClickListener(new View.OnClickListener() {
@@ -107,13 +107,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        b_addRoom.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "add a room", Toast.LENGTH_SHORT).show();//mini b_notification
-                startActivity(new Intent(MainActivity.this, AddRoomActivity.class));
-            }
-        });
 
         b_status.setOnClickListener(new View.OnClickListener() {
             @Override

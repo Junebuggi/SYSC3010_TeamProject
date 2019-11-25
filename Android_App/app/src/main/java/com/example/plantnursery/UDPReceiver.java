@@ -13,7 +13,7 @@ import java.util.Date;
 
 class UDPReceiver extends Thread{
     private DatagramSocket server = null;
-    private static final int PORT = 8008;
+    private static final int PORT =8008;
     private int notificationCount = 0;
 
     public UDPReceiver() throws IOException {
@@ -47,6 +47,7 @@ class UDPReceiver extends Thread{
                     String opcode = obj.getString("opcode");
                     switch (opcode){
                         case "D":
+                            System.out.println("~~~~in notification opcode");
                             //send an ACK here
                             //{"opcode" : "D", "sensorArray" : "0,0,0,0,0,0,1,0,0,0,0"}
                             //process the array, add the data
@@ -87,6 +88,14 @@ class UDPReceiver extends Thread{
                             }
                             if (sensors[9] == 1) {
                                 MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" ERROR" + ": " + "Water pump wrror" + " " + new Date());
+                            }
+
+                            //send ACK to globalServer
+                            JSONObject ack = new JSONObject();
+                            try{
+                                ack.put("opcode", "0");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
 
                         case "0":

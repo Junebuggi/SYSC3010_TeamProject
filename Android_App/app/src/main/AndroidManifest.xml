@@ -19,19 +19,12 @@
         <activity android:name=".NotesActivity"/>
         <activity android:name=".NotificationActivity"/>
         <activity android:name=".AddPotActivity"/>
-        <activity android:name=".AddRoomActivity"/>
         <activity android:name=".ViewDataActivity"/>
         <activity android:name=".ViewStatusActivity"/>
         <activity android:name=".AddThresholdsActivity"/>
 
     </application>
 
-    // Required for local unit tests (JUnit 4 framework)
-    testImplementation 'junit:junit:4.12'
-
-    // Required for instrumented tests
-    androidTestImplementation 'com.android.support:support-annotations:24.0.0'
-    androidTestImplementation 'com.android.support.test:runner:0.5'
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />

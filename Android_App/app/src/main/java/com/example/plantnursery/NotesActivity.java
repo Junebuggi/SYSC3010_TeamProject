@@ -23,7 +23,7 @@ public class NotesActivity extends AppCompatActivity {
     private EditText plantID, notes;
     private String str;
     private UDPSender udpSender;
-
+    private UDPReceiver udpReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,13 +54,16 @@ public class NotesActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-//                System.out.println(addNotes.toString());
                 udpSender.run(ipAddress, addNotes.toString(), PORT);
             }
         });
 
         try {
+            UDPReceiver udpReceiver = new UDPReceiver();
+            udpReceiver.start();
+
+            //if doesnt receive within 3 sec resend
+
             udpSender = new UDPSender();
             Log.d("User", "Thread start...");
         } catch (Exception e) {
