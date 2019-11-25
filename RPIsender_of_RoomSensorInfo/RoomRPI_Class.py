@@ -190,7 +190,7 @@ class RoomRPI:
             else:
                 #send error
                 self.__ser.write(("E,").encode("utf-8"))
-        return('{"opcode": None, "potID": None,"waterPumpStatus": None,"waterDistance": None,"waterDistanceStatus": None,"light": None,"ldrStatus": None,"soilMoisture": None,"soilMoistureStatus": None}')
+        return('{"opcode": null, "potID": null,"waterPumpStatus": null,"waterDistance": null,"waterDistanceStatus": null,"light": null,"ldrStatus": null,"soilMoisture": null,"soilMoistureStatus": null}')
 
     #To create JSON to start water pump and communicate to arduino
     def startWaterPump(self, pumpDuration):
