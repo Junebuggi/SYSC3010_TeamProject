@@ -11,32 +11,32 @@
            it off using a timer.
 
   @author Emma Boulay
-  @version 1.8 15/11/19
+  @version 1.10 21/11/19
 */
 
 #define serialPi Serial
 
-//Declare constant variables
-const int potID = 1; //Each pot has its own unique identifier hardcoded
-const double ldrLower = 390; //the value when the LDR is complete darkness
-const double ldrUpper = 685; //the value when the LDR is in complete brightness
-const double ldrRange = ldrUpper - ldrLower; //Used to map a percentage of light detected
-const float criticalDistance = 9.00; // The pump will not turn on to prevent hardware damages
-                                     // if the waterDistance is below critical levels
+//Define constant variables
+#define potID 1 //Each pot has its own unique identifier hardcoded
+#define ldrLower 390 //the value when the LDR is complete darkness
+#define ldrUpper 685 //the value when the LDR is in complete brightness
+#define ldrRange (ldrLower-ldrUpper) //Used to map a percentage of light detected
+#define criticalDistance 9.00 // The pump will not turn on to prevent hardware damages
+                              // if the waterDistance is below critical levels
                                      
-//Declare Sensor and Pump Pins
-const int ldrPin = A0;
-const int trigPin = 10;
-const int echoPin = 9;
-const int soilMoisturePin = A2;
-const int pumpPin = 2;
+//Define Sensor and Pump Pins
+#define ldrPin A0
+#define trigPin 10
+#define echoPin 9
+#define soilMoisturePin A2
+#define pumpPin 7
 
-//Declare debugging LED pins
-const int ldrLED = 13;
-const int distanceLED = 11;
-const int soilMoistureLED = 8;
-const int pumpLED = 6;
-const int ackLED = 5;
+//Define debugging LED pins
+#define ldrLED 13
+#define distanceLED 11
+#define soilMoistureLED 8
+#define pumpLED 6
+#define ackLED 5
 
 // Define global variables for waterPump
 float initialDistance; // The initial waterDistance when the pump begins to run
@@ -55,12 +55,11 @@ void getWaterLevel(void);
 void getSoilMoisture(void);
 void waterPumpManager(void);
 
-/*
- * Starts the sketch from the beginning by declaring the reset 
- * function to be at address 0
- */
-void(* resetFunc) (void) = 0;
 
+/*
+ * Sets the modes for all of the pins and initializes timer1 for the
+ * water pump
+ */
 void setup() {
 
   //Set the modes for the debuggin LEDs as outputs
@@ -101,6 +100,7 @@ void setup() {
 void loop() {
   String opcode = "";
   boolean flag = false;
+  
   if (serialPi.available() > 0) {
     opcode = serialPi.readStringUntil(',');
     if (opcode == "E") { // The roomPi is requesting potSensorData
@@ -123,22 +123,18 @@ void loop() {
         }
       }
     }
-
+    
     else if (opcode = "C") { // The roomPi is requesting for the water pump to be turned on
       initialDistance = readUltraSonic(); // Find the initial water level
       waterPumpDuration = serialPi.readStringUntil('\n').toInt();
       if (waterPumpDuration >= 1 && (initialDistance + 0.1 < criticalDistance) ) {
         static int timerCount = 0; //Initialize timerCount to 0 first time through
-        digitalWrite(pumpLED, HIGH); //For testing purposes, remove later
-        digitalWrite(pumpPin, LOW);
-        
+        pumpIterations++;
+        digitalWrite(pumpPin, LOW); //Turn on pump: the relay the pump is connected to is active low
         TIMSK1 |= (1 << OCIE1A); // Enable the timer for the water pump
       }
     }
   }
-
-  //if(serialPi.available() > 0) { serialPi.readString(); } //Flush any leftover values
-
 }
 /**
    Polls all the sensors and adds the data into a string in the JSON format to be
@@ -148,7 +144,7 @@ void loop() {
 */
 String getSensorData(void) {
 
-  packet = "{\"opcode\": 8, \"potID\": " + String(potID);
+  packet = "{\"opcode\": \"8\", \"potID\": " + String(potID);
   packet += ",";
   packet += "\"waterPumpStatus\": " + String(waterPumpStatus) + ",";
   getWaterLevel();
@@ -159,6 +155,10 @@ String getSensorData(void) {
 
 }
 
+void waterPumpManager(void) {
+  
+}
+
 /**
    Polls the ultraSonic sensor to get the waterDistance and adds this to the
    String to be sent to the roomPi
@@ -167,6 +167,7 @@ void getWaterLevel(void) {
 
   float distance = readUltraSonic();
   boolean waterDistanceStatus;
+  boolean waterLow;
 
   packet += "\"waterDistance\": " + String(distance);
   packet += ",";
@@ -180,7 +181,14 @@ void getWaterLevel(void) {
     digitalWrite(distanceLED, LOW);
     waterDistanceStatus = true;
   }
+  if (distance > criticalDistance) {
+    waterLow = false;
+  }
+  else {
+    waterLow = true;
+  }
   packet += "\"waterDistanceStatus\": " + String(waterDistanceStatus) + ",";
+  packet += "\"waterLow\": " + String(waterLow) + ",";
 }
 
 /**
@@ -245,30 +253,23 @@ void getSoilMoisture(void) {
 }
 
 /**
-   The timer ISR used to turn off the water pump. When the water pump is turned on the
+   The timer ISR is used to turn off the water pump. When the water pump is turned on the
    ISR runs every second and turns off the pump if it has ran for pumpDuration seconds or
    if there is not enough water in the tank.
 */
 ISR(TIMER1_COMPA_vect) {
   timerCount++;
-  float distance = readUltraSonic();
-  if (distance + 0.1 > criticalDistance) { //Turn the pump off if there isn't enough water
+  float distance = readUltraSonic(); 
+  
+  //Turn the pump off if there isn't enough water or timer is done!
+  if (timerCount >= waterPumpDuration || distance + 0.1 > criticalDistance) {
     digitalWrite(pumpPin, HIGH);
     TIMSK1 &= ~(1 << OCIE1A); //Disable the timer
     timerCount = 0; //Reset timerCount for the next time
-    return;
-  }
-  if (timerCount >= waterPumpDuration) {
-    digitalWrite(pumpPin, HIGH);
-    TIMSK1 &= ~(1 << OCIE1A); //Disable the timer
-    timerCount = 0; //Reses timerCount for the next time
-    pumpIterations++;
+    
     if ( (distance - initialDistance) >= 0.5) { //acceptable error of 0.5cm
       // The water levels did not decrease when the pump was suppose to be on
       waterPumpStatus = false;
     }
-    if (pumpIterations == 5) { // The relay can cause problems with normal arduino processes 
-      resetFunc();             // after multiple runs. To prevent this the arduino resets after
-    }                          // 5 successful pump runs.
   }
 }
