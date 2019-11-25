@@ -18,7 +18,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int PORT = 1000;
+    public static final int PORT = 1000;
     private static final String ipAddress = "192.168.137.101";
 
     Button b_status, b_notification, b_data, b_notes, b_addPot, b_addRoom, b_thresholds;
