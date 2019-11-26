@@ -50,7 +50,14 @@ class RoomRPI:
         self.__ack_timeout = 1
         self.__ack_endTime = 4
         print("\nRoom RPI Initialized")
-        
+    
+    #To blink a pin once
+    def blink(self, pin):
+        GPIO.output(pin,GPIO.HIGH)
+        time.sleep(1)
+        GPIO.output(pin,GPIO.LOW)
+        return
+    
     #To send msgs to the global server
     def send_server_msg(self, message):
         self.__soc_send.sendto(message, self.__server_addrs)
