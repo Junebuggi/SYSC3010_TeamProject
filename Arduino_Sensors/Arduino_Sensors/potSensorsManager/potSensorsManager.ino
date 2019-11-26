@@ -44,7 +44,6 @@ float initialDistance; // The initial waterDistance when the pump begins to run
 int waterPumpDuration; // How long in seconds the pump is set to run for
 boolean waterPumpStatus = true; // Set to false in timer ISR if no water was dispensed, otherwise true
 int timerCount = 0;
-int pumpIterations = 0;
 
 String packet; //The packet to be sent to the roomPi
 
@@ -157,7 +156,6 @@ void waterPumpManager(void) {
       
       if (waterPumpDuration >= 1 && (initialDistance + 0.1 < criticalDistance) ) {
         static int timerCount = 0; //Initialize timerCount to 0 first time through
-        pumpIterations++;
         digitalWrite(pumpPin, LOW); //Turn on pump: the relay the pump is connected to is active low
         TIMSK1 |= (1 << OCIE1A); // Enable the timer for the water pump
       }
