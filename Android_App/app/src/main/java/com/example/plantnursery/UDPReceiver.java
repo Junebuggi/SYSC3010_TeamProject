@@ -12,17 +12,28 @@ import java.util.Date;
 
 
 class UDPReceiver extends Thread{
-    //private static final String ipAddress = "192.168.137.1";
-    private static final int PORT =1000;
+    private String ipAddress = "192.168.1.94";
+    private static final int PORT =8008;
+    UDPSender udpSender = new UDPSender();
+    //JSONObject ack = new JSONObject();
+
 
     private DatagramSocket server = null;
     private int notificationCount = 0;
 
-    public UDPReceiver() throws IOException {
+    public UDPReceiver() throws IOException, JSONException {
+
+
         server = new DatagramSocket(PORT);
         Log.d("User","new server socket");
     }
     public void run(){
+        JSONObject ack = new JSONObject();
+        try {
+            ack.put("opcode", "0");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
 //        try {
 //            //ensures handler is initialized first before thread is executed
@@ -31,12 +42,10 @@ class UDPReceiver extends Thread{
 //            e.printStackTrace();
 //        }
         byte[] byte1024 = new byte[1024];
-        DatagramPacket dPacket = new DatagramPacket(byte1024, 100);
+        DatagramPacket dPacket = new DatagramPacket(byte1024, 1000);
         String txt;
-
         try{
-            JSONObject ack = new JSONObject();
-            ack.put("opcode", "0");
+
             Log.d("User","runing run()");
             while(true){
                 server.receive(dPacket);
@@ -50,37 +59,9 @@ class UDPReceiver extends Thread{
 
                     JSONObject obj = new JSONObject(txt);
                     String opcode = obj.getString("opcode");
-                    System.out.println("~~~~~~~~got opcode" + txt);
                     switch (opcode){
-                        case "0":
-                            System.out.println("~~~~ack received!");
-                        case "6":
-                            try {
-                                //ensures handler is initialized first before thread is executed
-                                //Thread.sleep(1000);
-                                DataTableActivity.exHandler.sendMessage(DataTableActivity.exHandler.obtainMessage(1, txt));
-
-                            }
-                             catch (NullPointerException nullPointerException){
-                                System.out.println("Catch the Nullpointer exception");
-                            }
-
-                        case "E":
-                           // udpSender.run(ipAddress, ack.toString() , PORT);
-
-                            try {
-                                //ensures handler is initialized first before thread is executed
-                                Thread.sleep(1000);
-                                ViewStatusActivity.exHandler.sendMessage(ViewStatusActivity.exHandler.obtainMessage(1, txt));
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            } catch (NullPointerException nullPointerException){
-                                System.out.println("Catch the Nullpointer exception");
-                            }
-
-                            //ViewStatusActivity.exHandler.sendMessage(ViewStatusActivity.exHandler.obtainMessage(1, txt));
                         case "D":
-                           // udpSender.run(ipAddress, ack.toString() , PORT);
+                            udpSender.run(ipAddress, ack.toString() , PORT);
                             System.out.println("~~~~in notification opcode");
                             //send an ACK here
                             //{"opcode" : "D", "sensorArray" : "0,0,0,0,0,0,1,0,0,0,0"}
@@ -123,7 +104,42 @@ class UDPReceiver extends Thread{
                             if (sensors[9] == 1) {
                                 MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" ERROR" + ": " + "Water pump wrror" + " " + new Date());
                             }
+
+                            //send ACK to globalServer
+
+
+                        case "0":
+                            //ACK
+                            System.out.println("~~~~~~ACK RECEIVED");
+                        case "6":
+                            //udpSender.run(ipAddress, ack.toString() , PORT);
+                            //stats are sent
+                            try {
+                                //ensures handler is initialized first before thread is executed
+                                Thread.sleep(1000);
+                                DataTableActivity.exHandler.sendMessage(DataTableActivity.exHandler.obtainMessage(1, txt));
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            } catch (NullPointerException nullPointerException){
+                                System.out.println("Catch the Nullpointer exception");
+                            }
+                            //ViewDataActivity.exHandler.sendMessage(ViewDataActivity.exHandler.obtainMessage(1, txt));
+                        case "E":
+                            udpSender.run(ipAddress, ack.toString() , PORT);
+
+                            try {
+                                //ensures handler is initialized first before thread is executed
+                                Thread.sleep(1000);
+                                ViewStatusActivity.exHandler.sendMessage(ViewStatusActivity.exHandler.obtainMessage(1, txt));
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            } catch (NullPointerException nullPointerException){
+                                System.out.println("Catch the Nullpointer exception");
+                            }
+
+                            //ViewStatusActivity.exHandler.sendMessage(ViewStatusActivity.exHandler.obtainMessage(1, txt));
                     }
+
 
                     Log.d("User","Handler send Message");
                     if(true) break;
@@ -132,10 +148,9 @@ class UDPReceiver extends Thread{
             }
         }
         catch(IOException e) {}
-      catch (JSONException e) {
-         e.printStackTrace();
-      }
-
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void CloseSocket(DatagramSocket socket) throws IOException{
