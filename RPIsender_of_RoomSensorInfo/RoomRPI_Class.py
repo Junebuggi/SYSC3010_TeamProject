@@ -77,7 +77,7 @@ class RoomRPI:
     
     #To send msgs to the global server
     def send_server_msg(self, message):
-        self.__soc_send.sendto(message, self.__server_addrs)
+        self.__soc_send.sendto(message.encode("utf-8"), self.__server_addrs)
         #Blink send LED
         self.blink(self.__sendLED)
         print("\nMessage sent to Server: " + message)
