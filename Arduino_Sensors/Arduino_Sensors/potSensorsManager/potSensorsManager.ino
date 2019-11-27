@@ -28,7 +28,7 @@
 //Define Sensor and Pump Pins
 #define ldrPin A0
 #define trigPin 8
-#define echoPin 6
+#define echoPin 7
 #define soilMoisturePin A2
 #define pumpPin 9
 
@@ -37,7 +37,7 @@
 #define distanceLED 12
 #define soilMoistureLED 11
 #define pumpLED 10
-#define ackLED 7
+#define ackLED 5
 
 // Define global variables for waterPump
 float initialDistance; // The initial waterDistance when the pump begins to run
@@ -100,6 +100,7 @@ void loop() {
 
   String opcode = "";
   boolean flag = false;
+  digitalWrite(ackLED, HIGH);
 
   if (serialPi.available() > 0) {
     opcode = serialPi.readStringUntil(',');
