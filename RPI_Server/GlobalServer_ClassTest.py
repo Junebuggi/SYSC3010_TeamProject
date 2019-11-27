@@ -36,8 +36,8 @@ class GlobalServer:
         self.__dbconnect.row_factory = sqlite3.Row;
         self.__cursor = self.__dbconnect.cursor()        
         #Setting up default threshold variables
-        self.__defaultThresholdValue = 80
-        self.__defaultLessGreaterThan = "<"
+        self.__defaultThresholdValue = 0
+        self.__defaultLessGreaterThan = ">"
         self.__lightThreshold = self.__defaultThresholdValue
         self.__lightLessGreaterThan =  self.__defaultLessGreaterThan
         self.__soilMoistureThreshold = self.__defaultThresholdValue
@@ -53,7 +53,7 @@ class GlobalServer:
         self.__currentRoomTemperature = 0
         self.__waterPumpDuration = 2
         #Setting timeout/end time values
-        self.__ack_timeout = 2
+        self.__ack_timeout = 5
         self.__ack_endTime = 4
         print("\nGlobal Server Initialized")
     
@@ -73,37 +73,30 @@ class GlobalServer:
         self.__soc_recv.settimeout(self.__ack_timeout)
         #If less than a endTime amount of time
         while(1):
-            if time.time() < (startTime + endTime):
-                try:
-                    #Try Receving otherwise timeout and retry
-                    print("Waiting for Acknowledgement . . .")
-                    buf, address = self.__soc_recv.recvfrom(self.__port)
-                    print(buf)
-                except socket.timeout:
-                    print("Receiving is Timed Out")
-                    continue
-                try:
+            try:
+                buf_noload, address = self.__soc_recv.recvfrom(self.__port)
+                #try:
                     #If buf is received, try to load it
-                    buf = json.loads(buf)
-                    if len(buf)>0:
-                        #Blink receive Led
-                        self.blink(self.__receiveLED)
-                        print ("Received %s bytes from '%s': %s " % (len(buf), address[0], buf))
-                        #Sending ack
-                        self.__soc_send.sendto(self.__ackstr, (address[0], self.__port))
-                        #Blink send Led
-                        self.blink(self.__sendLED)
-                        print ("Sent %s to %s" % (self.__ackstr, (address[0], self.__port)))
-                        #Give time for the ack sent to be acknowledged
-                        time.sleep(self.__ack_endTime)
-                        print("returning")
-                        return buf
-                except (ValueError, KeyError, TypeError):
-                    print("Error")
-                    continue
-            else:
-                #Failed to receive ack within a endTime amount of time
-                return False
+                buf = json.loads(str(buf_noload))
+                print(buf)
+                if len(buf_noload)>0:
+                    #Blink receive Led
+                    self.blink(self.__receiveLED)
+                    print ("Received %s bytes from '%s': %s " % (len(buf), address[0], buf))
+                    #Sending ack
+                    self.__soc_send.sendto(self.__ackstr, (address[0], self.__port))
+                    #Blink send Led
+                    self.blink(self.__sendLED)
+                    print ("Sent %s to %s" % (self.__ackstr, (address[0], self.__port)))
+                    #Give time for the ack sent to be acknowledged
+                    #time.sleep(self.__ack_endTime)
+                    print("returning")
+                    return (buf, buf_noload)
+                #except (ValueError, KeyError, TypeError):
+                    #print("Error5")
+            except socket.timeout:
+                print("Receiving is Timed Out")
+                continue
             
             
     
@@ -200,7 +193,7 @@ class GlobalServer:
         return
     
     #To update pot data in db
-    def updatePotTable(self, sensorInfo, tdate, time):
+    def updatePotTable(self, sensorInfo, tdate, ttime):
         potID = sensorInfo.get('potID')
         self.__currentWaterDistance = sensorInfo.get('waterDistance')
         self.__currentLight = sensorInfo.get('light')
@@ -214,7 +207,7 @@ class GlobalServer:
         return
     
     #To update room data in db
-    def updateRoomTable(self, sensorInfo,tdate, time):
+    def updateRoomTable(self, sensorInfo,tdate, ttime):
         self.__currentRoomTemperature = round(sensorInfo.get('temperature'), 2)
         self.__currentRoomHumidity = round(sensorInfo.get('humidity'), 2)
         roomID = sensorInfo.get('roomID')
@@ -243,26 +236,27 @@ class GlobalServer:
                             self.__roomTemperatureLessGreaterThan, roomTemperatureNotfn)
         #Combined tuples for sensors
         sensorArr = [light, roomHumidity, roomTemperature, soilMoisture]
+        print(sensorArr)
         #For each sensor compare current sensor value with threshold value
         for sensor in sensorArr:
             if sensor[2] == ">":
                 if sensor[0] > sensor[1]:
                     #Threshold is met, notify user
-                    notifyApp(sensor[3])
+                    self.notifyApp(sensor[3])
                     if(len(sensor) == 4):
                         #Soil moisture's threshold is met, then start water pump, notify user
-                        startPumpStr = '{"opcode" : "4", "pumpDuration" : "' + str(sensor[4]) + '"}'
-                        startWaterPump(startPumpStr) 
-                        notifyApp(startPumpStr) 
+                        startPumpStr = '{"opcode" : "4", "pumpDuration" : "' + str(self.__waterPumpDuration) + '"}'
+                        self.startWaterPump(startPumpStr) 
+                        self.notifyApp(startPumpStr) 
             elif sensor[2] == "<":
                 if sensor[0] < sensor[1]:
                     #Threshold is met, notify user
-                    notifyApp(sensor[3])
-                    if(length(sensor) == 4):
+                    self.notifyApp(sensor[3])
+                    if(len(sensor) == 4):
                         #Soil moisture's threshold is met, then start water pump, notify user
-                        startPumpStr = '{"opcode" : "4", "pumpDuration" : "' + str(sensor[4]) + '"}'
-                        startWaterPump(startPumpStr) 
-                        notifyApp(startPumpStr) 
+                        startPumpStr = '{"opcode" : "4", "pumpDuration" : "' + str(self.__waterPumpDuration) + '"}'
+                        self.startWaterPump(startPumpStr) 
+                        self.notifyApp(startPumpStr) 
         print("\Thresholds Compared")
         return
     
@@ -330,7 +324,7 @@ class GlobalServer:
     
     #To send msgs to the app and wait for ack
     def send_App_Msg(self, message):
-        self.__soc_send.sendto(message, self.__app_addrs)
+        self.__soc_send.sendto(message, self.__room_addrs)
         #Blink send LED
         self.blink(self.__sendLED)
         print("\nNotifcation sent to App: " + message)
@@ -418,14 +412,15 @@ class GlobalServer:
 #Main function which receives json data and invokes methods based on opcode received
 def main():
     #Create GlobalServer object (port, room_ip_addrs, app_ip_addrs)
-    globalServer = GlobalServer(8008, '192.168.137.103',
-                              '192.168.137.102')
+    globalServer = GlobalServer(1003, '192.168.137.103','192.168.137.218')
     while True:
-        message = globalServer.receive()
-        if (message ==  False):
+        data = globalServer.receive()
+        print(data)
+        if (data ==  False):
             #If length of buffer is <1
             continue
         else:
+            message = data[0]
             #User wants to update notes table
             if (message.get('opcode') == "1"):
                 globalServer.updateUserNotesTable(message)
@@ -444,15 +439,11 @@ def main():
                 globalServer.send_stats(rowNumbers, sensors)
             #If an error has occured in the room rpi or arduino
             if (message.get('opcode') == "D"):
-                #print(message)
-                error = json.dumps(str(message))
-                error = json.loads(error)
-                error = json.dumps(error)
-                error.encode('utf-8')
-                print("the errorr"  + error)
-                globalServer.notifyApp(error)
+                print("the errorr after dumping" + str(data[1]))
+                globalServer.notifyApp(str(data[1]))
             #If room rpi sent all sensory data, update tables, compare values to thresholds as well
-            if (message.get('opcode') == "9"): 
+            if (message.get('opcode') == "9"):
+                print(message)
                 tdate = str(date.today())
                 ttime = str(datetime.now().strftime("%H:%M:%S"))
                 globalServer.updateRoomTable(message, tdate, ttime)
