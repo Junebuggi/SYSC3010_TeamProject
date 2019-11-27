@@ -369,7 +369,7 @@ class GlobalServer:
         return stats
     
     #To send the stats with the corresponding opcode
-    def get_stats(self, rowNumbers, sensors):
+    def send_stats(self, rowNumbers, sensors):
         if rowNumbers == '0':
             #0 means to send app just one most recent row of data (opcode E)
             oneRow = globalServer.get_stats(1, sensors)
@@ -385,7 +385,7 @@ class GlobalServer:
         else:
             #If no ack received, try sending again
             print("\nStats sent again to app (notify again)")
-            self.get_stats(rowNumbers, sensors)
+            self.send_stats(rowNumbers, sensors)
         return
 
 #Main function which receives json data and invokes methods based on opcode received
@@ -415,7 +415,7 @@ def main():
             if (message.get('opcode') == "5"):
                 rowNumbers = message.get("rowNumbers")
                 sensors = message.get("sensorType")
-                globalServer.get_stats(rowNumbers, sensors)
+                globalServer.send_stats(rowNumbers, sensors)
             #If an error has occured in the room rpi or arduino
             if (message.get('opcode') == "D"): 
                 globalServer.notifyApp(str(message))
