@@ -17,7 +17,7 @@ import java.io.IOException;
 public class StatusActivity extends AppCompatActivity {
 
     private String ipAddress = "192.168.137.101";
-    private static final int PORT = 8008;
+    private static final int PORT = 1003;
 
     private Button sendPotID;
     private EditText potID;
@@ -41,7 +41,7 @@ public class StatusActivity extends AppCompatActivity {
                     //opcode for this view is row == 0 when in fact its the last row entered
                     sendPot.put("rowNumbers", 0);
                     sendPot.put("potID", potID.getText().toString());
-                    sensors = "light, roomTemperature, roomHumidity, waterDistance, soilMoisture";
+                    sensors = "light, temperature, humidity, waterDistance, soilMoisture";
                     sendPot.put("sensorType", sensors);
 
                 } catch (JSONException e) {

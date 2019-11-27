@@ -18,7 +18,7 @@ import java.io.IOException;
 
 public class NotesActivity extends AppCompatActivity {
 
-    private static final int PORT = 8008;
+    private static final int PORT = 1001;
     private static final String ipAddress = "192.168.137.101";
 
     private ImageButton sendNotes;

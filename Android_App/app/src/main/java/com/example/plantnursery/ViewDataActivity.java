@@ -17,7 +17,7 @@ import java.io.IOException;
 
 public class ViewDataActivity extends AppCompatActivity {
 
-    private String ipAddress = "192.168.137.101";
+    private String ipAddress = "172.17.47.247";
     private static final int PORT = 8008;
 
     UDPSender  udpSender = new UDPSender();
@@ -56,26 +56,24 @@ public class ViewDataActivity extends AppCompatActivity {
                     data.put("opcode", "5");
 
                     if(temp.isChecked()){
-                        sensorType += "roomTemperature,";
+                        sensorType += "temperature,";
                     }
                     if(humidity.isChecked()){
-                        sensorType += "roomHumidity,";
+                        sensorType += "humidity,";
                     }
                     if(light.isChecked()){
                         sensorType += "light,";
                     }
                     if(ultrasonic.isChecked()){
-                        sensorType += "waterLevel,";
+                        sensorType += "waterDistance,";
                     }
                     if(soilMoisture.isChecked()){
                         sensorType += "soilMoisture,";
                     }
 
-                    //remove last comma?
-                    //sensorType = sensorType.replaceAll(",", "");
 
                     String sensor = sensorType.substring(0, sensorType.lastIndexOf(","));
-                    System.out.println("~~~~~~~~~~" + sensorType);
+                    System.out.println("~~~~~~~~~~" + sensor);
 
                     data.put("rowNumbers", numRecords.getText().toString());
                     data.put("potID", potID.getText().toString());
@@ -91,16 +89,8 @@ public class ViewDataActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                //startActivity(new Intent(ViewDataActivity.this, DataTableActivity.class));
-
-                //bring to another page that will display the data
-                //need to use recycler view again so can scroll
-                //figure out how to output data in a table??
                 }
             });
-
-        //startActivity(new Intent(ViewDataActivity.this, DataTableActivity.class));
-
 
     }
 

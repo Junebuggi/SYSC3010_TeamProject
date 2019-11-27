@@ -12,7 +12,7 @@ import java.util.Date;
 
 
 class UDPReceiver extends Thread{
-    private String ipAddress = "192.168.137.101";
+    private String ipAddress = "172.17.47.247";
     private static final int PORT =8008;
     UDPSender udpSender = new UDPSender();
     //JSONObject ack = new JSONObject();
@@ -34,7 +34,7 @@ class UDPReceiver extends Thread{
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        
+
         byte[] byte1024 = new byte[1024];
         DatagramPacket dPacket = new DatagramPacket(byte1024, 1000);
         String txt;
@@ -47,9 +47,6 @@ class UDPReceiver extends Thread{
                {
                     txt = new String(byte1024, 0, dPacket.getLength());
                     System.out.println("~~~~~~~~this is the string" + txt);
-                    //MainActivity.notificationHistory.add(notificationCount++ +"Threshold" + ": " + "light threshold is met" + " " + new Date());
-                    //MainActivity.notificationHistory.add(txt);
-                    //ViewStatusActivity.exHandler.sendMessage(ViewStatusActivity.exHandler.obtainMessage(1,txt));
 
                     JSONObject obj = new JSONObject(txt);
                     String opcode = obj.getString("opcode");
