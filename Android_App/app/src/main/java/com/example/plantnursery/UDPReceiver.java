@@ -12,8 +12,10 @@ import java.util.Date;
 
 
 class UDPReceiver extends Thread{
+    //private static final String ipAddress = "192.168.137.1";
+    private static final int PORT =1000;
+
     private DatagramSocket server = null;
-    private static final int PORT =8008;
     private int notificationCount = 0;
 
     public UDPReceiver() throws IOException {
@@ -31,7 +33,10 @@ class UDPReceiver extends Thread{
         byte[] byte1024 = new byte[1024];
         DatagramPacket dPacket = new DatagramPacket(byte1024, 100);
         String txt;
+
         try{
+            JSONObject ack = new JSONObject();
+            ack.put("opcode", "0");
             Log.d("User","runing run()");
             while(true){
                 server.receive(dPacket);
@@ -45,8 +50,37 @@ class UDPReceiver extends Thread{
 
                     JSONObject obj = new JSONObject(txt);
                     String opcode = obj.getString("opcode");
+                    System.out.println("~~~~~~~~got opcode" + txt);
                     switch (opcode){
+                        case "0":
+                            System.out.println("~~~~ack received!");
+                        case "6":
+                            try {
+                                //ensures handler is initialized first before thread is executed
+                                //Thread.sleep(1000);
+                                DataTableActivity.exHandler.sendMessage(DataTableActivity.exHandler.obtainMessage(1, txt));
+
+                            }
+                             catch (NullPointerException nullPointerException){
+                                System.out.println("Catch the Nullpointer exception");
+                            }
+
+                        case "E":
+                           // udpSender.run(ipAddress, ack.toString() , PORT);
+
+                            try {
+                                //ensures handler is initialized first before thread is executed
+                                Thread.sleep(1000);
+                                ViewStatusActivity.exHandler.sendMessage(ViewStatusActivity.exHandler.obtainMessage(1, txt));
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            } catch (NullPointerException nullPointerException){
+                                System.out.println("Catch the Nullpointer exception");
+                            }
+
+                            //ViewStatusActivity.exHandler.sendMessage(ViewStatusActivity.exHandler.obtainMessage(1, txt));
                         case "D":
+                           // udpSender.run(ipAddress, ack.toString() , PORT);
                             System.out.println("~~~~in notification opcode");
                             //send an ACK here
                             //{"opcode" : "D", "sensorArray" : "0,0,0,0,0,0,1,0,0,0,0"}
@@ -89,35 +123,7 @@ class UDPReceiver extends Thread{
                             if (sensors[9] == 1) {
                                 MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" ERROR" + ": " + "Water pump wrror" + " " + new Date());
                             }
-
-                            //send ACK to globalServer
-                            JSONObject ack = new JSONObject();
-                            try{
-                                ack.put("opcode", "0");
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                        case "0":
-                            //ACK
-                        case "6":
-                            //stats are sent
-                            //ViewDataActivity.exHandler.sendMessage(ViewDataActivity.exHandler.obtainMessage(1, txt));
-                        case "E":
-
-                            try {
-                                //ensures handler is initialized first before thread is executed
-                                Thread.sleep(1000);
-                                ViewStatusActivity.exHandler.sendMessage(ViewStatusActivity.exHandler.obtainMessage(1, txt));
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            } catch (NullPointerException nullPointerException){
-                                System.out.println("Catch the Nullpointer exception");
-                            }
-
-                            //ViewStatusActivity.exHandler.sendMessage(ViewStatusActivity.exHandler.obtainMessage(1, txt));
                     }
-
 
                     Log.d("User","Handler send Message");
                     if(true) break;
@@ -129,6 +135,7 @@ class UDPReceiver extends Thread{
       catch (JSONException e) {
          e.printStackTrace();
       }
+
     }
 
     private void CloseSocket(DatagramSocket socket) throws IOException{

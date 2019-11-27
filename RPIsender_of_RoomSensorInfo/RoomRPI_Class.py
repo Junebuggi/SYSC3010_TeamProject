@@ -5,7 +5,7 @@
 import socket, sys, time, json, serial, Adafruit_DHT
 import RPi.GPIO as GPIO
 from datetime import datetime, date
-
+import Adafruit_CharLCD as LCD
 
 #Creating a room rpi class
 class RoomRPI:
@@ -40,6 +40,21 @@ class RoomRPI:
         #Setting up pins for temp/humidity sensor
         self.__DHT_SENSOR = Adafruit_DHT.DHT22
         self.__DHT_PIN = 4
+        # Setting up pins for the LCD
+        lcd_rs        = 25  
+        lcd_en        = 24
+        lcd_d4        = 23
+        lcd_d5        = 17
+        lcd_d6        = 18
+        lcd_d7        = 22
+        lcd_backlight = 4
+        # Define LCD column and row size for 16x2 LCD.
+        lcd_columns = 16
+        lcd_rows    = 2
+        #Initializing the LCD
+        self.__lcd = LCD.Adafruit_CharLCD(lcd_rs, lcd_en, lcd_d4, lcd_d5, \
+                     lcd_d6, lcd_d7, lcd_columns, lcd_rows, lcd_backlight)
+        self.__lcd.show_cursor(False)
         #Setting up default sensor variables
         self.__currentLight = 0
         self.__currentSoilMoisture = 0
@@ -128,6 +143,10 @@ class RoomRPI:
         self.__currentRoomHumidity, self.__currentRoomTemperature = \
                                     Adafruit_DHT.read(self.__DHT_SENSOR, self.__DHT_PIN);
         print("\nRoom Data Variables Updated")
+
+        self.__lcd.clear()
+        self.__lcd.message("Temp: " + str(self.__currentRoomTemperature) + chr(223) + "C\nHumidity: " + str(self.__currentRoomHumidity) + "%")
+
         return
 
     #To set current pot sensor values to what has been detected by pot sensors

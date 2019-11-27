@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+
 /**
  * This class is used to collect threshold values the app user will like to set
  * and send the threshold values to the globalServer which will store it in the
@@ -97,7 +99,7 @@ public class AddThresholdsActivity extends AppCompatActivity {
                         threshold.put("lessGreaterThan", "greater");
                         udpSender.run(ipAddress, threshold.toString(), PORT);
                     }
-                } catch (JSONException e) {
+                } catch (JSONException | IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -135,7 +137,7 @@ public class AddThresholdsActivity extends AppCompatActivity {
                         udpSender.run(ipAddress, threshold.toString(), PORT);
                     }
 
-                } catch (JSONException e) {
+                } catch (JSONException | IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -171,7 +173,7 @@ public class AddThresholdsActivity extends AppCompatActivity {
                         threshold.put("lessGreaterThan", "greater");
                         udpSender.run(ipAddress, threshold.toString(), PORT);
                     }
-                } catch (JSONException e) {
+                } catch (JSONException | IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -207,7 +209,7 @@ public class AddThresholdsActivity extends AppCompatActivity {
                         udpSender.run(ipAddress, threshold.toString(), PORT);
                     }
 
-                } catch (JSONException e) {
+                } catch (JSONException | IOException e) {
                     e.printStackTrace();
                 }
             }
