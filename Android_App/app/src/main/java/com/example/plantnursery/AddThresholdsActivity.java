@@ -21,11 +21,11 @@ import java.io.IOException;
  */
 public class AddThresholdsActivity extends AppCompatActivity {
 
-    private static final int PORT = 1000;
+    private static final int PORT = 8008;
     private static final String ipAddress = "192.168.137.101";
     private UDPSender udpSender;
     private Button setLightThreshold, setTempThreshold, setHumidityThreshold, setSoilThreshold;
-    private EditText tempThreshold, lightThreshold, humidityThreshold, soilThreshold, potID, roomID;
+    private EditText tempThreshold, lightThreshold, humidityThreshold, soilThreshold, potID;
     private CheckBox tempLess, tempGreater, lightLess, lightGreater, humidityLess,
             humidityGreater, soilLess, soilGreater;
 
@@ -42,7 +42,6 @@ public class AddThresholdsActivity extends AppCompatActivity {
         }
 
         //allow all widgets in view to be found
-        roomID = findViewById(R.id.editText12);
         potID = findViewById(R.id.editText11);
 
         //buttons, send info to globalServer
@@ -81,7 +80,7 @@ public class AddThresholdsActivity extends AppCompatActivity {
                     threshold.put("sensorType", "roomTemperature");
                     threshold.put("thresholdValue", tempThreshold.getText().toString());
                     threshold.put("potID", potID.getText().toString());
-                    threshold.put("roomID", roomID.getText().toString());
+
 
                     //if both checkboxes are pressed, the message is not sent
                     if ((tempLess.isChecked() && tempGreater.isChecked()) |
@@ -93,10 +92,11 @@ public class AddThresholdsActivity extends AppCompatActivity {
 
                     //logic for checkboxes, default is greater
                     else if (tempLess.isChecked()) {
-                        threshold.put("lessGreaterThan", "less");
+                        threshold.put("lessGreaterThan", "<");
                         udpSender.run(ipAddress, threshold.toString(), PORT);
                     } else {
-                        threshold.put("lessGreaterThan", "greater");
+                        //x>threshold
+                        threshold.put("lessGreaterThan", ">");
                         udpSender.run(ipAddress, threshold.toString(), PORT);
                     }
                 } catch (JSONException | IOException e) {
@@ -119,7 +119,7 @@ public class AddThresholdsActivity extends AppCompatActivity {
                     threshold.put("sensorType", "light");
                     threshold.put("thresholdValue", lightThreshold.getText().toString());
                     threshold.put("potID", potID.getText().toString());
-                    threshold.put("roomID", roomID.getText().toString());
+
 
                     //if both checkboxes are pressed, the message is not sent
                     if (lightLess.isChecked() && lightGreater.isChecked()) {
@@ -130,10 +130,10 @@ public class AddThresholdsActivity extends AppCompatActivity {
 
                     //logic for checkboxes, default is greater
                     else if (lightLess.isChecked()) {
-                        threshold.put("lessGreaterThan", "less");
+                        threshold.put("lessGreaterThan", "<");
                         udpSender.run(ipAddress, threshold.toString(), PORT);
                     } else {
-                        threshold.put("lessGreaterThan", "greater");
+                        threshold.put("lessGreaterThan", ">");
                         udpSender.run(ipAddress, threshold.toString(), PORT);
                     }
 
@@ -156,7 +156,7 @@ public class AddThresholdsActivity extends AppCompatActivity {
                     threshold.put("sensorType", "roomHumidity");
                     threshold.put("thresholdValue", humidityThreshold.getText().toString());
                     threshold.put("potID", potID.getText().toString());
-                    threshold.put("roomID", roomID.getText().toString());
+
 
                     //if both checkboxes are pressed, the message is not sent
                     if (humidityLess.isChecked() && humidityGreater.isChecked()) {
@@ -167,10 +167,10 @@ public class AddThresholdsActivity extends AppCompatActivity {
 
                     //logic for checkboxes, default is greater
                     else if (humidityLess.isChecked()) {
-                        threshold.put("lessGreaterThan", "less");
+                        threshold.put("lessGreaterThan", "<");
                         udpSender.run(ipAddress, threshold.toString(), PORT);
                     } else {
-                        threshold.put("lessGreaterThan", "greater");
+                        threshold.put("lessGreaterThan", ">");
                         udpSender.run(ipAddress, threshold.toString(), PORT);
                     }
                 } catch (JSONException | IOException e) {
@@ -191,7 +191,6 @@ public class AddThresholdsActivity extends AppCompatActivity {
                     threshold.put("sensorType", "soilMoisture");
                     threshold.put("thresholdValue", soilThreshold.getText().toString());
                     threshold.put("potID", potID.getText().toString());
-                    threshold.put("roomID", roomID.getText().toString());
 
                     //if both checkboxes are pressed, the message is not sent
                     if (soilLess.isChecked() && soilGreater.isChecked()) {
@@ -202,10 +201,10 @@ public class AddThresholdsActivity extends AppCompatActivity {
 
                     //logic for checkboxes, default is greater
                     else if (soilLess.isChecked()) {
-                        threshold.put("lessGreaterThan", "less");
+                        threshold.put("lessGreaterThan", "<");
                         udpSender.run(ipAddress, threshold.toString(), PORT);
                     } else {
-                        threshold.put("lessGreaterThan", "greater");
+                        threshold.put("lessGreaterThan", ">");
                         udpSender.run(ipAddress, threshold.toString(), PORT);
                     }
 

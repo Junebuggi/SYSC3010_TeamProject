@@ -2,6 +2,7 @@ package com.example.plantnursery;
 
 import android.util.Log;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -15,7 +16,12 @@ import java.util.concurrent.TimeoutException;
 public class UDPSender extends Thread {
 
 
-    //DatagramPacket packet;
+    DatagramPacket packet;
+    //UDPReceiver udpReceiver = new UDPReceiver();
+    int count = 0;
+
+    public UDPSender() throws IOException, JSONException {
+    }
     //implemtn ack in this thread..i think receiving ack
 
 
@@ -27,7 +33,7 @@ public class UDPSender extends Thread {
             InetAddress serverAddress = InetAddress.getByName(strIP);
             Log.d("IP Address", serverAddress.toString());
 
-            DatagramPacket packet;
+            //DatagramPacket packet;
 
             //send socket
             packet=new DatagramPacket(str.toString().getBytes(),str.length(),serverAddress,port);
@@ -35,10 +41,18 @@ public class UDPSender extends Thread {
             socket.send(packet);
             System.out.println("~~~~~/n/n/nsent");
 
+            //udpReceiver.start();
+            //socket.setSoTimeout(3000);
+
         }
 
         catch(SocketException e)
         {
+//            count++;
+//            socket.send(packet);
+//            if(count >= 3){
+//                socket.close();
+//            }
             e.printStackTrace();
             String error = e.toString();
             Log.e("Error by Sender", error);

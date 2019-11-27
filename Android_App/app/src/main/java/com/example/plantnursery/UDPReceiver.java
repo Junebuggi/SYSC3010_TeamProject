@@ -12,7 +12,7 @@ import java.util.Date;
 
 
 class UDPReceiver extends Thread{
-    private String ipAddress = "192.168.1.94";
+    private String ipAddress = "192.168.137.101";
     private static final int PORT =8008;
     UDPSender udpSender = new UDPSender();
     //JSONObject ack = new JSONObject();
@@ -49,8 +49,8 @@ class UDPReceiver extends Thread{
             Log.d("User","runing run()");
             while(true){
                 server.receive(dPacket);
-                while(true)
-                {
+               while(true)
+               {
                     txt = new String(byte1024, 0, dPacket.getLength());
                     System.out.println("~~~~~~~~this is the string" + txt);
                     //MainActivity.notificationHistory.add(notificationCount++ +"Threshold" + ": " + "light threshold is met" + " " + new Date());
@@ -61,6 +61,7 @@ class UDPReceiver extends Thread{
                     String opcode = obj.getString("opcode");
                     switch (opcode){
                         case "D":
+                            System.out.println("~~~caseD");
                             udpSender.run(ipAddress, ack.toString() , PORT);
                             System.out.println("~~~~in notification opcode");
                             //send an ACK here
@@ -106,13 +107,16 @@ class UDPReceiver extends Thread{
                             }
 
                             //send ACK to globalServer
+                            break;
 
 
                         case "0":
                             //ACK
                             System.out.println("~~~~~~ACK RECEIVED");
+                            break;
                         case "6":
-                            //udpSender.run(ipAddress, ack.toString() , PORT);
+                            System.out.println("~~~~case6");
+                            udpSender.run(ipAddress, ack.toString() , PORT);
                             //stats are sent
                             try {
                                 //ensures handler is initialized first before thread is executed
@@ -124,7 +128,9 @@ class UDPReceiver extends Thread{
                                 System.out.println("Catch the Nullpointer exception");
                             }
                             //ViewDataActivity.exHandler.sendMessage(ViewDataActivity.exHandler.obtainMessage(1, txt));
+                            break;
                         case "E":
+                            System.out.println("~~~~caseE");
                             udpSender.run(ipAddress, ack.toString() , PORT);
 
                             try {
@@ -136,6 +142,7 @@ class UDPReceiver extends Thread{
                             } catch (NullPointerException nullPointerException){
                                 System.out.println("Catch the Nullpointer exception");
                             }
+                            break;
 
                             //ViewStatusActivity.exHandler.sendMessage(ViewStatusActivity.exHandler.obtainMessage(1, txt));
                     }

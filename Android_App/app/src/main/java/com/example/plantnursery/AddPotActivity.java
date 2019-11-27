@@ -23,7 +23,7 @@ public class AddPotActivity extends AppCompatActivity {
     private static final String ipAddress = "192.168.137.101";
 
     private Button addPot;
-    private  EditText piID, arduinoID, plantName, waterAmount, rmName;
+    private  EditText piID, arduinoID, rmName;
     private UDPSender udpsender;
     private String str;
 
@@ -41,7 +41,6 @@ public class AddPotActivity extends AppCompatActivity {
 
         piID = (EditText)findViewById(R.id.editText7);
         arduinoID = (EditText)findViewById(R.id.editText8);
-        waterAmount = (EditText)findViewById(R.id.editText5);
         addPot = (Button)findViewById(R.id.button8);
         rmName = findViewById(R.id.editText15);
 
@@ -61,7 +60,6 @@ public class AddPotActivity extends AppCompatActivity {
                     newPot.put("roomID", piID.getText().toString());
                     newPot.put("ownerID", rmName.getText().toString()); //getting rid of rmName?
                     newPot.put("potID",arduinoID.getText().toString());
-                    newPot.put("owner", waterAmount.getText().toString()); //r we adding ater amount or just owner?
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

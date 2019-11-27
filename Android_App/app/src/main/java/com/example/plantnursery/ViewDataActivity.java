@@ -10,11 +10,14 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
 
 public class ViewDataActivity extends AppCompatActivity {
 
-    private String ipAddress = "192.168.1.94";
+    private String ipAddress = "192.168.137.101";
     private static final int PORT = 8008;
     UDPSender  udpSender = new UDPSender();
     private Button viewData;
@@ -22,6 +25,9 @@ public class ViewDataActivity extends AppCompatActivity {
     private CheckBox temp, humidity, light, ultrasonic, soilMoisture;
     String sensorType = "";
     JSONObject data;
+
+    public ViewDataActivity() throws IOException, JSONException {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,51 +50,55 @@ public class ViewDataActivity extends AppCompatActivity {
                 Toast.makeText(ViewDataActivity.this, "view data", Toast.LENGTH_SHORT).show();
                 //put it in JSON format
                 //[‘opcode’: ‘5’, ‘sensorType’: comma separated string, ‘rowNumbers’: integer]
-//                data = new JSONObject();
-//                try {
-//                    data.put("opcode", "5");
-//
-//                    if(temp.isChecked()){
-//                        sensorType += "roomTemperature,";
-//                    }
-//                    if(humidity.isChecked()){
-//                        sensorType += "roomHumidity,";
-//                    }
-//                    if(light.isChecked()){
-//                        sensorType += "light,";
-//                    }
-//                    if(ultrasonic.isChecked()){
-//                        sensorType += "waterLevel,";
-//                    }
-//                    if(soilMoisture.isChecked()){
-//                        sensorType += "soilMoisture,";
-//                    }
-//
-//                    //remove last comma?
-//
-//                    data.put("rowNumbers", numRecords.getText().toString());
-//                    data.put("potID", potID.getText().toString());
-//                    data.put("sensorType", sensorType);
-//
-//
-//                    udpSender.run(ipAddress, data.toString() , PORT);
+                data = new JSONObject();
+                try {
+                    data.put("opcode", "5");
+
+                    if(temp.isChecked()){
+                        sensorType += "roomTemperature,";
+                    }
+                    if(humidity.isChecked()){
+                        sensorType += "roomHumidity,";
+                    }
+                    if(light.isChecked()){
+                        sensorType += "light,";
+                    }
+                    if(ultrasonic.isChecked()){
+                        sensorType += "waterLevel,";
+                    }
+                    if(soilMoisture.isChecked()){
+                        sensorType += "soilMoisture,";
+                    }
+
+                    //remove last comma?
+                    //sensorType = sensorType.replaceAll(",", "");
+
+                    String sensor = sensorType.substring(0, sensorType.lastIndexOf(","));
+                    System.out.println("~~~~~~~~~~" + sensorType);
+
+                    data.put("rowNumbers", numRecords.getText().toString());
+                    data.put("potID", potID.getText().toString());
+                    data.put("sensorType", sensor);
+
+
+                    udpSender.run(ipAddress, data.toString() , PORT);
 
                     startActivity(new Intent(ViewDataActivity.this, DataTableActivity.class));
 
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 //startActivity(new Intent(ViewDataActivity.this, DataTableActivity.class));
 
                 //bring to another page that will display the data
                 //need to use recycler view again so can scroll
-                //figure out how to output data in a table???
-            }
-        });
+                //figure out how to output data in a table??
+                }
+            });
 
         //startActivity(new Intent(ViewDataActivity.this, DataTableActivity.class));
-
-
 
 
     }
