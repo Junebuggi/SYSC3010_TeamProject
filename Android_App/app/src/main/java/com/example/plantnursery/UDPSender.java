@@ -10,12 +10,16 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.concurrent.TimeoutException;
 
 public class UDPSender extends Thread {
 
 
+    //DatagramPacket packet;
+    //implemtn ack in this thread..i think receiving ack
 
-    public void run(String strIP, String str, int port){
+
+    public void run(String strIP, String str, int port) throws IOException {
         DatagramSocket socket = null;
         try
         {
@@ -30,7 +34,9 @@ public class UDPSender extends Thread {
             System.out.println("~~~~~~~~~~~~/n/n/nsendinggggggggg");
             socket.send(packet);
             System.out.println("~~~~~/n/n/nsent");
+
         }
+
         catch(SocketException e)
         {
             e.printStackTrace();

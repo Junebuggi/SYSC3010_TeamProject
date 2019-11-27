@@ -15,6 +15,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+
 public class AddPotActivity extends AppCompatActivity {
 
     private static final int PORT = 8008;
@@ -65,7 +67,11 @@ public class AddPotActivity extends AppCompatActivity {
                 }
 
 //                str = "" + piID.getText().toString()+ arduinoID.getText().toString() + plantName.getText().toString() + waterAmount.getText().toString();
-                udpsender.run(ipAddress, newPot.toString(), PORT);
+                try {
+                    udpsender.run(ipAddress, newPot.toString(), PORT);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
 

@@ -14,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+
 public class NotesActivity extends AppCompatActivity {
 
     private static final int PORT = 1000;
@@ -54,16 +56,15 @@ public class NotesActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                udpSender.run(ipAddress, addNotes.toString(), PORT);
+                try {
+                    udpSender.run(ipAddress, addNotes.toString(), PORT);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
         try {
-            UDPReceiver udpReceiver = new UDPReceiver();
-            udpReceiver.start();
-
-            //if doesnt receive within 3 sec resend
-
             udpSender = new UDPSender();
             Log.d("User", "Thread start...");
         } catch (Exception e) {

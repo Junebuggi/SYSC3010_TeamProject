@@ -14,12 +14,13 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final int PORT = 1000;
-    private static final String ipAddress = "192.168.137.101";
+    public static final int PORT = 8008;
+    private static final String ipAddress = "192.168.137.1";
 
     Button b_status, b_notification, b_data, b_notes, b_addPot, b_thresholds;
     static ArrayList<String> notificationHistory= new ArrayList<>(); //keep track of notifications
@@ -39,8 +40,8 @@ public class MainActivity extends AppCompatActivity {
         //this is here for notifications purposes
         try{
             udpSender = new UDPSender();
-//            UDPReceiver udpReceiver = new UDPReceiver();
-//            udpReceiver.start();
+            UDPReceiver udpReceiver = new UDPReceiver();
+            udpReceiver.start();
             Log.d("User","Thread start...");
         }catch(Exception e)
         {
@@ -122,6 +123,8 @@ public class MainActivity extends AppCompatActivity {
                     request.put("rowNumbers", 0);
                     udpSender.run(ipAddress, request.toString() , PORT);
                 } catch (JSONException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
 
