@@ -34,13 +34,7 @@ class UDPReceiver extends Thread{
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-//        try {
-//            //ensures handler is initialized first before thread is executed
-//            Thread.sleep(100);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+        
         byte[] byte1024 = new byte[1024];
         DatagramPacket dPacket = new DatagramPacket(byte1024, 1000);
         String txt;

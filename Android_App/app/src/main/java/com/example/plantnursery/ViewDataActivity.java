@@ -19,6 +19,7 @@ public class ViewDataActivity extends AppCompatActivity {
 
     private String ipAddress = "192.168.137.101";
     private static final int PORT = 8008;
+
     UDPSender  udpSender = new UDPSender();
     private Button viewData;
     private EditText numRecords, potID;

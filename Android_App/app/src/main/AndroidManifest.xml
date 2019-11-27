@@ -20,9 +20,11 @@
         <activity android:name=".NotificationActivity"/>
         <activity android:name=".AddPotActivity"/>
         <activity android:name=".ViewDataActivity"/>
-        <activity android:name=".ViewStatusActivity"/>
-        <activity android:name=".AddThresholdsActivity"/>
         <activity android:name=".DataTableActivity"/>
+        <activity android:name=".ViewStatusActivity"/>
+        <activity android:name=".StatusActivity"/>
+        <activity android:name=".AddThresholdsActivity"/>
+
 
     </application>
 

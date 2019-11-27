@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -64,18 +65,48 @@ public class ViewStatusActivity extends AppCompatActivity {
 
                 JSONObject obj = null;
                 try {
-                    //cast string to JSON
                     obj = new JSONObject((String) msg.obj);
 
-                    //interpret JSON and set text of textviews to corresponding values
-                    textTemp.setText(obj.getString("roomTemperature"));
-                    textHumidity.setText(obj.getString("roomHumidity"));
-                    textWaterLevel.setText(obj.getString("waterDistance"));
-                    textLight.setText(obj.getString("light"));
-                    textSoil.setText(obj.getString("soilMoisture"));
+                    JSONArray result = obj.getJSONArray("statsArray");
+                   // for (int i = 0; i < result.length(); i++) {
+                        JSONObject jsonObject = result.getJSONObject(0);
+
+                        String light = jsonObject.getString("light");
+                        String temperature = jsonObject.getString("roomTemperature");
+                        String humidity = jsonObject.getString("roomHumidity");
+                        String waterLevel = jsonObject.getString("waterLevel");
+                        String soil = jsonObject.getString("soilMoisture");
+//                        String date = jsonObject.getString("tdate");
+//                        String time = jsonObject.getString("ttime");
+                        String[] stats = {light, temperature, humidity, waterLevel, soil};
+
+                    textTemp.setText(stats[1]);
+                    textHumidity.setText(stats[2]);
+                    textWaterLevel.setText(stats[3]);
+                    textLight.setText(stats[0]);
+                    textSoil.setText(stats[4]);
+                   // }
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
+
+
+//                JSONObject obj = null;
+//                try {
+//                    //cast string to JSON
+//                    obj = new JSONObject((String) msg.obj);
+//
+//                    //interpret JSON and set text of textviews to corresponding values
+//                    textTemp.setText(obj.getString("roomTemperature"));
+//                    textHumidity.setText(obj.getString("roomHumidity"));
+//                    textWaterLevel.setText(obj.getString("waterDistance"));
+//                    textLight.setText(obj.getString("light"));
+//                    textSoil.setText(obj.getString("soilMoisture"));
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
                 Log.d("Handler", "Now in Handler");
             }
         };

@@ -40,7 +40,7 @@ public class DataTableActivity extends AppCompatActivity {
 
         //set the headers
         String[] spaceProbeHeaders={"Sensor","Value","Date","Time"};
-        tableView.setHeaderBackgroundColor(Color.parseColor("#cc2e85"));
+        tableView.setHeaderBackgroundColor(Color.parseColor("#95F80D"));
         tableView.setHeaderAdapter(new SimpleTableHeaderAdapter(this,spaceProbeHeaders));
         tableView.setColumnCount(4);
 
@@ -54,6 +54,8 @@ public class DataTableActivity extends AppCompatActivity {
                 super.handleMessage(msg);
                 ArrayList<String[]> list = new ArrayList<>();
                 String[] stats;
+                String sensor = "";
+                String name = "";
 
                 try{
                     JSONObject obj = new JSONObject((String) msg.obj);
@@ -61,12 +63,36 @@ public class DataTableActivity extends AppCompatActivity {
                     for (int i = 0; i < result.length(); i++) {
                         JSONObject jsonObject = result.getJSONObject(i);
 
-                        String name = jsonObject.getString("light");
-                        String phone = jsonObject.getString("tdate");
-                        String email = jsonObject.getString("ttime");
+                        if(jsonObject.has("light")){
+                            sensor = "Light";
+                            name = jsonObject.getString("light");
+                        }
 
-                        String j = String.valueOf(i);
-                        stats = new String[]{j, name, email, phone};
+                        if(jsonObject.has("roomTemperature")){
+                            sensor = "Temperature";
+                            name = jsonObject.getString("roomTemperature");
+                        }
+
+                        if(jsonObject.has("roomHumidity")){
+                            sensor = "Humidity";
+                            name = jsonObject.getString("roomHumidity");
+                        }
+
+                        if(jsonObject.has("soilMoisture")){
+                            sensor = "Soil Moisture";
+                            name = jsonObject.getString("soilMoisture");
+                        }
+
+                        if(jsonObject.has("waterLevel")){
+                            sensor = "Water Level";
+                            name = jsonObject.getString("waterLevel");
+                        }
+
+                        //String name = jsonObject.getString("light");
+                        String date = jsonObject.getString("tdate");
+                        String time = jsonObject.getString("ttime");
+
+                        stats = new String[]{sensor, name, date, time};
 
                         list.add(stats);
                     }
@@ -84,3 +110,24 @@ public class DataTableActivity extends AppCompatActivity {
 
 
 }
+
+//try{
+//        JSONObject obj = new JSONObject((String) msg.obj);
+//        JSONArray result = obj.getJSONArray("statsArray");
+//        for (int i = 0; i < result.length(); i++) {
+//        JSONObject jsonObject = result.getJSONObject(i);
+//
+//        String name = jsonObject.getString("light");
+//        String phone = jsonObject.getString("tdate");
+//        String email = jsonObject.getString("ttime");
+//
+//        String j = String.valueOf(i);
+//        stats = new String[]{j, name, email, phone};
+//
+//        list.add(stats);
+//        }
+//
+//        tableView.setDataAdapter(new SimpleTableDataAdapter(DataTableActivity.this, list));
+//        }catch (JSONException e) {
+//        e.printStackTrace();
+//        }

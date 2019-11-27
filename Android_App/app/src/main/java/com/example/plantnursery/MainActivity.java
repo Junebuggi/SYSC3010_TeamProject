@@ -116,19 +116,19 @@ public class MainActivity extends AppCompatActivity {
 
                 //send request to globalServer
                 //[‘opcode’: ‘5’, ‘sensorType’: comma separated string, ‘rowNumbers’: integer]
-                JSONObject request = new JSONObject();
-                try {
-                    request.put("opcode", "5");
-                    request.put("sensorType", "light, temperature, humidity, soilMoisture"); //did we decide no water supply?
-                    request.put("rowNumbers", 0);
-                    udpSender.run(ipAddress, request.toString() , PORT);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+//                JSONObject request = new JSONObject();
+//                try {
+//                    request.put("opcode", "5");
+//                    request.put("sensorType", "light, temperature, humidity, soilMoisture"); //did we decide no water supply?
+//                    request.put("rowNumbers", 0);
+//                    udpSender.run(ipAddress, request.toString() , PORT);
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
 
-                startActivity(new Intent(MainActivity.this, ViewStatusActivity.class));
+                startActivity(new Intent(MainActivity.this, StatusActivity.class));
             }
         });
 
