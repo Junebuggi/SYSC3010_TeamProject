@@ -13,11 +13,11 @@
 #include <math.h>
 
 const int promptLED = 5; // Will blink to let you know you have 5 seconds until the next test
-const int passLED = 8; //A green LED that blinks if the test passes
-const int failLED = 11; //A red LED that blinks if the test fails
+const int passLED = 11; //A green LED that blinks if the test passes
+const int failLED = 12; //A red LED that blinks if the test fails
 
-const int trigPin = 10;
-const int echoPin = 9;
+const int trigPin = 8;
+const int echoPin = 7;
 
 const int nTrials = 5;
 const int promptTime = 5; //The number of seconds the promptLED blinks before the next trial starts
@@ -48,11 +48,11 @@ void setup() {
     runTest(nTrials, distancesToTest[i]);
   }
 
-  Serial.println("================ Test Report Summary ================");
+  Serial.println("================ Test Report Summary ============= ===");
   Serial.println("Total number of tests: " + String(nPass + nFail));
   Serial.println("Number of Successes: " + String(nPass));
   Serial.println("Number of Fails: " + String(nFail));
-  Serial.println("Success Rate: " + String((double) nPass / nFail * 100) + "%"); 
+  Serial.println("Success Rate: " + String(((double) nPass / (nPass + nFail)) * 100) + "%"); 
    
 }
 
