@@ -13,31 +13,27 @@ class GlobalServer:
         #Setting port
         self.__port = int(port)
         #Setting timeout/end time values
-        self.__ack_timeout = 2
-        self.__ack_endTime = 4
+        self.__ack_timeout = 1
+        self.__receive_timeout = 10
+        self.__ack_endTime = 3
         #Setting socket to receive with a timeout set
         self.__soc_recv = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         recv_address = ('', self.__port)
         self.__soc_recv.bind(recv_address)
-        self.__soc_recv.settimeout(self.__ack_timeout)
-         #Setting socket to receive without a timeout
-        self.__soc_recvNoTimeout = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        recv_address = ('', self.__port)
-        self.__soc_recvNoTimeout.bind(recv_address)
         #Setting socket/addresses to send to the room rpi and app
         self.__soc_send =  socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.__room_addrs = (room_ip_addrs, self.__port)
         self.__app_addrs = (app_ip_addrs, self.__port)
         #Setting up led blinking  
-        self.__receiveLED = 14  #error in receiving
-        self.__sendLED = 15     #to show ack received
-        self.__dberrorLED = 18     #to show error in updating DB
+        self.__receiveLED = 14  #error in receiving BLUE
+        self.__sendLED = 15     #to show ack received GREEN
+        self.__dberrorLED = 18     #to show error in updating DB RED
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
         GPIO.setup(self.__receiveLED, GPIO.OUT)
         GPIO.setup(self.__sendLED, GPIO.OUT)
         #Setting up string for acknowldegements
-        self.__ackstr = "{'opcode':'0'}"
+        self.__ackstr = '{"opcode" : "0"}'
         #Setting database connections
         dbpath = '/home/pi/Documents/Team_Project/dataBases/plantNursery_DB.db'
         self.__dbconnect = sqlite3.connect(dbpath); 
@@ -59,19 +55,20 @@ class GlobalServer:
         self.__currentWaterDistance = 0
         self.__currentRoomHumidity = 0
         self.__currentRoomTemperature = 0
-        self.__waterPumpDuration = 2
+        self.__waterPumpDuration = 5
         #Number of times to keep resending a msg if ack not received
-        self.__numRetries = 3
+        self.__numRetries = 1
         print("\nGlobal Server Initialized")
 
     #Receives/returns buffer and sends ack 
     def receive(self):
+        self.__soc_recv.settimeout(self.__receive_timeout)
         print("\nWaiting to receive on port %d ... " % self.__port)
         #Keep Receiving
         while(1):
             #Try loading buffer, if error send no ack and blink receive LED to show error
             try:
-                buf_noload, address = self.__soc_recvNoTimeout.recvfrom(self.__port)
+                buf_noload, address = self.__soc_recv.recvfrom(self.__port)
                 buf = json.loads(str(buf_noload))
                 #Check to see if nothing received
                 if len(buf) > 0:
@@ -84,12 +81,15 @@ class GlobalServer:
                     print("Nothing was Received")
                     #Blink receive LED to show error
                     self.blink(self.__receiveLED)
-                    return Null
+                    return None
             except (ValueError, KeyError, TypeError):
                 print("Error in Loading Json String")
                 #Blink receive LED to show error
                 self.blink(self.__receiveLED)
-                return Null            
+                return None
+            except socket.timeout:
+                print("Receiving is Timed Out")
+                return None
         
     #To blink a pin once
     def blink(self, pin):
@@ -236,7 +236,7 @@ class GlobalServer:
                 #Threshold is met, notify user
                 if sensor[0] > sensor[1]:
                     self.notifyApp(sensor[3])
-                    if(len(sensor) == 4):
+                    if(len(sensor) == 5):
                         #Soil moisture's threshold is met, then start water pump, notify user for starting pump
                         startPumpStr = '{"opcode" : "4", "pumpDuration" : "' + str(self.__waterPumpDuration) + '"}'
                         self.startWaterPump(startPumpStr) 
@@ -245,7 +245,7 @@ class GlobalServer:
                 #Threshold is met, notify user
                 if sensor[0] < sensor[1]:
                     self.notifyApp(sensor[3])
-                    if(len(sensor) == 4):
+                    if(len(sensor) == 5):
                         #Soil moisture's threshold is met, then start water pump, notify user for starting pump
                         startPumpStr = '{"opcode" : "4", "pumpDuration" : "' + str(self.__waterPumpDuration) + '"}'
                         self.startWaterPump(startPumpStr) 
@@ -260,9 +260,9 @@ class GlobalServer:
         while(i != self.__numRetries):
             if (self.send_Room_Msg(startPump) == True):
                 #Ack has been received, return
-                print("Water Pump Msg sent to Room RPi")
+                print("Water Pump Ms has been sent to Room RPi")
                 return
-             else:
+            else:
                 #If no ack received, try sending again
                 print("Msg sent again to Room RPI")
             i = i + 1
@@ -273,9 +273,10 @@ class GlobalServer:
     #To send msgs to the room and wait for ack (times out if no ack received)
     def send_Room_Msg(self, message):
         self.__soc_send.sendto(message, self.__room_addrs)
-        print("\Message sent to Room: " + message)
+        print("\Message has been sent to Room: " + message)
         startTime = time.time()
         endTime = self.__ack_endTime
+        self.__soc_recv.settimeout(self.__ack_timeout)
         while (True):
             #If less than a endTime amount of time
             if time.time() < (startTime + endTime):
@@ -316,9 +317,9 @@ class GlobalServer:
         while(i != self.__numRetries):
             if (self.send_App_Msg(message) == True):
                 #Ack has been received, return
-                print("Msg sent to app")
+                print("Msg has been sent to app")
                 return
-             else:
+            else:
                 #If no ack received, try sending again
                 print("Msg sent again to app (notify again)")
             i = i + 1
@@ -328,10 +329,11 @@ class GlobalServer:
     
     #To send msgs to the app and wait for ack (times out if no ack received)
     def send_App_Msg(self, message):
-        self.__soc_send.sendto(message, self.__room_addrs)
-        print("\nNotifcation sent to App: " + message)
+        self.__soc_send.sendto(message, self.__app_addrs)
+        print("\nNotifcation has been sent to App: " + message)
         startTime = time.time()
         endTime = self.__ack_endTime
+        self.__soc_recv.settimeout(self.__ack_timeout)
         while (True):
             #If less than a endTime amount of time
             if time.time() < (startTime + endTime):
@@ -366,10 +368,11 @@ class GlobalServer:
         return
     
     #To get requested stats from the db
-    def get_stats(self, rowNumbers, sensors):
+    def get_stats(self, rowNumbers, sensors, potID):
         #Try retrieving data from the database
         try:
             #Retrieve Data
+            #If potID doesn't exist, it returns an empty array without having any errors
             sensors = sensors.replace('"',"").replace("'","").replace('[',"").replace(']',"")
             mysql = """SELECT """ + sensors + """, tdate, ttime FROM (
             SELECT * FROM userPlants a
@@ -377,7 +380,8 @@ class GlobalServer:
             ON a.potID = b.potID 
             INNER JOIN roomData c 
             ON a.roomID = c.roomID AND b.tdate = c.tdate AND b.ttime = c.ttime
-            ORDER BY c.tdate DESC, c.ttime DESC LIMIT """ + str(rowNumbers) + """)"""
+            WHERE a.potID = """ + str(potID) + \
+            """ ORDER BY c.tdate DESC, c.ttime DESC LIMIT """ + str(rowNumbers) + """)"""
             myresult = self.__cursor.execute(mysql).fetchall()
         except sqlite3.Error, e:
             #If error, blink db error led, return empty array
@@ -390,14 +394,14 @@ class GlobalServer:
         return stats
     
     #To send the stats with the corresponding opcode
-    def send_stats(self, rowNumbers, sensors):
-        if rowNumbers == '0':
+    def send_stats(self, rowNumbers, sensors, potID):
+        if rowNumbers == 0:
             #0 means to send app just one most recent row of data (opcode E)
-            oneRow = self.get_stats(1, sensors)
+            oneRow = self.get_stats(1, sensors, potID)
             stats = '{"opcode" : "E", "statsArray" : ' + str(oneRow) + '}'
         else:
             #Otherwise send mutiple recent rows of data (opcode 6)
-            manyRows = self.get_stats(rowNumbers, sensors)
+            manyRows = self.get_stats(rowNumbers, sensors, potID)
             stats = '{"opcode" : "6", "statsArray" : ' + str(manyRows) + '}'
         #Send stats to App
         self.notifyApp(stats)
@@ -406,10 +410,10 @@ class GlobalServer:
 #Main function which receives json data and invokes methods based on opcode received
 def main():
     #Create GlobalServer object (port, room_ip_addrs, app_ip_addrs)
-    globalServer = GlobalServer(1003, '192.168.137.103','192.168.137.218')
+    globalServer = GlobalServer(8008, '169.254.14.50','192.168.137.102')
     while True:
         data = globalServer.receive()
-        if (data ==  Null):
+        if (data ==  None):
             #If length of buffer is <1, try receiving again
             continue
         else:
@@ -429,13 +433,13 @@ def main():
             if (message.get('opcode') == "5"):
                 rowNumbers = message.get("rowNumbers")
                 sensors = message.get("sensorType")
-                globalServer.send_stats(rowNumbers, sensors)
+                potID = message.get("potID")
+                globalServer.send_stats(rowNumbers, sensors, potID)
             #If an error has occured in the room rpi or arduino
             if (message.get('opcode') == "D"):
                 globalServer.notifyApp(str(data[1])) #Sending unloaded version
             #If room rpi sent all sensory data, update tables, compare values to thresholds as well
             if (message.get('opcode') == "9"):
-                print(message)
                 tdate = str(date.today())
                 ttime = str(datetime.now().strftime("%H:%M:%S"))
                 globalServer.updateRoomTable(message, tdate, ttime)
@@ -448,4 +452,5 @@ def main():
     
 if __name__== "__main__":
     main()
+
 
