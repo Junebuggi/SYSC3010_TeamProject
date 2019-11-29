@@ -11,14 +11,16 @@ import random
 #Creating a room rpi class
 class RoomRPI:
     #The constructor
-    def __init__(self, port, server_ip_addrs):
+    def __init__(self, port, server_ip_addrs, debug):
         #Setting port
         self.__port = int(port)
         #Setting room ID
         self.__roomID = 1
         #Setting timeout/end time values
         self.__ack_timeout = 2
-        self.__ack_endTime = 4
+        self.__ack_endTime = 5
+        #Setting whether to show print statement or not
+        self.__DEBUG = debug
         #Setting socket to receive
         self.__soc_recv = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         recv_address = ('', self.__port)
@@ -28,18 +30,18 @@ class RoomRPI:
         self.__soc_send =  socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.__server_addrs = (server_ip_addrs, self.__port)
         #Setting up led blinking which blink to signify errors
-        self.__receiveLED = 14 #to show error in receiving
-        self.__sendLED = 15 #to show ack received
-        self.__errorLED = 18 #to show temp/humidity sensor not working
+        self.__receiveLED = 16 #to show error in receiving
+        self.__sendLED = 20 #to show ack received
+        self.__errorLED = 21 #to show temp/humidity sensor not working
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
         GPIO.setup(self.__receiveLED, GPIO.OUT)
         GPIO.setup(self.__sendLED, GPIO.OUT)
         GPIO.setup(self.__errorLED, GPIO.OUT)
         #Setting up string for acknowldegements
-        self.__ackstr = "{'opcode':'0'}"
+        self.__ackstr = '{"opcode":"0"}'
         #Setting serial for arduino
-        self.__ser = serial.Serial('/dev/ttyUSB0', timeout = 0.1)
+        self.__ser = serial.Serial('/dev/ttyACM0', timeout = 0.1)
         self.__ser.flushInput()
         #Setting up pins for temp/humidity sensor
         self.__DHT_SENSOR = Adafruit_DHT.DHT22
@@ -66,35 +68,42 @@ class RoomRPI:
         self.__currentWaterDistance = 0
         self.__currentRoomHumidity = 0
         self.__currentRoomTemperature = 0
+        self.__currentWaterDistanceStatus = 0
         #Number of times to keep resending a msg if ack not received
-        self.__numRetries = 3
-        print("\nRoom RPI Initialized")
+        self.__numRetries = 1
+        if (self.__DEBUG):
+            print("\nRoom RPI Initialized")
     
     #Receives/returns buffer and sends ack
     def receive(self):
         #Receives
-        print("\nWaiting to receive on port %d ... " % self.__port)
+        if (self.__DEBUG):
+            print("\nWaiting to receive on port %d ... " % self.__port)
         #Try loading buffer, if error send no ack and blink receive LED to show error
         try:
             buf, address = self.__soc_recv.recvfrom(self.__port)
             buf = json.loads(str(buf))
             #Check to see if nothing received
             if len(buf) > 0:
-                print ("Received %s bytes from '%s': %s " % (len(buf), address[0], buf))
+                if (self.__DEBUG):
+                    print ("Received %s bytes from '%s': %s " % (len(buf), address[0], buf))
                 #Sending ack
                 self.__soc_send.sendto(self.__ackstr, (address[0], self.__port))
-                print ("Sent %s to %s" % (self.__ackstr, (address[0], self.__port)))
+                if (self.__DEBUG):
+                    print ("Sent %s to %s" % (self.__ackstr, (address[0], self.__port)))
                 return buf
             else:
-                print("Nothing was Received")
+                if (self.__DEBUG):
+                    print("Nothing was Received")
                 #Blink receive LED to show error
                 self.blink(self.__receiveLED)
-                return Null
+                return None
         except (ValueError, KeyError, TypeError):
-            print("Error in Loading Json String")
+            if (self.__DEBUG):
+                print("Error in Loading Json String")
             #Blink receive LED to show error
             self.blink(self.__receiveLED)
-            return Null
+            return None
         
     #To blink a pin once
     def blink(self, pin):
@@ -108,7 +117,8 @@ class RoomRPI:
         self.__soc_send.sendto(message.encode("utf-8"), self.__server_addrs)
         #Blink send LED
         self.blink(self.__sendLED)
-        print("\nMessage sent to Server: " + message)
+        if (self.__DEBUG):
+            print("\nMessage sent to Server: " + message)
         #Should be receiving an ack so timeout if no ack received
         self.__soc_recv.settimeout(self.__ack_timeout)
         startTime = time.time()
@@ -118,27 +128,33 @@ class RoomRPI:
             if time.time() < (startTime + endTime):
                 try:
                     #Try Receving otherwise timeout and retry
-                    print("Waiting for Acknowledgement . . .")
+                    if (self.__DEBUG):
+                        print("Waiting for Acknowledgement . . .")
                     buf, address = self.__soc_recv.recvfrom(self.__port)
                     #If buf is received, try to load it
-                    buf = json.loads(buf)
+                    buf = json.loads(str(buf))
                     if not len(buf):
                         #No ack received, retry
                         continue
                     else:
-                        if (buf.get("opcode") == "0"):
+                        if (buf.get("opcode") == '0'):
                             #Ack recevied!
-                            print("Acknowledgement Received")
+                            if (self.__DEBUG):
+                                print("Acknowledgement Received")
                             self.blink(self.__sendLED)
+                            time.sleep(2)
                             return True
                         else:
                             #No ack received, retry
                             continue
                 except socket.timeout:
-                    print("Receiving is Timed Out")
+                    if (self.__DEBUG):
+                        print("Receiving is Timed Out")
                     #Restart while loop (Retry)
                     continue
-                except (ValueError, KeyError, TypeError):
+                except (ValueError, KeyError, TypeError), e:
+                    if (self.__DEBUG):
+                        print(str(e))
                     #Ack not received, try again
                     continue
             else:
@@ -154,33 +170,44 @@ class RoomRPI:
             #Blink LED
             self.blink(self.__errorLED)
             #Set temp and humidity to 0 if sensor isn't working
-            self.__currentRoomTemperature = 0
-            self.__currentRoomHumidity = 0
-        print("\nDHT22 has been Tested")
+            self.__currentRoomTemperature = 1
+            self.__currentRoomHumidity = 1
+        if (self.__DEBUG):
+            print("\nDHT22 has been Tested")
         return
     
     #To send error to the server
     def errorDetected(self, error):
         #If ack received, try sending again for certain number of times
         i = 0
-        while(i != self.__numRetries):
+        while(i <= self.__numRetries):
+            if (i == 0):
+                if(self.__DEBUG):
+                    print("Msg has been sent to the Global Server")
+            else:
+                if(self.__DEBUG):
+                    print("Msg is being sent again to the Global Server")
             if (self.send_server_msg(error) == True):
                 #Ack has been received, return
-                print("Msg sent to Global Server")
+                if (self.__DEBUG):
+                    print("Msg has been received by Global Server")
                 return
             else:
                 #If no ack received, try sending again
-                print("Msg sent again to Global Server (notify again)")
+                if (self.__DEBUG):
+                    print("Msg has not been by Global Server")
             i = i + 1
         #Msg has been sent numRetries times, return
-        print("Msg was not received by Global Server")
+        if (self.__DEBUG):
+            print("Msg was not received by Global Server")
         return
     
     #To get measurements from DHT22 sensor for humidity and temp
     def collectRoomData(self):
         self.__currentRoomHumidity, self.__currentRoomTemperature = \
                                     Adafruit_DHT.read(self.__DHT_SENSOR, self.__DHT_PIN);
-        print("\nRoom Data Variables Updated")
+        if (self.__DEBUG):
+            print("\nRoom Data Variables Updated")
         if self.__currentRoomHumidity != None and self.__currentRoomTemperature != None:
             #Round Values
             self.__currentRoomHumidity = round(float(str(self.__currentRoomHumidity)), 2)
@@ -197,8 +224,8 @@ class RoomRPI:
         self.__currentWaterDistance = potData.get('waterDistance')
         self.__currentSoilMoisture = potData.get('soilMoisture')
         self.__currentLight = potData.get('light')
+        self.__currentWaterDistanceStatus = potData.get('waterDistanceStatus')
         #Arduino's sensor error variables
-        waterDistanceStatus = potData.get('waterDistanceStatus')
         soilMoistureStatus = potData.get('soilMoistureStatus')
         waterPumpStatus = potData.get('waterPumpStatus')
         ldrStatus = potData.get('ldrStatus')
@@ -211,14 +238,15 @@ class RoomRPI:
         if soilMoistureStatus == 0:
            soilMoisture = 0
            self.errorDetected('{"opcode" : "D", "sensorArray" : "0, 0, 0, 0, 0, 0, 0, 1, 0, 0"}')
-        if waterDistanceStatus == 0:
+        if self.__currentWaterDistanceStatus == 0:
            self.waterDistance = 0
            self.errorDetected('{"opcode" : "D", "sensorArray" : "0, 0, 0, 0, 0, 0, 0, 0, 1, 0"}')
         if waterPumpStatus == 0:
            self.errorDetected('{"opcode" : "D", "sensorArray" : "0, 0, 0, 0, 0, 0, 0, 0, 0, 1"}')
         if waterLow == 0:
            self.errorDetected('{"opcode" : "D", "sensorArray" : "0, 0, 0, 0, 1, 0, 0, 0, 0, 0"}')
-        print("\nPot Data Variables Updated")
+        if (self.__DEBUG):
+            print("\nPot Data Variables Updated")
         return potID
 
     #To create JSON with all data and send to global server
@@ -228,26 +256,30 @@ class RoomRPI:
                   str(self.__currentRoomTemperature) + ', "humidity": ' + \
                   str(self.__currentRoomHumidity) + ', "waterDistance": ' + \
                   str(self.__currentWaterDistance) + ', "waterDistanceStatus": ' + \
-                  ', "light": ' + str(self.__currentLight) + ', "soilMoisture": ' + \
+                  str(self.__currentWaterDistanceStatus) + ', "light": ' + str(self.__currentLight) + ', "soilMoisture": ' + \
                   str(self.__currentSoilMoisture) + '}'
          #If ack received, try sending again for certain number of times
         i = 0
         while(i != self.__numRetries):
-            if (self.send_server_msg(allData) == True):
+            if (self.send_server_msg(alldata) == True):
                 #Ack has been received, return
-                print("Msg sent to Global Server")
+                if (self.__DEBUG):
+                    print("Msg sent to Global Server")
                 return
             else:
                 #If no ack received, try sending again
-                print("Msg sent again to Global Server (notify again)")
+                if (self.__DEBUG):
+                    print("Msg sent again to Global Server (notify again)")
             i = i + 1
         #Msg has been sent numRetries times, return
-        print("Msg was not received by Global Server"
+        if (self.__DEBUG):
+            print("Msg was not received by Global Server")
         return  
        
     #To communicate to the arduino to send it's sensory data
     def requestPotData(self):
-        print("\nRequesting Pot Data")
+        if (self.__DEBUG):
+            print("\nRequesting Pot Data")
         self.__ser.write(("E,").encode("utf-8"))
         startTime = time.time()
         while time.time() < (startTime + 2):
@@ -257,14 +289,14 @@ class RoomRPI:
                 potData = potData.decode().strip('\r\n')
                 #send acknowledgement
                 self.__ser.write(("0,").encode("utf-8"))
-                print("Received Pot Data: " + str(potData))
+                if (self.__DEBUG):
+                    print("Received Pot Data: " + str(potData))
                 return potData
             else:  
                 #send error
                 self.__ser.write(("E,").encode("utf-8"))
-        #return('{"opcode": null, "potID": null,"waterPumpStatus": null,"waterDistance": null,"waterDistanceStatus": null,"light": null,"ldrStatus": null,"soilMoisture": null,"soilMoistureStatus": null}')
-        return('{"opcode": "8", "potID": 1,"waterPumpStatus": ' + str(random.randint(0,1)) + ',"waterDistance": ' + str(random.randint(0,10)) + ',"waterDistanceStatus": ' + str(random.randint(0,1)) + ',"light": ' + str(random.randint(0,100)) + ',"ldrStatus": ' + str(random.randint(0,1)) + ',"soilMoisture": ' + str(random.randint(0,100)) + ',"soilMoistureStatus": ' + str(random.randint(0,1)) + '}')
-
+        return('{"opcode": null, "potID": null,"waterPumpStatus": null,"waterDistance": null,"waterDistanceStatus": null,"light": null,"ldrStatus": null,"soilMoisture": null,"soilMoistureStatus": null}')
+        
     #To create JSON to start water pump and communicate to arduino
     def startWaterPump(self, pumpDuration):
         if type(pumpDuration) is int and pumpDuration >= 1:
@@ -279,14 +311,16 @@ class RoomRPI:
 #Main function which receives json data/arduino data and invokes methods based on opcode
 def main():
     #Create room RPI object (port, server_ip_addrs)
-    roomRPI = RoomRPI(8008, '192.168.137.101')
+    DEBUG = True
+    roomRPI = RoomRPI(1000, '169.254.171.154', DEBUG)
     startTime = time.time()
-    sendTime = 5
+    sendTime = 40
     while True:
         #Request arduino data after every 'sendTime' seconds
         if time.time() > (startTime + sendTime):
             message = roomRPI.requestPotData()
-            print(message)
+            if (DEBUG):
+                print(message)
             message = json.loads(message)
             #Ensure the opcode received is 8 (arduino sent pot data)
             if message.get('opcode') == '8':
@@ -304,7 +338,7 @@ def main():
             #Check to see if server sent a start water pump msg
             try:
                 message = roomRPI.receive()
-                if (message ==  Null):
+                if (message ==  None):
                     #If length of buffer is < 1
                     continue
                 else:
@@ -317,7 +351,8 @@ def main():
             except socket.timeout, e:
                 err = e.args[0]
                 if err == 'timed out':
-                    print('\nReceiver timed out')
+                    if (DEBUG):
+                        print('\nReceiver timed out')
                     continue
     roomRPI.__soc_recv.shutdown(1)
     roomRPI.__soc_send.shutdown(1)
@@ -327,3 +362,4 @@ if __name__== "__main__":
     main()
 
    
+
