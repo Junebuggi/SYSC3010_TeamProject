@@ -258,7 +258,7 @@ class GlobalServer:
                         startPumpStr = '{"opcode" : "4", "pumpDuration" : "' + str(self.__waterPumpDuration) + '"}'
                         self.startWaterPump(startPumpStr) 
                         self.notifyApp(startPumpStr) 
-                        self.__runPump == False
+                        self.__runPump = False
             elif sensor[2] == "<":
                 #Threshold is met, notify user
                 if sensor[0] < sensor[1]:
@@ -268,7 +268,7 @@ class GlobalServer:
                         startPumpStr = '{"opcode" : "4", "pumpDuration" : "' + str(self.__waterPumpDuration) + '"}'
                         self.startWaterPump(startPumpStr) 
                         self.notifyApp(startPumpStr) 
-                        self.__runPump == False
+                        self.__runPump = False
         if (self.__DEBUG):
             print("\nThresholds Compared")
         return
@@ -453,15 +453,20 @@ class GlobalServer:
         self.notifyApp(stats)
         return
 
+    #Enables pump to be run again
+    def enableRunPump(self):
+        self.__runPump = True
+        return
+
 #Main function which receives json data and invokes methods based on opcode received
 def main():
     #Create GlobalServer object (port, room_ip_addrs, app_ip_addrs)
     globalServer = GlobalServer(8008, '169.254.14.50','192.168.137.102', True)
     startTime = time.time()
-    maxPumpTime = 60 * 1
+    maxPumpTime = 100000 * 1
     while True:
-        if (time.time() >= (startTime + maxPumpTime):
-            self.__runPump = True
+        if time.time() >= (startTime + maxPumpTime):
+            globalServer.enableRunPump()
             startTime = time.time()
         data = globalServer.receive()
         if (data ==  None):
@@ -485,17 +490,7 @@ def main():
                 rowNumbers = message.get("rowNumbers")
                 sensors = message.get("sensorType")
                 potID = message.get("potID")
-                globalServer.send_stats(rowNumbers, sensors, potID)
-            #If an error has occured in the room rpi or arduino
-            if (message.get('opcode') == "D"):
-                globalServer.notifyApp(str(data[1])) #Sending unloaded version
-            #If room rpi sent all sensory data, update tables, compare values to thresholds as well
-            if (message.get('opcode') == "9"):
-                tdate = str(date.today())
-                ttime = str(datetime.now().strftime("%H:%M:%S"))
-                globalServer.updateRoomTable(message, tdate, ttime)
-                globalServer.updatePotTable(message, tdate, ttime) 
-                globalServer.checkUserThresholds()        
+                globalServer.send_stats(rowNumbers, sensors, potID)      
     self.__soc_recv.shutdown(1)
     self.__soc_send.shutdown(1)
     self.__cursor.close()
@@ -503,5 +498,6 @@ def main():
     
 if __name__== "__main__":
     main()
+
 
 
