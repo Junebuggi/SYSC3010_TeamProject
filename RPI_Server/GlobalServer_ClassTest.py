@@ -9,13 +9,15 @@ from datetime import datetime, date
 #Creating a global server class
 class GlobalServer:
     #The constructor
-    def __init__(self, port, room_ip_addrs, app_ip_addrs):
+    def __init__(self, port, room_ip_addrs, app_ip_addrs, debug):
         #Setting port
         self.__port = int(port)
         #Setting timeout/end time values
         self.__ack_timeout = 1
         self.__receive_timeout = 10
         self.__ack_endTime = 3
+        #Setting whether to show print statement or not
+        self.__DEBUG = debug
         #Setting socket to receive with a timeout set
         self.__soc_recv = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         recv_address = ('', self.__port)
@@ -63,7 +65,8 @@ class GlobalServer:
     #Receives/returns buffer and sends ack 
     def receive(self):
         self.__soc_recv.settimeout(self.__receive_timeout)
-        print("\nWaiting to receive on port %d ... " % self.__port)
+        if (self.__DEBUG):
+            print("\nWaiting to receive on port %d ... " % self.__port)
         #Keep Receiving
         while(1):
             #Try loading buffer, if error send no ack and blink receive LED to show error
@@ -72,23 +75,28 @@ class GlobalServer:
                 buf = json.loads(str(buf_noload))
                 #Check to see if nothing received
                 if len(buf) > 0:
-                    print ("Received %s bytes from '%s': %s " % (len(buf), address[0], buf))
+                    if (self.__DEBUG):
+                        print ("Received %s bytes from '%s': %s " % (len(buf), address[0], buf))
                     #Sending ack
                     self.__soc_send.sendto(self.__ackstr, (address[0], self.__port))
-                    print ("Sent %s to %s" % (self.__ackstr, (address[0], self.__port)))
+                    if (self.__DEBUG):
+                        print ("Sent %s to %s" % (self.__ackstr, (address[0], self.__port)))
                     return (buf, buf_noload)
                 else:
-                    print("Nothing was Received")
+                    if (self.__DEBUG):
+                        print("Nothing was Received")
                     #Blink receive LED to show error
                     self.blink(self.__receiveLED)
                     return None
             except (ValueError, KeyError, TypeError):
-                print("Error in Loading Json String")
+                if (self.__DEBUG):
+                    print("Error in Loading Json String")
                 #Blink receive LED to show error
                 self.blink(self.__receiveLED)
                 return None
             except socket.timeout:
-                print("Receiving is Timed Out")
+                if (self.__DEBUG):
+                    print("Receiving is Timed Out")
                 return None
         
     #To blink a pin once
@@ -107,7 +115,8 @@ class GlobalServer:
             self.__dbconnect.commit();
         except sqlite3.Error, e:
             #If error, blink db error LED
-            print ('\nDatabase Error %s:' % e.args[0])
+            if (self.__DEBUG):
+                print ('\nDatabase Error %s:' % e.args[0])
             self.blink(self.__dberrorLED)
         return
         
@@ -133,7 +142,8 @@ class GlobalServer:
                 str(self.__defaultThresholdValue) +  "', '" + self.__defaultLessGreaterThan + \
                 "', '" + tdate + "', '" + ttime + "')"    
         self.insertDBData(mySQL)
-        print("\nSet Default Thresholds")
+        if (self.__DEBUG):
+            print("\nSet Default Thresholds")
         return
         
     #To add user requested threshold entries into the db
@@ -161,7 +171,8 @@ class GlobalServer:
         elif sensorType == "roomHumidity":
             self.__roomTemperatureThreshold = thresholdValue
             self.__roomTemperatureLessGreaterThan = lessGreaterThan
-        print("\nSet User Requested Thresholds")
+        if (self.__DEBUG):
+            print("\nSet User Requested Thresholds")
         return
 
     #To update user data in userPlantsTable
@@ -172,7 +183,8 @@ class GlobalServer:
         #Inserting user data into db
         mySQL = "INSERT INTO userPlants VALUES ('" + potID + "', '" + roomID + "', '" + ownerID + "')"    
         self.insertDBData(mySQL)
-        print("\nUpdated User Data")
+        if (self.__DEBUG):
+            print("\nUpdated User Data")
         return
     
     #To update notes in userNotesTable
@@ -184,7 +196,8 @@ class GlobalServer:
         #Inserting notes into db
         mySQL = "INSERT INTO userNotes VALUES ('" + potID + "', '" + notes + "', '" + tdate + "', '" + ttime + "')"
         self.insertDBData(mySQL)
-        print("\nUpdated Notes Data")
+        if (self.__DEBUG):
+            print("\nUpdated Notes Data")
         return
     
     #To update pot data in db
@@ -198,7 +211,8 @@ class GlobalServer:
                 str(self.__currentSoilMoisture) + "', '" + str(self.__currentWaterDistance) + "', '" + \
                 tdate + "', '" + ttime + "')"    
         self.insertDBData(mySQL)
-        print("\nUpdated Pot Data")
+        if (self.__DEBUG):
+            print("\nUpdated Pot Data")
         return
     
     #To update room data in db
@@ -210,7 +224,8 @@ class GlobalServer:
         mySQL = "insert into roomData values ('" + str(roomID) + "', '" + str(self.__currentRoomTemperature) + \
                 "', '" + str(self.__currentRoomHumidity) + "' , '" + tdate + "', '" + ttime + "')"    
         self.insertDBData(mySQL)
-        print("\nUpdated Room Data")
+        if (self.__DEBUG):
+            print("\nUpdated Room Data")
         return
 
     #To compare current sensor data to threshold values
@@ -250,7 +265,8 @@ class GlobalServer:
                         startPumpStr = '{"opcode" : "4", "pumpDuration" : "' + str(self.__waterPumpDuration) + '"}'
                         self.startWaterPump(startPumpStr) 
                         self.notifyApp(startPumpStr) 
-        print("\nThresholds Compared")
+        if (self.__DEBUG):
+            print("\nThresholds Compared")
         return
     
     #Send room rpi msg to start water pump
@@ -259,16 +275,20 @@ class GlobalServer:
         i = 0
         while(i <= self.__numRetries):
             if (i == 0):
-                print("Msg has been sent to the Room RPI")
+                if (self.__DEBUG):
+                    print("Msg has been sent to the Room RPI")
             else:
-                print("Msg is being sent again to Room RPI")
+                if (self.__DEBUG):
+                    print("Msg is being sent again to Room RPI")
             if (self.send_Room_Msg(startPump) == True):
                 #Ack has been received, return
-                print("Water Pump Msg has been received by Room RPI")
+                if (self.__DEBUG):
+                    print("Water Pump Msg has been received by Room RPI")
                 return
             else:
                 #If no ack received, try sending again
-                print("Msg not received by Room RPI")
+                if (self.__DEBUG):
+                    print("Msg not received by Room RPI")
             i = i + 1
         #Stop trying to send msg
         return   
@@ -276,7 +296,8 @@ class GlobalServer:
     #To send msgs to the room and wait for ack (times out if no ack received)
     def send_Room_Msg(self, message):
         self.__soc_send.sendto(message, self.__room_addrs)
-        print("\Message has been sent to Room: " + message)
+        if (self.__DEBUG):
+            print("\Message has been sent to Room: " + message)
         startTime = time.time()
         endTime = self.__ack_endTime
         self.__soc_recv.settimeout(self.__ack_timeout)
@@ -285,7 +306,8 @@ class GlobalServer:
             if time.time() < (startTime + endTime):
                 try:
                     #Try Receving ack otherwise timeout and retry
-                    print("Waiting for Acknowledgement . . .")
+                    if (self.__DEBUG):
+                        print("Waiting for Acknowledgement . . .")
                     buf, address = self.__soc_recv.recvfrom(self.__port)
                     #If buf is received, try to load it
                     buf = json.loads(buf)
@@ -295,14 +317,16 @@ class GlobalServer:
                     else:
                         if (buf.get("opcode") == "0"):
                             #Ack recevied, blink ack LED
-                            print("Acknowledgement Received")
+                            if (self.__DEBUG):
+                                print("Acknowledgement Received")
                             self.blink(self.__sendLED)
                             return True
                         else:
                             #No ack received, retry
                             continue
                 except socket.timeout:
-                    print("Receiving is Timed Out")
+                    if (self.__DEBUG):
+                        print("Receiving is Timed Out")
                     #Restart while loop (Retry)
                     continue
                 except (ValueError, KeyError, TypeError):
@@ -319,16 +343,20 @@ class GlobalServer:
         i = 0
         while(i <= self.__numRetries):
             if (i == 0):
-                print("Msg has been sent to the App")
+                if (self.__DEBUG):
+                    print("Msg has been sent to the App")
             else:
-                print("Msg is being sent again to the App")
+                if (self.__DEBUG):
+                    print("Msg is being sent again to the App")
             if (self.send_App_Msg(message) == True):
                 #Ack has been received, return
-                print("Water Pump Msg has been received by the App")
+                if (self.__DEBUG):
+                    print("Water Pump Msg has been received by the App")
                 return
             else:
                 #If no ack received, try sending again
-                print("Msg not received by the App")
+                if (self.__DEBUG):
+                    print("Msg not received by the App")
             i = i + 1
         #Stop trying to send msg
         return   
@@ -338,7 +366,8 @@ class GlobalServer:
     #To send msgs to the app and wait for ack (times out if no ack received)
     def send_App_Msg(self, message):
         self.__soc_send.sendto(message, self.__app_addrs)
-        print("\nNotifcation has been sent to App: " + message)
+        if (self.__DEBUG):
+            print("\nNotifcation has been sent to App: " + message)
         startTime = time.time()
         endTime = self.__ack_endTime
         self.__soc_recv.settimeout(self.__ack_timeout)
@@ -347,7 +376,8 @@ class GlobalServer:
             if time.time() < (startTime + endTime):
                 try:
                     #Try Receving otherwise timeout and retry
-                    print("Waiting for Acknowledgement . . .")
+                    if (self.__DEBUG):
+                        print("Waiting for Acknowledgement . . .")
                     buf, address = self.__soc_recv.recvfrom(self.__port)
                     #If buf is received, try to load it
                     buf = json.loads(buf)
@@ -357,7 +387,8 @@ class GlobalServer:
                     else:
                         if (buf.get("opcode") == "0"):
                             #Ack recevied, blink ack led
-                            print("Acknowledgement Received")
+                            if (self.__DEBUG):
+                                print("Acknowledgement Received")
                             self.blink(self.__sendLED)
                             return True
                         else:
@@ -367,7 +398,8 @@ class GlobalServer:
                     #Ack not received, try again
                     continue
                 except socket.timeout:
-                    print("Receiving is Timed Out")
+                    if (self.__DEBUG):
+                        print("Receiving is Timed Out")
                     #Restart while loop (Retry)
                     continue
             else:
@@ -393,12 +425,14 @@ class GlobalServer:
             myresult = self.__cursor.execute(mysql).fetchall()
         except sqlite3.Error, e:
             #If error, blink db error led, return empty array
-            print '\nDatabase Error %s:' % e.args[0]
+            if (self.__DEBUG):
+                print '\nDatabase Error %s:' % e.args[0]
             self.blink(self.__dberrorLED)
             return "[]"
         #Convert data into json format
         stats = json.dumps( [dict(i) for i in myresult] )
-        print("\nData Retreived from DB")
+        if (self.__DEBUG):
+            print("\nData Retreived from DB")
         return stats
     
     #To send the stats with the corresponding opcode
@@ -418,7 +452,7 @@ class GlobalServer:
 #Main function which receives json data and invokes methods based on opcode received
 def main():
     #Create GlobalServer object (port, room_ip_addrs, app_ip_addrs)
-    globalServer = GlobalServer(8008, '169.254.14.50','192.168.137.102')
+    globalServer = GlobalServer(8008, '169.254.14.50','192.168.137.102', True)
     while True:
         data = globalServer.receive()
         if (data ==  None):
