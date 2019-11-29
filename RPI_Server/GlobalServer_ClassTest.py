@@ -257,17 +257,20 @@ class GlobalServer:
     def startWaterPump(self, startPump):
         #If ack received, try sending again for certain number of times
         i = 0
-        while(i != self.__numRetries):
+        while(i <= self.__numRetries):
+            if (i == 0):
+                print("Msg has been sent to the Room RPI")
+            else:
+                print("Msg is being sent again to Room RPI")
             if (self.send_Room_Msg(startPump) == True):
                 #Ack has been received, return
-                print("Water Pump Ms has been sent to Room RPi")
+                print("Water Pump Msg has been received by Room RPI")
                 return
             else:
                 #If no ack received, try sending again
-                print("Msg sent again to Room RPI")
+                print("Msg not received by Room RPI")
             i = i + 1
-        #Msg has been sent numRetries times, return
-        print("Msg was not received by Room RPI")
+        #Stop trying to send msg
         return   
     
     #To send msgs to the room and wait for ack (times out if no ack received)
@@ -314,18 +317,23 @@ class GlobalServer:
     def notifyApp(self, message):
         #If ack received, try sending again for certain number of times
         i = 0
-        while(i != self.__numRetries):
+        while(i <= self.__numRetries):
+            if (i == 0):
+                print("Msg has been sent to the App")
+            else:
+                print("Msg is being sent again to the App")
             if (self.send_App_Msg(message) == True):
                 #Ack has been received, return
-                print("Msg has been sent to app")
+                print("Water Pump Msg has been received by the App")
                 return
             else:
                 #If no ack received, try sending again
-                print("Msg sent again to app (notify again)")
+                print("Msg not received by the App")
             i = i + 1
-        #Msg has been sent numRetries times, return
-        print("Msg was not received by App")
-        return
+        #Stop trying to send msg
+        return   
+    
+    
     
     #To send msgs to the app and wait for ack (times out if no ack received)
     def send_App_Msg(self, message):
