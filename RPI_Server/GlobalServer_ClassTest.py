@@ -364,9 +364,7 @@ class GlobalServer:
             i = i + 1
         #Stop trying to send msg
         return   
-    
-    
-    
+  
     #To send msgs to the app and wait for ack (times out if no ack received)
     def send_App_Msg(self, message):
         self.__soc_send.sendto(message, self.__app_addrs)
@@ -460,14 +458,19 @@ class GlobalServer:
 
 #Main function which receives json data and invokes methods based on opcode received
 def main():
-    #Create GlobalServer object (port, room_ip_addrs, app_ip_addrs)
-    globalServer = GlobalServer(8008, '169.254.14.50','192.168.137.102', True)
+    DEBUG = True
+    #Create GlobalServer object (port, room_ip_addrs, app_ip_addrs, DEBUG)
+    globalServer = GlobalServer(8008, '169.254.14.50','192.168.137.102', DEBUG)
     startTime = time.time()
-    maxPumpTime = 100000 * 1
+    pumpNotRunTime = 80
     while True:
-        if time.time() >= (startTime + maxPumpTime):
+        #In the beginning, the water pump is already enabled in class intialization
+        #The water pump is only disabled when the pump is run
+        #The pump is enabled once the pumpNotRunTime has been passed and time is recalculated
+        if time.time() >= (startTime + pumpNotRunTime):
             globalServer.enableRunPump()
             startTime = time.time()
+        #receive
         data = globalServer.receive()
         if (data ==  None):
             #If length of buffer is <1, try receiving again
