@@ -20,7 +20,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     public static final int PORT = 8008;
-    private static final String ipAddress = "192.168.137.1";
+    private static final String ipAddress = "192.168.137.101";
 
     Button b_status, b_notification, b_data, b_notes, b_addPot, b_thresholds;
     static ArrayList<String> notificationHistory= new ArrayList<>(); //keep track of notifications

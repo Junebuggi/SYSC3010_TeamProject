@@ -13,15 +13,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.SocketException;
 
 public class StatusActivity extends AppCompatActivity {
 
     private String ipAddress = "192.168.137.101";
-    private static final int PORT = 1003;
+    private static final int PORT = 1000;
+    private int count;
 
     private Button sendPotID;
     private EditText potID;
     private  UDPSender udpSender;
+    private UDPReceiver udpReceiver;
     private String sensors;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,21 +51,44 @@ public class StatusActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                try {
-                    udpSender = new UDPSender();
-                    udpSender.run(ipAddress, sendPot.toString() , PORT);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
-                    e.printStackTrace();
+
+
+                boolean received = true;
+                count = 0;
+                while(received) {
+                    try {
+
+
+                        udpSender = new UDPSender();
+                        udpSender.run(ipAddress, sendPot.toString(), PORT);
+                        //udpReceiver = new UDPReceiver();
+                        //udpReceiver.start();
+                        //udpReceiver.udpSender.socket.setSoTimeout(10000);
+
+
+                        udpSender.socket.setSoTimeout(3000);
+                        if(count == 0){
+                            received = false;
+                        }
+                        System.out.println("~~~~~~~~~~~ timeout");
+                    } catch (SocketException e) {
+                        try {
+                            count++;
+                            System.out.println("~~~~~~~~~~~" + count);
+                            if (count >= 3) {
+                                received = false;
+                            }
+                        } finally {
+                            //udpSender.socket.close();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-
-                //goes to viewStatusActivity nect
                 startActivity(new Intent(StatusActivity.this, ViewStatusActivity.class));
-
-
             }
-
         });
     }
 }

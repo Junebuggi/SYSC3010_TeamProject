@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeoutException;
@@ -19,6 +20,7 @@ public class UDPSender extends Thread {
     DatagramPacket packet;
     //UDPReceiver udpReceiver = new UDPReceiver();
     int count = 0;
+    DatagramSocket socket = null;
 
     public UDPSender() throws IOException, JSONException {
     }
@@ -26,7 +28,7 @@ public class UDPSender extends Thread {
 
 
     public void run(String strIP, String str, int port) throws IOException {
-        DatagramSocket socket = null;
+        //DatagramSocket socket = null;
         try
         {
             socket = new DatagramSocket();
@@ -41,21 +43,6 @@ public class UDPSender extends Thread {
             socket.send(packet);
             System.out.println("~~~~~/n/n/nsent");
 
-            //udpReceiver.start();
-            //socket.setSoTimeout(3000);
-
-        }
-
-        catch(SocketException e)
-        {
-//            count++;
-//            socket.send(packet);
-//            if(count >= 3){
-//                socket.close();
-//            }
-            e.printStackTrace();
-            String error = e.toString();
-            Log.e("Error by Sender", error);
         }
         catch(UnknownHostException e)
         {

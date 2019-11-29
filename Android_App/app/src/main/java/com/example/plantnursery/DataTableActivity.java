@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -60,6 +61,9 @@ public class DataTableActivity extends AppCompatActivity {
                 try{
                     JSONObject obj = new JSONObject((String) msg.obj);
                     JSONArray result = obj.getJSONArray("statsArray");
+                    if(result.length() == 0){
+                        Toast.makeText(DataTableActivity.this, "invalid potID, no data found :(", Toast.LENGTH_SHORT).show();
+                    }
                     for (int i = 0; i < result.length(); i++) {
                         JSONObject jsonObject = result.getJSONObject(i);
 

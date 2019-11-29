@@ -21,8 +21,9 @@ import java.io.IOException;
  */
 public class AddThresholdsActivity extends AppCompatActivity {
 
-    private static final int PORT = 8008;
     private static final String ipAddress = "192.168.137.101";
+    private static final int PORT = 8008;
+
     private UDPSender udpSender;
     private Button setLightThreshold, setTempThreshold, setHumidityThreshold, setSoilThreshold;
     private EditText tempThreshold, lightThreshold, humidityThreshold, soilThreshold, potID;

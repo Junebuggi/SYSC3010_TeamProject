@@ -6,6 +6,7 @@ import android.os.Message;
 import android.os.StrictMode;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -68,24 +69,30 @@ public class ViewStatusActivity extends AppCompatActivity {
                     obj = new JSONObject((String) msg.obj);
 
                     JSONArray result = obj.getJSONArray("statsArray");
-                   // for (int i = 0; i < result.length(); i++) {
+
+                    if(result.length() == 0){
+                        Toast.makeText(ViewStatusActivity.this, "invalid potID, no data found :(", Toast.LENGTH_SHORT).show();
+                    } else{
+                        // for (int i = 0; i < result.length(); i++) {
                         JSONObject jsonObject = result.getJSONObject(0);
 
                         String light = jsonObject.getString("light");
-                        String temperature = jsonObject.getString("roomTemperature");
-                        String humidity = jsonObject.getString("roomHumidity");
-                        String waterLevel = jsonObject.getString("waterLevel");
+                        String temperature = jsonObject.getString("temperature");
+                        String humidity = jsonObject.getString("humidity");
+                        String waterLevel = jsonObject.getString("waterDistance");
                         String soil = jsonObject.getString("soilMoisture");
 //                        String date = jsonObject.getString("tdate");
 //                        String time = jsonObject.getString("ttime");
                         String[] stats = {light, temperature, humidity, waterLevel, soil};
 
-                    textTemp.setText(stats[1]);
-                    textHumidity.setText(stats[2]);
-                    textWaterLevel.setText(stats[3]);
-                    textLight.setText(stats[0]);
-                    textSoil.setText(stats[4]);
-                   // }
+                        textTemp.setText(stats[1]);
+                        textHumidity.setText(stats[2]);
+                        textWaterLevel.setText(stats[3]);
+                        textLight.setText(stats[0]);
+                        textSoil.setText(stats[4]);
+                        // }
+                    }
+
 
                 } catch (JSONException e) {
                     e.printStackTrace();

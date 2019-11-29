@@ -12,8 +12,8 @@ import java.util.Date;
 
 
 class UDPReceiver extends Thread{
-    private String ipAddress = "172.17.47.247";
-    private static final int PORT =8008;
+    private String ipAddress = "192.168.137.101";
+    private static final int PORT =1000;
     UDPSender udpSender = new UDPSender();
     //JSONObject ack = new JSONObject();
 
@@ -22,8 +22,6 @@ class UDPReceiver extends Thread{
     private int notificationCount = 0;
 
     public UDPReceiver() throws IOException, JSONException {
-
-
         server = new DatagramSocket(PORT);
         Log.d("User","new server socket");
     }
@@ -53,6 +51,7 @@ class UDPReceiver extends Thread{
                     switch (opcode){
                         case "D":
                             System.out.println("~~~caseD");
+                            //send ACK
                             udpSender.run(ipAddress, ack.toString() , PORT);
                             System.out.println("~~~~in notification opcode");
                             //send an ACK here
@@ -67,19 +66,19 @@ class UDPReceiver extends Thread{
                             }
 
                             if (sensors[0] == 1) {
-                                MainActivity.notificationHistory.add(0, "#" + notificationCount++ +" Threshold" + ": " + "Light threshold is met" + " " + new Date());
+                                MainActivity.notificationHistory.add(0, "#" + notificationCount++ +" Threshold" + ": " + "Light threshold is met!" + " " + new Date());
                             }
                             if (sensors[1] == 1) {
-                                MainActivity.notificationHistory.add(0, "#" + notificationCount++ +" Threshold" + ": " + "Humidity threshold is met" + " " + new Date());
+                                MainActivity.notificationHistory.add(0, "#" + notificationCount++ +" Threshold" + ": " + "Humidity threshold is met!" + " " + new Date());
                             }
                             if (sensors[2] == 1) {
-                                MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" Threshold" + ": " + "Temperature threshold is met" + " " + new Date());
+                                MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" Threshold" + ": " + "Temperature threshold is met!" + " " + new Date());
                             }
                             if (sensors[3] == 1) {
-                                MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" Threshold" + ": " + "Soil moisture threshold is met" + " " + new Date());
+                                MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" Threshold" + ": " + "Soil moisture threshold is met!" + " " + new Date());
                             }
                             if (sensors[4] == 1) {
-                                MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" Threshold" + ": " + "Water supply is low, please refill" + " " + new Date());
+                                MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" Threshold" + ": " + "Water supply is low, please refill!" + " " + new Date());
                             }
                             if (sensors[5] == 1) {
                                 MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" ERROR" + ": " + "Light sensor error" + " " + new Date());
@@ -96,17 +95,14 @@ class UDPReceiver extends Thread{
                             if (sensors[9] == 1) {
                                 MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" ERROR" + ": " + "Water pump wrror" + " " + new Date());
                             }
-
-                            //send ACK to globalServer
                             break;
-
-
                         case "0":
-                            //ACK
+                            //ACK received
                             System.out.println("~~~~~~ACK RECEIVED");
                             break;
                         case "6":
                             System.out.println("~~~~case6");
+                            //send ACK
                             udpSender.run(ipAddress, ack.toString() , PORT);
                             //stats are sent
                             try {
