@@ -60,6 +60,8 @@ class GlobalServer:
         self.__waterPumpDuration = 5
         #Number of times to keep resending a msg if ack not received
         self.__numRetries = 1
+        #To determine whether or not pump should be enabled 
+        self.__runPump = True
         print("\nGlobal Server Initialized")
 
     #Receives/returns buffer and sends ack 
@@ -251,20 +253,22 @@ class GlobalServer:
                 #Threshold is met, notify user
                 if sensor[0] > sensor[1]:
                     self.notifyApp(sensor[3])
-                    if(len(sensor) == 5):
+                    if(len(sensor) == 5 and self.__runPump == True):
                         #Soil moisture's threshold is met, then start water pump, notify user for starting pump
                         startPumpStr = '{"opcode" : "4", "pumpDuration" : "' + str(self.__waterPumpDuration) + '"}'
                         self.startWaterPump(startPumpStr) 
                         self.notifyApp(startPumpStr) 
+                        self.__runPump == False
             elif sensor[2] == "<":
                 #Threshold is met, notify user
                 if sensor[0] < sensor[1]:
                     self.notifyApp(sensor[3])
-                    if(len(sensor) == 5):
+                    if(len(sensor) == 5 and self.__runPump == True):
                         #Soil moisture's threshold is met, then start water pump, notify user for starting pump
                         startPumpStr = '{"opcode" : "4", "pumpDuration" : "' + str(self.__waterPumpDuration) + '"}'
                         self.startWaterPump(startPumpStr) 
                         self.notifyApp(startPumpStr) 
+                        self.__runPump == False
         if (self.__DEBUG):
             print("\nThresholds Compared")
         return
@@ -453,7 +457,12 @@ class GlobalServer:
 def main():
     #Create GlobalServer object (port, room_ip_addrs, app_ip_addrs)
     globalServer = GlobalServer(8008, '169.254.14.50','192.168.137.102', True)
+    startTime = time.time()
+    maxPumpTime = 60 * 1
     while True:
+        if (time.time() >= (startTime + maxPumpTime):
+            self.__runPump = True
+            startTime = time.time()
         data = globalServer.receive()
         if (data ==  None):
             #If length of buffer is <1, try receiving again
