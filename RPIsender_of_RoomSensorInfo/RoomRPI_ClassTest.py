@@ -197,9 +197,7 @@ class RoomRPI:
                 if (self.__DEBUG):
                     print("Msg has not been by Global Server")
             i = i + 1
-        #Msg has been sent numRetries times, return
-        if (self.__DEBUG):
-            print("Msg was not received by Global Server")
+        #Stop trying to send message
         return
     
     #To get measurements from DHT22 sensor for humidity and temp
@@ -259,22 +257,26 @@ class RoomRPI:
                   str(self.__currentWaterDistanceStatus) + ', "light": ' + str(self.__currentLight) + ', "soilMoisture": ' + \
                   str(self.__currentSoilMoisture) + '}'
          #If ack received, try sending again for certain number of times
-        i = 0
-        while(i != self.__numRetries):
+         i = 0
+        while(i <= self.__numRetries):
+            if (i == 0):
+                if(self.__DEBUG):
+                    print("Msg has been sent to the Global Server")
+            else:
+                if(self.__DEBUG):
+                    print("Msg is being sent again to the Global Server")
             if (self.send_server_msg(alldata) == True):
                 #Ack has been received, return
                 if (self.__DEBUG):
-                    print("Msg sent to Global Server")
+                    print("Msg has been received by Global Server")
                 return
             else:
                 #If no ack received, try sending again
                 if (self.__DEBUG):
-                    print("Msg sent again to Global Server (notify again)")
+                    print("Msg has not been by Global Server")
             i = i + 1
-        #Msg has been sent numRetries times, return
-        if (self.__DEBUG):
-            print("Msg was not received by Global Server")
-        return  
+        #Stop trying to send message
+        return
        
     #To communicate to the arduino to send it's sensory data
     def requestPotData(self):
