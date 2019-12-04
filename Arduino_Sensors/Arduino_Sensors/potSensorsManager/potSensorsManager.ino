@@ -18,9 +18,9 @@
 
 //Define constant variables
 #define potID 1 //Each pot has its own unique identifier hardcoded
-#define airValue 520
-#define waterValue 260
-#define ldrLower 390 //the value when the LDR is complete darkness
+#define airValue 650
+#define waterValue 325
+#define ldrLower 360 //the value when the LDR is complete darkness
 #define ldrUpper 685 //the value when the LDR is in complete brightness
 #define criticalDistance 9.00 // The pump will not turn on to prevent hardware damages
                               // if the waterDistance is below critical levels
@@ -37,7 +37,7 @@
 #define distanceLED 12
 #define soilMoistureLED 11
 #define pumpLED 10
-#define ackLED 5
+#define ackLED 6
 
 // Define global variables for waterPump
 float initialDistance; // The initial waterDistance when the pump begins to run
@@ -85,6 +85,7 @@ void setup() {
   TCCR1B |= (1 << WGM12); // turn on CTC mode
   TCCR1B |= (1 << CS10) | (1 << CS12); // Set CS10 and CS12 bits for 1024 prescaler
   TIMSK1 &= ~(1 << OCIE1A); // disable timer compare interrupt
+  sei(); // disable global interrupts
 
   serialPi.begin(9600); //begin serial on port 9600
 
@@ -100,8 +101,8 @@ void loop() {
 
   String opcode = "";
   boolean flag = false;
-  digitalWrite(ackLED, HIGH);
 
+  
   if (serialPi.available() > 0) {
     opcode = serialPi.readStringUntil(',');
     if (opcode == "E") { // The roomPi is requesting potSensorData
@@ -127,7 +128,7 @@ void loop() {
     }
 
     else if (opcode = "C") { // The roomPi is requesting for the water pump to be turned on
-      void waterPumpManager();
+      waterPumpManager();
     }
   }
 }
@@ -154,7 +155,6 @@ void waterPumpManager(void) {
       
       initialDistance = readUltraSonic(); // Find the initial water level
       waterPumpDuration = serialPi.readStringUntil('\n').toInt();
-      
       if (waterPumpDuration >= 1 && (initialDistance + 0.1 < criticalDistance) ) {
         static int timerCount = 0; //Initialize timerCount to 0 first time through
         digitalWrite(pumpPin, LOW); //Turn on pump: the relay the pump is connected to is active low
@@ -203,10 +203,19 @@ void getLDR(void) {
   int ldrValue = analogRead(ldrPin);
   boolean ldrStatus;
 
+  if (ldrValue < ldrLower && ldrValue > 100){
+    ldrValue = ldrLower;
+  } else {
+    ldrValue = 0;
+  }
+  if (ldrValue > ldrUpper){
+    ldrValue = ldrUpper;
+  }
+
   packet += "\"light\": " + String(map(ldrValue, ldrLower, ldrUpper, 0, 100)) + ",";
 
   //If no voltage is supplied to the ldr then turn on the debugging LED
-  if (ldrValue != 0) {
+  if (map(ldrValue, ldrLower, ldrUpper, 0, 100) > 0) {
     digitalWrite(ldrLED, LOW);
     ldrStatus = true;
   }
@@ -245,9 +254,16 @@ void getSoilMoisture(void) {
   boolean soilMoistureStatus;
   // Map the sensor value to a percentage from 0 to 100 
   packet += "\"soilMoisture\": " + String(100 - map(sensorValue, waterValue, airValue, 0, 100)) + ","; 
-
+  if (sensorValue < waterValue && sensorValue > 100){
+    sensorValue = waterValue;
+  } else {
+    sensorValue = 0;
+  }
+  if (sensorValue > airValue){
+    sensorValue = airValue;
+  }
   //If no voltage is supplied to the moisture sensor then turn on the debugging LED
-  if (analogRead(soilMoisturePin) == 0) {
+  if (analogRead(soilMoisturePin) < 1) {
     digitalWrite(soilMoistureLED, HIGH);
     soilMoistureStatus = false;
   } else {
@@ -271,8 +287,8 @@ ISR(TIMER1_COMPA_vect) {
     digitalWrite(pumpPin, HIGH);
     TIMSK1 &= ~(1 << OCIE1A); //Disable the timer
     timerCount = 0; //Reset timerCount for the next time
-
-    if ( (distance - initialDistance) >= 0.5) { //acceptable error of 0.5cm
+    waterPumpStatus = false;
+    if ( abs(distance - initialDistance) <= 0.05) { //acceptable error of 0.05cm
       // The water levels did not decrease when the pump was suppose to be on
       waterPumpStatus = false;
     }
