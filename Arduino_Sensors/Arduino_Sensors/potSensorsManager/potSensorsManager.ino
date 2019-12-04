@@ -9,7 +9,6 @@
            the roomPi asks for the water pump to be turned on, then
            the arduino turns it on for the specified time and turns
            it off using a timer.
-
   @author Emma Boulay
   @version 1.11 25/11/19
 */
@@ -135,7 +134,6 @@ void loop() {
 /**
    Polls all the sensors and adds the data into a string in the JSON format to be
    sent to the roomPi
-
    @return a String of the potSensorsData in a JSON format
 */
 String getSensorData(void) {
@@ -203,10 +201,8 @@ void getLDR(void) {
   int ldrValue = analogRead(ldrPin);
   boolean ldrStatus;
 
-  if (ldrValue < ldrLower && ldrValue > 100){
+  if (ldrValue < ldrLower && ldrValue < 100){
     ldrValue = ldrLower;
-  } else {
-    ldrValue = 0;
   }
   if (ldrValue > ldrUpper){
     ldrValue = ldrUpper;
@@ -215,7 +211,7 @@ void getLDR(void) {
   packet += "\"light\": " + String(map(ldrValue, ldrLower, ldrUpper, 0, 100)) + ",";
 
   //If no voltage is supplied to the ldr then turn on the debugging LED
-  if (map(ldrValue, ldrLower, ldrUpper, 0, 100) > 0) {
+  if (analogRead(ldrPin) > 0) {
     digitalWrite(ldrLED, LOW);
     ldrStatus = true;
   }
@@ -229,7 +225,6 @@ void getLDR(void) {
 }
 /**
    Polls the ultraSonic sensor
-
    @return the waterDistance in cm, represented as a float
 */
 float readUltraSonic(void) {
@@ -253,15 +248,13 @@ void getSoilMoisture(void) {
   int sensorValue = analogRead(soilMoisturePin);
   boolean soilMoistureStatus;
   // Map the sensor value to a percentage from 0 to 100 
-  packet += "\"soilMoisture\": " + String(100 - map(sensorValue, waterValue, airValue, 0, 100)) + ","; 
-  if (sensorValue < waterValue && sensorValue > 100){
+  if (sensorValue < waterValue && sensorValue < 100){
     sensorValue = waterValue;
-  } else {
-    sensorValue = 0;
   }
   if (sensorValue > airValue){
     sensorValue = airValue;
   }
+  packet += "\"soilMoisture\": " + String(100 - map(sensorValue, waterValue, airValue, 0, 100)) + ","; 
   //If no voltage is supplied to the moisture sensor then turn on the debugging LED
   if (analogRead(soilMoisturePin) < 1) {
     digitalWrite(soilMoistureLED, HIGH);
