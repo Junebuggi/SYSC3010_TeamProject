@@ -84,7 +84,7 @@ class UDPReceiver extends Thread{
                                 MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" Threshold" + ": " + "Soil moisture threshold is met!" + " " + new Date());
                             }
                             if (sensors[4] == 1) {
-                                MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" Threshold" + ": " + "Water supply is low, please refill!" + " " + new Date());
+                                MainActivity.notificationHistory.add(0,"#" + notificationCount++ + "Water supply is low, please refill!" + " " + new Date());
                             }
                             if (sensors[5] == 1) {
                                 MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" ERROR" + ": " + "Light sensor error" + " " + new Date());

@@ -78,7 +78,7 @@ public class DataTableActivity extends AppCompatActivity {
                         }
 
                         if(jsonObject.has("t")){
-                            sensor = "Temperature";
+                            sensor = "Temp";
                             name = jsonObject.getString("t");
                             String date = jsonObject.getString("d");
                             String time = jsonObject.getString("T");
@@ -96,7 +96,7 @@ public class DataTableActivity extends AppCompatActivity {
                         }
 
                         if(jsonObject.has("s")){ //14 records
-                            sensor = "Soil Moisture";
+                            sensor = "Moisture";
                             name = jsonObject.getString("s");
                             String date = jsonObject.getString("d");
                             String time = jsonObject.getString("T");
@@ -105,7 +105,7 @@ public class DataTableActivity extends AppCompatActivity {
                         }
 
                         if(jsonObject.has("w")){
-                            sensor = "Water Level";
+                            sensor = "WaterLevel";
                             name = jsonObject.getString("w");
                             String date = jsonObject.getString("d");
                             String time = jsonObject.getString("T");

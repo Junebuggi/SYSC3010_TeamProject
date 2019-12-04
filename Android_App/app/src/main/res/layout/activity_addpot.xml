@@ -26,6 +26,7 @@
         android:layout_marginLeft="24dp"
         android:autoText="false"
         android:text="Room ID"
+        android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/editText7"
         app:layout_constraintStart_toStartOf="parent" />
@@ -86,6 +87,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginLeft="24dp"
         android:text="Pot ID"
+        android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/editText8"
         app:layout_constraintStart_toStartOf="parent" />
@@ -99,6 +101,7 @@
         android:layout_marginEnd="24dp"
         android:layout_marginRight="24dp"
         android:text="Owner ID"
+        android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/editText15"
         app:layout_constraintEnd_toStartOf="@+id/editText15"

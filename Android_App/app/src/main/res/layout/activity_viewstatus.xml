@@ -82,6 +82,7 @@
         android:layout_marginLeft="24dp"
         android:layout_marginTop="24dp"
         android:text="water Level"
+        android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView18" />
@@ -94,6 +95,7 @@
         android:layout_marginLeft="24dp"
         android:layout_marginTop="24dp"
         android:text="Light"
+        android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView17" />
@@ -106,6 +108,7 @@
         android:layout_marginLeft="24dp"
         android:layout_marginTop="24dp"
         android:text="Soil Moisture"
+        android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView16" />
@@ -118,7 +121,9 @@
         android:layout_marginLeft="24dp"
         android:layout_marginTop="24dp"
         android:text="Temperature"
+        android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView14" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

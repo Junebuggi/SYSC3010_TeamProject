@@ -49,39 +49,70 @@ public class ViewDataActivity extends AppCompatActivity {
         viewData.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(ViewDataActivity.this, "view data", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(ViewDataActivity.this, "view data", Toast.LENGTH_SHORT).show();
                 //put it in JSON format
                 //[‘opcode’: ‘5’, ‘sensorType’: comma separated string, ‘rowNumbers’: integer]
                 data = new JSONObject();
+                int count = 0;
                 try {
                     data.put("opcode", "5");
 
                     if(temp.isChecked()){
                         sensorType += "temperature,";
+                        count++;
                     }
                     if(humidity.isChecked()){
                         sensorType += "humidity,";
+                        count++;
                     }
                     if(light.isChecked()){
                         sensorType += "light,";
+                        count++;
                     }
                     if(ultrasonic.isChecked()){
                         sensorType += "waterDistance,";
+                        count++;
                     }
                     if(soilMoisture.isChecked()){
                         sensorType += "soilMoisture,";
+                        count++;
                     }
 
 
                     String sensor = sensorType.substring(0, sensorType.lastIndexOf(","));
                     System.out.println("~~~~~~~~~~" + sensor);
 
-                    data.put("rowNumbers", numRecords.getText().toString());
+
                     data.put("potID", potID.getText().toString());
                     data.put("sensorType", sensor);
+                    data.put("rowNumbers", numRecords.getText().toString());
+
+                    if(temp.isChecked() && humidity.isChecked() && light.isChecked() && ultrasonic.isChecked() && soilMoisture.isChecked()){
+                        if(Integer.parseInt(numRecords.getText().toString()) < 11){
+                            Toast.makeText(ViewDataActivity.this, "sent", Toast.LENGTH_SHORT).show();
+                            udpSender.run(ipAddress, data.toString() , PORT);
+                            startActivity(new Intent(ViewDataActivity.this, DataTableActivity.class));
+                        }else{
+                            Toast.makeText(ViewDataActivity.this, "row numbers must be less than 11", Toast.LENGTH_SHORT).show();
+                        }
+                    }
 
 
-                    udpSender.run(ipAddress, data.toString() , PORT);
+                    if(count <= 4){
+                        //count = 0;
+                        if((Integer.parseInt(numRecords.getText().toString()) < 11) &&( Integer.parseInt(numRecords.getText().toString()) >0)){
+                            Toast.makeText(ViewDataActivity.this, "sent", Toast.LENGTH_SHORT).show();
+                            udpSender.run(ipAddress, data.toString() , PORT);
+                            startActivity(new Intent(ViewDataActivity.this, DataTableActivity.class));
+                        }else{
+                            Toast.makeText(ViewDataActivity.this, "row numbers must be less than 11", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+
+
+
+                    //udpSender.run(ipAddress, data.toString() , PORT);
 //                    boolean received = true;
 //                    int count = 0;
 //                    while(received) {
@@ -110,10 +141,12 @@ public class ViewDataActivity extends AppCompatActivity {
 //                        }
 //                    }
 
-                    startActivity(new Intent(ViewDataActivity.this, DataTableActivity.class));
+                    //startActivity(new Intent(ViewDataActivity.this, DataTableActivity.class));
 
                 } catch (JSONException e) {
                     e.printStackTrace();
+                } catch (NumberFormatException e){
+                    Toast.makeText(ViewDataActivity.this, "row numbers must be less than 11", Toast.LENGTH_SHORT).show();
                 }
                 }
             });

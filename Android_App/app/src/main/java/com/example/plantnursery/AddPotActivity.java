@@ -51,7 +51,7 @@ public class AddPotActivity extends AppCompatActivity {
         addPot.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(AddPotActivity.this, "add a plantzzzz", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AddPotActivity.this, "add a pot", Toast.LENGTH_SHORT).show();
                 //System.out.println("~~~~~~~~\n\n\ni am here " + str );
                 //0x02 [‘opcode’: ‘2’, ‘roomID’: Integer, ‘roomName’: String, ‘potID: integer, ‘plantName’: String, ‘owner’:String]
                 JSONObject newPot = new JSONObject();
