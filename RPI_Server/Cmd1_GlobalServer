@@ -9,9 +9,10 @@ from datetime import datetime, date
 #Creating a global server class
 class GlobalServer:
     #The constructor
-    def __init__(self, port, room_ip_addrs, app_ip_addrs, debug):
+    def __init__(self, roomPort, appPort, room_ip_addrs, app_ip_addrs, debug):
         #Setting port
-        self.__port = int(port)
+        self.__roomPort = int(roomPort)
+        self.__appPort = int(appPort)
         #Setting timeout/end time values
         self.__ack_timeout = 1
         self.__receive_timeout = 10
@@ -24,8 +25,8 @@ class GlobalServer:
         self.__soc_recv.bind(recv_address)
         #Setting socket/addresses to send to the room rpi and app
         self.__soc_send =  socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.__room_addrs = (room_ip_addrs, self.__port)
-        self.__app_addrs = (app_ip_addrs, self.__port)
+        self.__room_addrs = (room_ip_addrs, self.__roomPort)
+        self.__app_addrs = (app_ip_addrs, self.__appPort)
         #Setting up led blinking  
         self.__receiveLED = 14  #error in receiving BLUE
         self.__sendLED = 15     #to show ack received GREEN
@@ -68,21 +69,21 @@ class GlobalServer:
     def receive(self):
         self.__soc_recv.settimeout(self.__receive_timeout)
         if (self.__DEBUG):
-            print("\nWaiting to receive on port %d ... " % self.__port)
+            print("\nWaiting to receive on port %d ... " % self.__roomPort)
         #Keep Receiving
         while(1):
             #Try loading buffer, if error send no ack and blink receive LED to show error
             try:
-                buf_noload, address = self.__soc_recv.recvfrom(self.__port)
+                buf_noload, address = self.__soc_recv.recvfrom(self.__roomPort)
                 buf = json.loads(str(buf_noload))
                 #Check to see if nothing received
                 if len(buf) > 0:
                     if (self.__DEBUG):
                         print ("Received %s bytes from '%s': %s " % (len(buf), address[0], buf))
                     #Sending ack
-                    self.__soc_send.sendto(self.__ackstr, (address[0], self.__port))
+                    self.__soc_send.sendto(self.__ackstr, (address[0], self.__roomPort))
                     if (self.__DEBUG):
-                        print ("Sent %s to %s" % (self.__ackstr, (address[0], self.__port)))
+                        print ("Sent %s to %s" % (self.__ackstr, (address[0], self.__roomPort)))
                     return (buf, buf_noload)
                 else:
                     if (self.__DEBUG):
@@ -312,7 +313,7 @@ class GlobalServer:
                     #Try Receving ack otherwise timeout and retry
                     if (self.__DEBUG):
                         print("Waiting for Acknowledgement . . .")
-                    buf, address = self.__soc_recv.recvfrom(self.__port)
+                    buf, address = self.__soc_recv.recvfrom(self.__roomPort)
                     #If buf is received, try to load it
                     buf = json.loads(buf)
                     if not len(buf):
@@ -380,7 +381,7 @@ class GlobalServer:
                     #Try Receving otherwise timeout and retry
                     if (self.__DEBUG):
                         print("Waiting for Acknowledgement . . .")
-                    buf, address = self.__soc_recv.recvfrom(self.__port)
+                    buf, address = self.__soc_recv.recvfrom(self.__roomPort)
                     #If buf is received, try to load it
                     buf = json.loads(buf)
                     if not len(buf):
@@ -460,7 +461,7 @@ class GlobalServer:
 def main():
     DEBUG = True
     #Create GlobalServer object (port, room_ip_addrs, app_ip_addrs, DEBUG)
-    globalServer = GlobalServer(8008, '169.254.14.50','192.168.137.102', DEBUG)
+    globalServer = GlobalServer(1000, 8008, '169.254.14.50','192.168.137.102', DEBUG)
     startTime = time.time()
     pumpNotRunTime = 80
     while True:
@@ -477,23 +478,22 @@ def main():
             continue
         else:
             message = data[0] #The loaded buffer version
-            #User wants to update notes table
-            if (message.get('opcode') == "1"):
-                globalServer.updateUserNotesTable(message)
             #User wants to add a pot with a room and owner
             if (message.get('opcode') == "2"): 
                 globalServer.updateUserPlantsTable(message)
                 #Set default thresholds for that potID
                 globalServer.setDefaultThresholds(message.get("potID"))
-            #If user wants to set thresholds to requested ones
-            if (message.get('opcode') == "3"): 
-                globalServer.updateUserThresholdsTable(message)
-            #If user wants to view stats
-            if (message.get('opcode') == "5"):
-                rowNumbers = message.get("rowNumbers")
-                sensors = message.get("sensorType")
-                potID = message.get("potID")
-                globalServer.send_stats(rowNumbers, sensors, potID)      
+            #If an error has occured in the room rpi or arduino
+            if (message.get('opcode') == "D"):
+                globalServer.notifyApp(str(data[1])) #Sending unloaded version
+            #If room rpi sent all sensory data, update tables, compare values to thresholds as well
+            if (message.get('opcode') == "9"):
+                print(message)
+                tdate = str(date.today())
+                ttime = str(datetime.now().strftime("%H:%M:%S"))
+                globalServer.updateRoomTable(message, tdate, ttime)
+                globalServer.updatePotTable(message, tdate, ttime) 
+                globalServer.checkUserThresholds()
     self.__soc_recv.shutdown(1)
     self.__soc_send.shutdown(1)
     self.__cursor.close()

@@ -1,6 +1,8 @@
 #Author: Abeer Rafiq
 #Modified: 11/28/2019 2:04 pm
 
+
+
 #Importing Packages
 import socket, sys, time, json, serial, Adafruit_DHT
 import RPi.GPIO as GPIO
@@ -17,8 +19,8 @@ class RoomRPI:
         #Setting room ID
         self.__roomID = 1
         #Setting timeout/end time values
-        self.__ack_timeout = 2
-        self.__ack_endTime = 5
+        self.__ack_timeout = 10
+        self.__ack_endTime = 20
         #Setting whether to show print statement or not
         self.__DEBUG = debug
         #Setting socket to receive
@@ -69,6 +71,9 @@ class RoomRPI:
         self.__currentRoomHumidity = 0
         self.__currentRoomTemperature = 0
         self.__currentWaterDistanceStatus = 0
+        self.__currentWaterPumpStatus = 0
+        self.__currentSoilMoistureStatus = 0
+        self.__currentWaterLow = 0
         #Number of times to keep resending a msg if ack not received
         self.__numRetries = 1
         if (self.__DEBUG):
@@ -197,7 +202,9 @@ class RoomRPI:
                 if (self.__DEBUG):
                     print("Msg has not been by Global Server")
             i = i + 1
-        #Stop trying to send message
+        #Msg has been sent numRetries times, return
+        if (self.__DEBUG):
+            print("Msg was not received by Global Server")
         return
     
     #To get measurements from DHT22 sensor for humidity and temp
@@ -223,26 +230,27 @@ class RoomRPI:
         self.__currentSoilMoisture = potData.get('soilMoisture')
         self.__currentLight = potData.get('light')
         self.__currentWaterDistanceStatus = potData.get('waterDistanceStatus')
+        self.__currentWaterPumpStatus = potData.get('waterPumpStatus')
+        self.__currentWaterLow = potData.get('waterLow')
+        self.__currentSoilMoistureStatus = potData.get('soilMoistureStatus')
         #Arduino's sensor error variables
-        soilMoistureStatus = potData.get('soilMoistureStatus')
-        waterPumpStatus = potData.get('waterPumpStatus')
         ldrStatus = potData.get('ldrStatus')
-        waterLow = potData.get('waterLow')
         #If any status == 0, means there is an error, call errorDetected
         #Set associating measurement to 0 if there is one
         if ldrStatus == 0:
            light = 0
            self.errorDetected('{"opcode" : "D", "sensorArray" : "0, 0, 0, 0, 0, 1, 0, 0, 0, 0"}')
-        if soilMoistureStatus == 0:
+        if self.__currentWaterLow == 0:
+           soilMoisture = 0
+           self.errorDetected('{"opcode" : "D", "sensorArray" : "0, 0, 0, 0, 1, 0, 0, 0, 0, 0"}')
+        if self.__currentSoilMoistureStatus == 0:
            soilMoisture = 0
            self.errorDetected('{"opcode" : "D", "sensorArray" : "0, 0, 0, 0, 0, 0, 0, 1, 0, 0"}')
         if self.__currentWaterDistanceStatus == 0:
            self.waterDistance = 0
            self.errorDetected('{"opcode" : "D", "sensorArray" : "0, 0, 0, 0, 0, 0, 0, 0, 1, 0"}')
-        if waterPumpStatus == 0:
+        if self.__currentWaterPumpStatus == 0:
            self.errorDetected('{"opcode" : "D", "sensorArray" : "0, 0, 0, 0, 0, 0, 0, 0, 0, 1"}')
-        if waterLow == 0:
-           self.errorDetected('{"opcode" : "D", "sensorArray" : "0, 0, 0, 0, 1, 0, 0, 0, 0, 0"}')
         if (self.__DEBUG):
             print("\nPot Data Variables Updated")
         return potID
@@ -257,26 +265,19 @@ class RoomRPI:
                   str(self.__currentWaterDistanceStatus) + ', "light": ' + str(self.__currentLight) + ', "soilMoisture": ' + \
                   str(self.__currentSoilMoisture) + '}'
          #If ack received, try sending again for certain number of times
-         i = 0
+        i = 0
         while(i <= self.__numRetries):
-            if (i == 0):
-                if(self.__DEBUG):
-                    print("Msg has been sent to the Global Server")
-            else:
-                if(self.__DEBUG):
-                    print("Msg is being sent again to the Global Server")
             if (self.send_server_msg(alldata) == True):
                 #Ack has been received, return
                 if (self.__DEBUG):
-                    print("Msg has been received by Global Server")
+                    print("Msg sent to Global Server")
                 return
             else:
                 #If no ack received, try sending again
                 if (self.__DEBUG):
-                    print("Msg has not been by Global Server")
+                    print("Msg not received by Global")
             i = i + 1
-        #Stop trying to send message
-        return
+        return  
        
     #To communicate to the arduino to send it's sensory data
     def requestPotData(self):
@@ -301,22 +302,28 @@ class RoomRPI:
         
     #To create JSON to start water pump and communicate to arduino
     def startWaterPump(self, pumpDuration):
-        if type(pumpDuration) is int and pumpDuration >= 1:
-            #Creating json, writing to serial
-            pumpMessage = "C," + str(pumpDuration)
-            self.__ser.write((pumpMessage).encode("utf-8"))
+        if(self.__currentSoilMoistureStatus == 1 and self.__currentWaterLow == 1 and self.__currentWaterDistanceStatus == 1):
+            if type(pumpDuration) is int and pumpDuration >= 1:
+                if (self.__DEBUG):
+                    print("\nStarting Water Pump!!")
+                #Creating json, writing to serial
+                pumpMessage = "C," + str(pumpDuration)
+                self.__ser.write((pumpMessage).encode("utf-8"))
+            else:
+                #Error is raised
+                raise ValueError("Pump duration must be an integer AND must be greater than or equal to 1")
         else:
-            #Error is raised
-            raise ValueError("Pump duration must be an integer AND must be greater than or equal to 1")
+            if (self.__DEBUG):
+                print("\nWater Pump is not working! No water pump msg sent")
         return
     
 #Main function which receives json data/arduino data and invokes methods based on opcode
 def main():
     #Create room RPI object (port, server_ip_addrs)
     DEBUG = True
-    roomRPI = RoomRPI(1000, '169.254.171.154', DEBUG)
+    roomRPI = RoomRPI(1003, '192.168.137.101', DEBUG)
     startTime = time.time()
-    sendTime = 40
+    sendTime = 20
     while True:
         #Request arduino data after every 'sendTime' seconds
         if time.time() > (startTime + sendTime):
@@ -364,4 +371,3 @@ if __name__== "__main__":
     main()
 
    
-
