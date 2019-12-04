@@ -16,19 +16,11 @@ import java.util.concurrent.TimeoutException;
 
 public class UDPSender extends Thread {
 
-
-    DatagramPacket packet;
-    //UDPReceiver udpReceiver = new UDPReceiver();
-    int count = 0;
-    DatagramSocket socket = null;
-
-    public UDPSender() throws IOException, JSONException {
-    }
-    //implemtn ack in this thread..i think receiving ack
+    private DatagramPacket packet;
+    private DatagramSocket socket;
 
 
-    public void run(String strIP, String str, int port) throws IOException {
-        //DatagramSocket socket = null;
+    public void run(String strIP, String str, int port) {
         try
         {
             socket = new DatagramSocket();

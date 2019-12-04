@@ -66,39 +66,56 @@ public class DataTableActivity extends AppCompatActivity {
                     }
                     for (int i = 0; i < result.length(); i++) {
                         JSONObject jsonObject = result.getJSONObject(i);
+                        //all of them is 6
 
-                        if(jsonObject.has("light")){
+                        if(jsonObject.has("l")){
                             sensor = "Light";
-                            name = jsonObject.getString("light");
+                            name = jsonObject.getString("l");
+                            String date = jsonObject.getString("d");
+                            String time = jsonObject.getString("T");
+                            stats = new String[]{sensor, name, date, time};
+                            list.add(stats);
                         }
 
-                        if(jsonObject.has("roomTemperature")){
+                        if(jsonObject.has("t")){
                             sensor = "Temperature";
-                            name = jsonObject.getString("roomTemperature");
+                            name = jsonObject.getString("t");
+                            String date = jsonObject.getString("d");
+                            String time = jsonObject.getString("T");
+                            stats = new String[]{sensor, name, date, time};
+                            list.add(stats);
                         }
 
-                        if(jsonObject.has("roomHumidity")){
+                        if(jsonObject.has("h")){
                             sensor = "Humidity";
-                            name = jsonObject.getString("roomHumidity");
+                            name = jsonObject.getString("h");
+                            String date = jsonObject.getString("d");
+                            String time = jsonObject.getString("T");
+                            stats = new String[]{sensor, name, date, time};
+                            list.add(stats);
                         }
 
-                        if(jsonObject.has("soilMoisture")){
+                        if(jsonObject.has("s")){ //14 records
                             sensor = "Soil Moisture";
-                            name = jsonObject.getString("soilMoisture");
+                            name = jsonObject.getString("s");
+                            String date = jsonObject.getString("d");
+                            String time = jsonObject.getString("T");
+                            stats = new String[]{sensor, name, date, time};
+                            list.add(stats);
                         }
 
-                        if(jsonObject.has("waterLevel")){
+                        if(jsonObject.has("w")){
                             sensor = "Water Level";
-                            name = jsonObject.getString("waterLevel");
+                            name = jsonObject.getString("w");
+                            String date = jsonObject.getString("d");
+                            String time = jsonObject.getString("T");
+                            stats = new String[]{sensor, name, date, time};
+                            list.add(stats);
                         }
-
-                        //String name = jsonObject.getString("light");
-                        String date = jsonObject.getString("tdate");
-                        String time = jsonObject.getString("ttime");
-
-                        stats = new String[]{sensor, name, date, time};
-
-                        list.add(stats);
+//                        if(list.size() > 30){
+//                            Toast.makeText(DataTableActivity.this, "limit is 30 rows!", Toast.LENGTH_SHORT).show();
+//                            break;
+//                        }
                     }
 
                     tableView.setDataAdapter(new SimpleTableDataAdapter(DataTableActivity.this, list));

@@ -18,14 +18,13 @@ import java.io.IOException;
 
 public class NotesActivity extends AppCompatActivity {
 
-    private static final int PORT = 1000;
+    private static final int PORT = 8008;
     private static final String ipAddress = "192.168.137.101";
 
     private ImageButton sendNotes;
     private EditText plantID, notes;
     private String str;
     private UDPSender udpSender;
-    private UDPReceiver udpReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,11 +55,8 @@ public class NotesActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                try {
-                    udpSender.run(ipAddress, addNotes.toString(), PORT);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                udpSender.run(ipAddress, addNotes.toString(), PORT);
+
             }
         });
 

@@ -19,7 +19,7 @@ import java.io.IOException;
 
 public class AddPotActivity extends AppCompatActivity {
 
-    private static final int PORT = 1000;
+    private static final int PORT = 8008;
     private static final String ipAddress = "192.168.137.101";
 
     private Button addPot;
@@ -65,11 +65,7 @@ public class AddPotActivity extends AppCompatActivity {
                 }
 
 //                str = "" + piID.getText().toString()+ arduinoID.getText().toString() + plantName.getText().toString() + waterAmount.getText().toString();
-                try {
-                    udpsender.run(ipAddress, newPot.toString(), PORT);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                udpsender.run(ipAddress, newPot.toString(), PORT);
             }
         });
 

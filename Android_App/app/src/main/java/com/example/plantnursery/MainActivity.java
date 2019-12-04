@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static final int PORT = 8008;
     private static final String ipAddress = "192.168.137.101";
+    public  static UDPReceiver udpReceiver;
 
     Button b_status, b_notification, b_data, b_notes, b_addPot, b_thresholds;
     static ArrayList<String> notificationHistory= new ArrayList<>(); //keep track of notifications
@@ -39,8 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
         //this is here for notifications purposes
         try{
-            udpSender = new UDPSender();
-            UDPReceiver udpReceiver = new UDPReceiver();
+            udpReceiver = new UDPReceiver();
             udpReceiver.start();
             Log.d("User","Thread start...");
         }catch(Exception e)

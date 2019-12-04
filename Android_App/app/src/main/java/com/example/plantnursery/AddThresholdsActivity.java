@@ -95,12 +95,14 @@ public class AddThresholdsActivity extends AppCompatActivity {
                     else if (tempLess.isChecked()) {
                         threshold.put("lessGreaterThan", "<");
                         udpSender.run(ipAddress, threshold.toString(), PORT);
+                        udpSender.run(ipAddress, threshold.toString(), 1003);
                     } else {
                         //x>threshold
                         threshold.put("lessGreaterThan", ">");
                         udpSender.run(ipAddress, threshold.toString(), PORT);
+                        udpSender.run(ipAddress, threshold.toString(), 1003);
                     }
-                } catch (JSONException | IOException e) {
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
@@ -133,12 +135,14 @@ public class AddThresholdsActivity extends AppCompatActivity {
                     else if (lightLess.isChecked()) {
                         threshold.put("lessGreaterThan", "<");
                         udpSender.run(ipAddress, threshold.toString(), PORT);
+                        udpSender.run(ipAddress, threshold.toString(), 1003);
                     } else {
                         threshold.put("lessGreaterThan", ">");
                         udpSender.run(ipAddress, threshold.toString(), PORT);
+                        udpSender.run(ipAddress, threshold.toString(), 1003);
                     }
 
-                } catch (JSONException | IOException e) {
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
@@ -170,11 +174,13 @@ public class AddThresholdsActivity extends AppCompatActivity {
                     else if (humidityLess.isChecked()) {
                         threshold.put("lessGreaterThan", "<");
                         udpSender.run(ipAddress, threshold.toString(), PORT);
+                        udpSender.run(ipAddress, threshold.toString(), 1003);
                     } else {
                         threshold.put("lessGreaterThan", ">");
                         udpSender.run(ipAddress, threshold.toString(), PORT);
+                        udpSender.run(ipAddress, threshold.toString(), 1003);
                     }
-                } catch (JSONException | IOException e) {
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
@@ -204,12 +210,14 @@ public class AddThresholdsActivity extends AppCompatActivity {
                     else if (soilLess.isChecked()) {
                         threshold.put("lessGreaterThan", "<");
                         udpSender.run(ipAddress, threshold.toString(), PORT);
+                        udpSender.run(ipAddress, threshold.toString(), 1003);
                     } else {
                         threshold.put("lessGreaterThan", ">");
                         udpSender.run(ipAddress, threshold.toString(), PORT);
+                        udpSender.run(ipAddress, threshold.toString(), 1003);
                     }
 
-                } catch (JSONException | IOException e) {
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }

@@ -76,11 +76,11 @@ public class ViewStatusActivity extends AppCompatActivity {
                         // for (int i = 0; i < result.length(); i++) {
                         JSONObject jsonObject = result.getJSONObject(0);
 
-                        String light = jsonObject.getString("light");
-                        String temperature = jsonObject.getString("temperature");
-                        String humidity = jsonObject.getString("humidity");
-                        String waterLevel = jsonObject.getString("waterDistance");
-                        String soil = jsonObject.getString("soilMoisture");
+                        String light = jsonObject.getString("l");
+                        String temperature = jsonObject.getString("t");
+                        String humidity = jsonObject.getString("h");
+                        String waterLevel = jsonObject.getString("w");
+                        String soil = jsonObject.getString("s");
 //                        String date = jsonObject.getString("tdate");
 //                        String time = jsonObject.getString("ttime");
                         String[] stats = {light, temperature, humidity, waterLevel, soil};

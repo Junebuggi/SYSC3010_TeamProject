@@ -8,21 +8,26 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.SocketException;
 import java.util.Date;
 
 
 class UDPReceiver extends Thread{
     private String ipAddress = "192.168.137.101";
-    private static final int PORT =1000;
+    private static final int PORT =8008;
+
     UDPSender udpSender = new UDPSender();
-    //JSONObject ack = new JSONObject();
-
-
     private DatagramSocket server = null;
     private int notificationCount = 0;
 
-    public UDPReceiver() throws IOException, JSONException {
-        server = new DatagramSocket(PORT);
+
+
+    public UDPReceiver() {
+        try {
+            server = new DatagramSocket(PORT);
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
         Log.d("User","new server socket");
     }
     public void run(){
@@ -43,6 +48,7 @@ class UDPReceiver extends Thread{
                 server.receive(dPacket);
                while(true)
                {
+                   //server.setSoTimeout(3000);
                     txt = new String(byte1024, 0, dPacket.getLength());
                     System.out.println("~~~~~~~~this is the string" + txt);
 
@@ -52,7 +58,7 @@ class UDPReceiver extends Thread{
                         case "D":
                             System.out.println("~~~caseD");
                             //send ACK
-                            udpSender.run(ipAddress, ack.toString() , PORT);
+                            udpSender.run(ipAddress, ack.toString() , 1003);
                             System.out.println("~~~~in notification opcode");
                             //send an ACK here
                             //{"opcode" : "D", "sensorArray" : "0,0,0,0,0,0,1,0,0,0,0"}
@@ -93,12 +99,16 @@ class UDPReceiver extends Thread{
                                 MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" ERROR" + ": " + "Ultrasonic sensor error" + " " + new Date());
                             }
                             if (sensors[9] == 1) {
-                                MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" ERROR" + ": " + "Water pump wrror" + " " + new Date());
+                                MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" ERROR" + ": " + "Water pump error" + " " + new Date());
                             }
                             break;
                         case "0":
                             //ACK received
                             System.out.println("~~~~~~ACK RECEIVED");
+                            break;
+                        case "4":
+                            udpSender.run(ipAddress, ack.toString() , 1003);
+                            MainActivity.notificationHistory.add(0,"#" + notificationCount++ +" Pump Started: Duration"+ obj.getString("pumpDuration") + new Date());
                             break;
                         case "6":
                             System.out.println("~~~~case6");
@@ -116,7 +126,7 @@ class UDPReceiver extends Thread{
                             }
                             //ViewDataActivity.exHandler.sendMessage(ViewDataActivity.exHandler.obtainMessage(1, txt));
                             break;
-                        case "E":
+                        case "7":
                             System.out.println("~~~~caseE");
                             udpSender.run(ipAddress, ack.toString() , PORT);
 
@@ -141,8 +151,9 @@ class UDPReceiver extends Thread{
                 //CloseSocket(client);
             }
         }
-        catch(IOException e) {}
         catch (JSONException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

@@ -81,34 +81,34 @@ public class ViewDataActivity extends AppCompatActivity {
                     data.put("sensorType", sensor);
 
 
-                    //udpSender.run(ipAddress, data.toString() , PORT);
-                    boolean received = true;
-                    int count = 0;
-                    while(received) {
-                        try {
-                            udpSender = new UDPSender();
-                            udpSender.run(ipAddress, data.toString(), PORT);
-                            udpSender.socket.setSoTimeout(1000);
-                            if(count == 0){
-                                received = false;
-                            }
-                            System.out.println("~~~~~~~~~~~ timeout");
-                        } catch (SocketException e) {
-                            try {
-                                count++;
-                                System.out.println("~~~~~~~~~~~" + count);
-                                if (count >= 3) {
-                                    received = false;
-                                }
-                            } finally {
-                                udpSender.socket.close();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
+                    udpSender.run(ipAddress, data.toString() , PORT);
+//                    boolean received = true;
+//                    int count = 0;
+//                    while(received) {
+//                        try {
+//                            udpSender = new UDPSender();
+//                            udpSender.run(ipAddress, data.toString(), PORT);
+//                            udpSender.socket.setSoTimeout(1000);
+//                            if(count == 0){
+//                                received = false;
+//                            }
+//                            System.out.println("~~~~~~~~~~~ timeout");
+//                        } catch (SocketException e) {
+//                            try {
+//                                count++;
+//                                System.out.println("~~~~~~~~~~~" + count);
+//                                if (count >= 3) {
+//                                    received = false;
+//                                }
+//                            } finally {
+//                                udpSender.socket.close();
+//                            }
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
 
                     startActivity(new Intent(ViewDataActivity.this, DataTableActivity.class));
 

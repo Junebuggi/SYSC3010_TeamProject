@@ -13,13 +13,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 
 public class StatusActivity extends AppCompatActivity {
 
     private String ipAddress = "192.168.137.101";
-    private static final int PORT = 1000;
+    private static final int PORT = 8008;
     private int count;
 
     private Button sendPotID;
@@ -51,42 +54,10 @@ public class StatusActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                udpSender = new UDPSender();
 
+                udpSender.run(ipAddress, sendPot.toString(), PORT);
 
-                boolean received = true;
-                count = 0;
-                while(received) {
-                    try {
-
-
-                        udpSender = new UDPSender();
-                        udpSender.run(ipAddress, sendPot.toString(), PORT);
-                        //udpReceiver = new UDPReceiver();
-                        //udpReceiver.start();
-                        //udpReceiver.udpSender.socket.setSoTimeout(10000);
-
-
-                        udpSender.socket.setSoTimeout(3000);
-                        if(count == 0){
-                            received = false;
-                        }
-                        System.out.println("~~~~~~~~~~~ timeout");
-                    } catch (SocketException e) {
-                        try {
-                            count++;
-                            System.out.println("~~~~~~~~~~~" + count);
-                            if (count >= 3) {
-                                received = false;
-                            }
-                        } finally {
-                            //udpSender.socket.close();
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
                 startActivity(new Intent(StatusActivity.this, ViewStatusActivity.class));
             }
         });
