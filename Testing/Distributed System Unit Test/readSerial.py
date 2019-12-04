@@ -2,7 +2,7 @@ import serial
 import time
 import json
 
-ser = serial.Serial('/dev/tty.usbmodem144101', 9600, timeout = 0.1)
+ser = serial.Serial('/dev/cu.usbserial-14410', 9600, timeout = 0.1)
 
 ser.baudrate = 9600
 ser.flushInput()

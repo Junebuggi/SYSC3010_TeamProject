@@ -12,7 +12,10 @@ nPacket = 0
 start = time.time()
 
 def requestPotData(): #Ask the arduino for the potData
+    if (ser.isOpen() == False):
+        ser.open()
     ser.write(("E,").encode("utf-8"))
+
     startTime = time.time()
     while time.time() < (startTime + 2):
         potData = ser.readline()
@@ -47,44 +50,3 @@ while n < 20:
     startWaterPump(3)
     #ser.write(("C,5\n").encode("utf-8"))  # start water pump message
     time.sleep(10)
-
-    # if(message[0] == 'C') :
-    #     pumpString = message + "\n"
-    #     ser.write((pumpString).encode("utf-8"))  # start water pump message
-    # elif (message[0] == 'E'):
-    #     ser.write(("E,").encode("utf-8"))  # start water pump message
-    #     flag = True
-    #     startTime = time.time()
-    #     while flag and (time.time() < startTime + 2):
-    #         data = ser.readline()
-    #         if (len(data) > 0):
-    #             data = data.decode().strip('\r\n')
-    #             flag = False
-    #             ser.write(("0,").encode("utf-8"))
-    #             print(data)
-    #         else:
-    #             ser.write(("E,").encode("utf-8"))
-
-
-
-    #time.sleep(0.2)
-    #ser.flushInput()
-        
-       # if str(data['opcode']) == "8":
-        ##     # message = "00" + "," + str(data[1]) + ","
-                #ser.write( bytes("0\n", 'utf-8'))
-    ##     # ser.write(bytes(",", 'utf-8'))
-    ##     # ser.write(bytes(str(data[1]), 'utf-8'))
-    ##     # ser.write(bytes(",", 'utf-8'))
-    ##     ack = "0\0"
-    ##     ser.write(ack.encode("utf-8"))
-    ##     time.sleep(0.2)
-    ##     # ser.write(str.encode(str())
-    ##
-        #print(data)
-        #print(nPacket)
-        #nPacket = (nPacket + 1) % 100
-
-    # Database table: <RoomID>, <Light>, <Humidity>, <Temperature>, <Heat Index>, <Date>, <Time>
-    # cursor.execute("insert into sensorData values (" + str(data[0]) + ", '" + str(data[1]) + "', '" + str(data[2]) + "', '" + str(data[3]) + "', '" + str(data[4]) + "', '" + date + "', '" + ttime + "')");
-    # dbconnect.commit();
