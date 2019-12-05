@@ -63,7 +63,19 @@ How to Set-up RoomPi
 
 How to Set-up potSensors Arduino
 --------------------------
+1. Connect the hardware to the Arduino following the potSensors Arduino schematic
+2.  Plug Arduino into Raspberry Pi using a USB cable
+3.  Open Terminal and run the following commands:
 
+	$ sudo apt-get update
+	
+	$ sudo apt-get install arduino
+	
+
+4.  Download potSensorsManager
+5.  Unzip contents to Desktop
+6.  Navigate to potSensorsManager -> potSensorsManager.ino and open using the Arduino IDE
+8.  On the top left of the Arduino IDE click the forward arrow "Upload"
 
 
 
