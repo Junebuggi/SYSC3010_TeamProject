@@ -1,5 +1,5 @@
 # SYSC3010_TeamProject: The Plant Nursery :sparkles: :seedling:
-Completed on: 06/12/19
+Completed on: 06/12/19\
 
 SYSC 3010 The Plant Nursery Project Repository 
 
@@ -39,13 +39,13 @@ Additional Hardware used:
 How to Set-up globalServer
 --------------------------
 
-1.Open Terminal and run the following commands:
+1.Open Terminal and run the following commands:\ 
 
 	pi@raspberry:~ $ sudo apt update
 	
 	pi@raspberry:~ $ sudo apt-get install sqlite3
 
-2.To create the Database and the tables run the follwoing commands in the terminal
+2.To create the Database and the tables run the follwoing commands in the terminal\ 
 
 	pi@raspberry:~ $ sqlite3 PlantNursery.db
 	
@@ -63,8 +63,15 @@ How to Set-up globalServer
 	
 	sqlite> COMMIT;
 	
-3.Download globalServer folder
-4.Unzip contents to Desktop
+3.Download globalServer folder\ 
+4.Unzip contents to Desktop\ 
+5.Navigate to the Desktop\
+
+	pi@raspberry:~ $ cd \Desktop
+	
+6.Run the shell command to start the globalServerApp.py and the globalServerRoomPi.py scripts
+
+	pi@raspberry:~ $ sudo sh globalServer.sh
 
 	
 
@@ -88,18 +95,18 @@ How to Set-up RoomPi
 
 How to Set-up potSensors Arduino
 --------------------------
-1.Connect the hardware to the Arduino following the potSensors Arduino schematic
-2.Plug Arduino into roomPi Raspberry Pi using a USB cable
-3.Open Terminal and run the following commands:
+1. Connect the hardware to the Arduino following the potSensors Arduino schematic\
+2. Plug Arduino into roomPi Raspberry Pi using a USB cable\
+3.Open Terminal and run the following commands:\  
 
 	pi@raspberry:~ $ sudo apt-get update
 	
 	pi@raspberry:~ $ sudo apt-get install arduino
 	
-4.Download potSensorsManager
-5.Unzip contents to Desktop
-6.Navigate to potSensorsManager -> potSensorsManager.ino and open using the Arduino IDE
-8.On the top left of the Arduino IDE click the forward arrow "Upload"
+4.Download potSensorsManager\
+5.Unzip contents to Desktop\  
+6.Navigate to potSensorsManager -> potSensorsManager.ino and open using the Arduino IDE\  
+8.On the top left of the Arduino IDE click the forward arrow "Upload"\  
 
 
 
