@@ -1,6 +1,5 @@
 package com.example.plantnursery;
 
-import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,57 +18,56 @@ import de.codecrafters.tableview.TableView;
 import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 
+/**
+ * table view of the data the user requested
+ * handles message received from UDPReceiver
+ *
+ * @author Ruqaya Almalki
+ */
 public class DataTableActivity extends AppCompatActivity {
 
-
-    TableView tableView;
-//
-//    private static final String[][] SPACESHIPS = { { "Casini", "Chemical", "NASA" },
-//            { "Spitzer", "Nuclear", "NASA" } };
-    public static Handler exHandler = null;
-
+    private TableView tableView;
+    public static Handler exHandler;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_datatable);
+
         tableView = findViewById(R.id.tableView);
 
-        //'{"opcode" : "6", "statsArray":"["{ "light":"3", "tdate": "12-12-12","ttime": "12:45pm"}", "{ "light": 37, "tdate": "2-12-12","ttime": "1:45pm"}"]"}'
-        //{"opcode" : "6", "statsArray" : "[{"light": 100.0, "ttime":14:48:58", "soilMoisture": 200.0, "tdate": "2019-11-28"},
-        // {"light": 10, "ttime":34:48:58", "soilMoisture": 29, "tdate": "2019-12-28"}]
-
-
-        //set the headers
-        String[] spaceProbeHeaders={"Sensor","Value","Date","Time"};
-        tableView.setHeaderBackgroundColor(Color.parseColor("#95F80D"));
-        tableView.setHeaderAdapter(new SimpleTableHeaderAdapter(this,spaceProbeHeaders));
+        String[] spaceProbeHeaders = {"Sensor", "Value", "Date", "Time"}; //set headers
+        tableView.setHeaderBackgroundColor(Color.parseColor("#95F80D")); //set color
+        tableView.setHeaderAdapter(new SimpleTableHeaderAdapter(this, spaceProbeHeaders));
         tableView.setColumnCount(4);
 
-        //tableView.setDataAdapter(new SimpleTableDataAdapter(this, SPACESHIPS ));
-
-
+        //handling message from receiver
         exHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
-                System.out.println("~~~~ in th handler dataTableActivity");
                 super.handleMessage(msg);
-                ArrayList<String[]> list = new ArrayList<>();
+
+                ArrayList<String[]> list = new ArrayList<>();//store info in arraylist
                 String[] stats;
                 String sensor = "";
                 String name = "";
 
-                try{
-                    JSONObject obj = new JSONObject((String) msg.obj);
-                    JSONArray result = obj.getJSONArray("statsArray");
-                    if(result.length() == 0){
-                        Toast.makeText(DataTableActivity.this, "invalid potID, no data found :(", Toast.LENGTH_SHORT).show();
+                try {
+                    JSONObject obj = new JSONObject((String) msg.obj); //cast to json
+                    JSONArray result = obj.getJSONArray("statsArray"); //get jsonarray
+
+                    if (result.length() == 0) { //inavlid potId, nothing returned
+                        Toast.makeText(DataTableActivity.this, "invalid potID, no data found", Toast.LENGTH_SHORT).show();
                     }
+
+                    //iterate through JSONArray and put info under the corrected header
                     for (int i = 0; i < result.length(); i++) {
                         JSONObject jsonObject = result.getJSONObject(i);
-                        //all of them is 6
 
-                        if(jsonObject.has("l")){
+                        //checking for what data has been sent to me
+                        //letters were used here since it would increase the number of rows that could be sent at once
+                        if (jsonObject.has("l")) {
                             sensor = "Light";
+                            //unpack object and place in the list
                             name = jsonObject.getString("l");
                             String date = jsonObject.getString("d");
                             String time = jsonObject.getString("T");
@@ -77,8 +75,9 @@ public class DataTableActivity extends AppCompatActivity {
                             list.add(stats);
                         }
 
-                        if(jsonObject.has("t")){
+                        if (jsonObject.has("t")) {
                             sensor = "Temp";
+                            //unpack object and place in the list
                             name = jsonObject.getString("t");
                             String date = jsonObject.getString("d");
                             String time = jsonObject.getString("T");
@@ -86,8 +85,9 @@ public class DataTableActivity extends AppCompatActivity {
                             list.add(stats);
                         }
 
-                        if(jsonObject.has("h")){
+                        if (jsonObject.has("h")) {
                             sensor = "Humidity";
+                            //unpack object and place in the list
                             name = jsonObject.getString("h");
                             String date = jsonObject.getString("d");
                             String time = jsonObject.getString("T");
@@ -95,8 +95,9 @@ public class DataTableActivity extends AppCompatActivity {
                             list.add(stats);
                         }
 
-                        if(jsonObject.has("s")){ //14 records
+                        if (jsonObject.has("s")) {
                             sensor = "Moisture";
+                            //unpack object and place in the list
                             name = jsonObject.getString("s");
                             String date = jsonObject.getString("d");
                             String time = jsonObject.getString("T");
@@ -104,51 +105,26 @@ public class DataTableActivity extends AppCompatActivity {
                             list.add(stats);
                         }
 
-                        if(jsonObject.has("w")){
+                        if (jsonObject.has("w")) {
                             sensor = "WaterLevel";
+                            //unpack object
                             name = jsonObject.getString("w");
                             String date = jsonObject.getString("d");
                             String time = jsonObject.getString("T");
                             stats = new String[]{sensor, name, date, time};
                             list.add(stats);
                         }
-//                        if(list.size() > 30){
-//                            Toast.makeText(DataTableActivity.this, "limit is 30 rows!", Toast.LENGTH_SHORT).show();
-//                            break;
-//                        }
                     }
 
+                    //place the arraylist in the table view
                     tableView.setDataAdapter(new SimpleTableDataAdapter(DataTableActivity.this, list));
-                }catch (JSONException e) {
+
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
 
 
         };
-
     }
-
-
 }
-
-//try{
-//        JSONObject obj = new JSONObject((String) msg.obj);
-//        JSONArray result = obj.getJSONArray("statsArray");
-//        for (int i = 0; i < result.length(); i++) {
-//        JSONObject jsonObject = result.getJSONObject(i);
-//
-//        String name = jsonObject.getString("light");
-//        String phone = jsonObject.getString("tdate");
-//        String email = jsonObject.getString("ttime");
-//
-//        String j = String.valueOf(i);
-//        stats = new String[]{j, name, email, phone};
-//
-//        list.add(stats);
-//        }
-//
-//        tableView.setDataAdapter(new SimpleTableDataAdapter(DataTableActivity.this, list));
-//        }catch (JSONException e) {
-//        e.printStackTrace();
-//        }

@@ -10,15 +10,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 /**
- * Created by danielmalone on 4/9/17.
+ * notification adapter used to bind the view with the rows that appear periodically
+ *
+ * @author Ruqaya Almalki
  */
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
 
-    private ArrayList<String> mDataset;
+    //storing the notifications
+    private ArrayList<String> notifications;
 
     public NotificationAdapter(ArrayList<String> dataset) {
-        mDataset = dataset;
+        notifications = dataset;
     }
 
     @Override
@@ -29,22 +32,22 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     @Override
     public void onBindViewHolder(NotificationAdapter.ViewHolder holder, int position) {
-        holder.mTitle.setText(mDataset.get(position));
+        holder.typeOfNotification.setText(notifications.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return mDataset.size();
+        return notifications.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView mTitle;
+        public TextView typeOfNotification;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
-            mTitle = (TextView) itemView.findViewById(R.id.title);
+            typeOfNotification = itemView.findViewById(R.id.title);
         }
     }
 }

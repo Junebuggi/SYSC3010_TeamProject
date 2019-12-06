@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.StrictMode;
-import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,6 +16,8 @@ import org.json.JSONObject;
 /**
  * This class is used to display the current soil moisture, temperature,
  * humidity, light, and water level of a pot in the Plant Nursery
+ *
+ * @author Ruqaya Almalki
  */
 public class ViewStatusActivity extends AppCompatActivity {
 
@@ -68,12 +69,12 @@ public class ViewStatusActivity extends AppCompatActivity {
                 try {
                     obj = new JSONObject((String) msg.obj);
 
+                    //decode json array
                     JSONArray result = obj.getJSONArray("statsArray");
 
-                    if(result.length() == 0){
+                    if (result.length() == 0) {
                         Toast.makeText(ViewStatusActivity.this, "invalid potID, no data found :(", Toast.LENGTH_SHORT).show();
-                    } else{
-                        // for (int i = 0; i < result.length(); i++) {
+                    } else {
                         JSONObject jsonObject = result.getJSONObject(0);
 
                         String light = jsonObject.getString("l");
@@ -81,40 +82,19 @@ public class ViewStatusActivity extends AppCompatActivity {
                         String humidity = jsonObject.getString("h");
                         String waterLevel = jsonObject.getString("w");
                         String soil = jsonObject.getString("s");
-//                        String date = jsonObject.getString("tdate");
-//                        String time = jsonObject.getString("ttime");
                         String[] stats = {light, temperature, humidity, waterLevel, soil};
 
+                        //set views on app
                         textTemp.setText(stats[1]);
                         textHumidity.setText(stats[2]);
                         textWaterLevel.setText(stats[3]);
                         textLight.setText(stats[0]);
                         textSoil.setText(stats[4]);
-                        // }
                     }
-
 
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-
-
-//                JSONObject obj = null;
-//                try {
-//                    //cast string to JSON
-//                    obj = new JSONObject((String) msg.obj);
-//
-//                    //interpret JSON and set text of textviews to corresponding values
-//                    textTemp.setText(obj.getString("roomTemperature"));
-//                    textHumidity.setText(obj.getString("roomHumidity"));
-//                    textWaterLevel.setText(obj.getString("waterDistance"));
-//                    textLight.setText(obj.getString("light"));
-//                    textSoil.setText(obj.getString("soilMoisture"));
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-                Log.d("Handler", "Now in Handler");
             }
         };
     }
