@@ -36,7 +36,7 @@ Additional Hardware used:
 
 * 16x2 LCD 
 
-How to Set-up globalServer
+How to Set-up the globalServer Raspberry Pi
 --------------------------
 
 1.Open Terminal and run the following commands:
@@ -74,7 +74,7 @@ How to Set-up globalServer
 	pi@raspberry:~ $ sudo sh globalServer.sh
 
 
-How to Set-up RoomPi
+How to Set-up the RoomPi Raspberry Pi
 --------------------------
 
 1.Download roomPi folder\
@@ -88,7 +88,7 @@ How to Set-up RoomPi
 	pi@raspberry:~ $ sudo python roomPiManager.py
 	
 
-How to Set-up potSensors Arduino
+How to Set-up the potSensors Arduino
 --------------------------
 1.Connect the hardware to the Arduino following the potSensors Arduino schematic
 2.Plug Arduino into roomPi Raspberry Pi using a USB cable\
@@ -103,5 +103,5 @@ How to Set-up potSensors Arduino
 6.Navigate to potSensorsManager -> potSensorsManager.ino and open using the Arduino IDE\
 7.On the top left of the Arduino IDE click the forward arrow "Upload"
 
-How to Plant Nursery Android Application
+How to Set-up the Plant Nursery Android Application
 --------------------------
