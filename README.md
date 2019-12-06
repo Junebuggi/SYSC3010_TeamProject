@@ -1,5 +1,5 @@
 # SYSC3010_TeamProject: The Plant Nursery :sparkles: :seedling:
-Completed on: 06/12/19\
+Completed on: 06/12/19 \
 
 SYSC 3010 The Plant Nursery Project Repository 
 
@@ -12,6 +12,10 @@ SYSC 3010 The Plant Nursery Project Repository
 Contributors:
 --------------
 
+Ruqaya Almalki\
+Emma Boulay\
+Abeer Rafiq\
+Abdul-Rahmaan Rufai\
 
 
 
