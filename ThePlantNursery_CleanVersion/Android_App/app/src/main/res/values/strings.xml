@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">The Plant Nursery</string>
+
+    <string name="enter_plantID">Enter Pot ID</string>
+    <string name="addNotes">Notes</string>
+    <string name="enter_RPiID">Enter Room ID</string>
+    <string name="enter_roomName">Enter Owner ID</string>
+    <string name="enter_plantName">Enter Plant Name</string>
+    <string name="enter_ArduinoID">Enter Arduino ID</string>
+
+
+    <string name="TempSensor">Temperature Sensor</string>
+    <string name="HumiditySensor">Humidity Sensor</string>
+    <string name="UltrasonicSensor">Water Level Sensor</string>
+    <string name="soilMoistureSensor">Soil Moisture Sensor</string>
+    <string name="lightSensor">Light Sensor</string>
+
+
+    <string name="thresholdValue">number</string>
+    <string name="records">Enter a number</string>
+</resources>
+
