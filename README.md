@@ -18,7 +18,7 @@ Abeer Rafiq\
 Abdul-Rahmaan Rufai
 
 ------------------------------------------------------------------------------------------------------------------------------
-To operate this system in a similar fashion as we have done, you will require 2 Raspberry pi's, an Arduino, an Android smart phone and an internet connection.
+To operate this system in a similar fashion as we have done, you will require 2 Raspberry pi's, an Arduino, an Android smart phone and an internet connection. All python scripts have been developed using the Python 2.7 language. You will need to find the IP of each Pi by using the ifconfig command in the terminal. Replace the IP in the app, roomPi and globalServer scripts to reflect this.
 
 Additional Hardware used:
 
@@ -77,6 +77,7 @@ How to Set-up the globalServer Raspberry Pi
 How to Set-up the RoomPi Raspberry Pi
 --------------------------
 
+1.Connect the hardware to the Raspberry Pi following the roomPi schematic
 1.Download roomPi folder\
 2.Unzip contents to Desktop\
 3.Navigate to the Desktop
