@@ -1,7 +1,5 @@
 #Author: Abeer Rafiq
-#Modified: 11/28/2019 2:04 pm
-
-
+#Modified: 12/6/2019 12pm
 
 #Importing Packages
 import socket, sys, time, json, serial, Adafruit_DHT
@@ -42,8 +40,13 @@ class RoomRPI:
         GPIO.setup(self.__errorLED, GPIO.OUT)
         #Setting up string for acknowldegements
         self.__ackstr = '{"opcode":"0"}'
-        #Setting serial for arduino
-        self.__ser = serial.Serial('/dev/ttyACM0', timeout = 0.1)
+        #Setting serial for arduino, if no serial print error and exit
+        try:
+            self.__ser = serial.Serial('/dev/ttyACM0', timeout = 0.1)
+        except serial.serialutil.SerialException:
+            if(DEBUG):
+                print("Error! No Arduino Connected!")
+                sys. exit(0)
         self.__ser.flushInput()
         #Setting up pins for temp/humidity sensor
         self.__DHT_SENSOR = Adafruit_DHT.DHT22
