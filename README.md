@@ -15,11 +15,7 @@ Contributors:
 Ruqaya Almalki\
 Emma Boulay\
 Abeer Rafiq\
-Abdul-Rahmaan Rufai\
-
-
-
-
+Abdul-Rahmaan Rufai
 
 ------------------------------------------------------------------------------------------------------------------------------
 To operate this system in a similar fashion as we have done, you will require 2 Raspberry pi's, an Arduino, an Android smart phone and an internet connection.
@@ -49,7 +45,7 @@ How to Set-up globalServer
 	
 	pi@raspberry:~ $ sudo apt-get install sqlite3
 
-2.To create the Database and the tables run the follwoing commands in the terminal
+2.To create the Database and the tables run the following commands in the terminal
 
 	pi@raspberry:~ $ sqlite3 PlantNursery.db
 	
@@ -76,13 +72,6 @@ How to Set-up globalServer
 6.Run the shell command to start the globalServerApp.py and the globalServerRoomPi.py scripts
 
 	pi@raspberry:~ $ sudo sh globalServer.sh
-
-	
-
-
-
-
-
 
 
 How to Set-up RoomPi
