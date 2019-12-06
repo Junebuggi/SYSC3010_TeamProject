@@ -6,7 +6,7 @@ SYSC 3010 The Plant Nursery Project Repository
 							The Plant Nursery 
 					An automated plant watering and monitoring system				
 <p align="center">
-<img src="https://github.com/Junebuggi/SYSC3010_TeamProject/blob/master/image_from_ios.jpg" width="400">
+<img src="https://github.com/Junebuggi/SYSC3010_TeamW4/blob/master/logo.jpg" width="400">
 </p>
 
 Contributors:
