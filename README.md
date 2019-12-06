@@ -106,8 +106,8 @@ How to Set-up the potSensors Arduino
 
 How to Set-up the Plant Nursery Android Application
 --------------------------
-1.Install and setup Android Studio.\
-2.Download thePlantNannyApp source code\
-3.Open the App folder project in Android Studio as an active project.\
-4.Build the signed APK.\
-5.Transfer the signed APK to your smartphone.
+1.Install Android Studio.\
+2.Download ThePlantNursery folder\
+3.Open Android Studio and navigate to the ThePlantNursery folder.\
+4.Run the app.\
+5.It can be ran either using the emulator or an android phone.
