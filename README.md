@@ -77,14 +77,16 @@ How to Set-up globalServer
 How to Set-up RoomPi
 --------------------------
 
+1.Download roomPi folder\
+2.Unzip contents to Desktop\
+3.Navigate to the Desktop
 
+	pi@raspberry:~ $ cd \Desktop
+	
+4.Open the terminal and run the following command:
 
-
-
-
-
-
-
+	pi@raspberry:~ $ sudo python roomPiManager.py
+	
 
 How to Set-up potSensors Arduino
 --------------------------
@@ -99,9 +101,7 @@ How to Set-up potSensors Arduino
 4.Download potSensorsManager
 5.Unzip contents to Desktop\
 6.Navigate to potSensorsManager -> potSensorsManager.ino and open using the Arduino IDE\
-8.On the top left of the Arduino IDE click the forward arrow "Upload"
-
-
+7.On the top left of the Arduino IDE click the forward arrow "Upload"
 
 How to Plant Nursery Android Application
 --------------------------
