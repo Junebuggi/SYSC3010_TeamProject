@@ -295,7 +295,7 @@ def main():
     globalServer = GlobalServerApp(8008,'192.168.137.102', DEBUG)
     while True:
         #receive
-        data = GlobalServerApp.receive()
+        data = globalServer.receive()
         if (data ==  None):
             #If length of buffer is <1, try receiving again
             continue
@@ -303,22 +303,22 @@ def main():
             message = data[0] #The loaded buffer version
             #User wants to update notes table
             if (message.get('opcode') == "1"):
-                GlobalServerApp.updateUserNotesTable(message)
+                globalServer.updateUserNotesTable(message)
             #User wants to add a pot with a room and owner
             if (message.get('opcode') == "2"): 
                 #Set default thresholds for that potID
-                GlobalServerApp.setDefaultThresholds(str(message.get("potID")))
+                globalServer.setDefaultThresholds(str(message.get("potID")))
                 #Update user plants table
-                GlobalServerApp.updateUserPlantsTable(message)
+                globalServer.updateUserPlantsTable(message)
             #If user wants to set thresholds to requested ones
             if (message.get('opcode') == "3"): 
-                GlobalServerApp.updateUserThresholdsTable(message)
+                globalServer.updateUserThresholdsTable(message)
             #If user wants to view stats
             if (message.get('opcode') == "5"):
                 rowNumbers = message.get("rowNumbers")
                 sensors = message.get("sensorType")
                 potID = message.get("potID")
-                GlobalServerApp.send_stats(rowNumbers, sensors, potID)      
+                globalServer.send_stats(rowNumbers, sensors, potID)      
     self.__soc_recv.shutdown(1)
     self.__soc_send.shutdown(1)
     self.__cursor.close()
