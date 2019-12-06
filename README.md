@@ -64,7 +64,7 @@ How to Set-up globalServer
 	sqlite> COMMIT;
 	
 3.Download globalServer folder\
-4.Unzip contents to Desktop\ 
+4.Unzip contents to Desktop\
 5.Navigate to the Desktop
 
 	pi@raspberry:~ $ cd \Desktop
