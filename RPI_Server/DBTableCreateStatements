@@ -1,5 +1,0 @@
-CREATE TABLE `potData` ( `potID` INTEGER, `light` REAL, `soilMoisture` REAL, `waterDistance` REAL, `tdate` DATE, `ttime` TIME )
-CREATE TABLE `roomData` ( `roomID` INTEGER, `temperature` REAL, `humidity` REAL, `tdate` DATE, `ttime` TIME )
-CREATE TABLE "userNotes" ( `potID` INTEGER, `notes` TEXT, `tdate` DATE, `ttime` TIME )
-CREATE TABLE `userPlants` ( `roomID` INTEGER, `potID` INTEGER, `ownerID` INTEGER )
-CREATE TABLE `userThresholds` ( `potID` INTEGER, `sensorType` TEXT, `thresholdValue` REAL, `lessGreaterThan` TEXT, `tdate` DATE, `ttime` TIME )
