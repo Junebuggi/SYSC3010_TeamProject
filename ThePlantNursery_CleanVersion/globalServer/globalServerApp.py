@@ -1,5 +1,5 @@
 #Author: Abeer Rafiq
-#Modified: 11/28/2019 2:04pm
+#Modified: 12/6/2019 11:40am
 
 #Importing Packages
 import socket, sys, time, json, sqlite3
@@ -7,7 +7,7 @@ import RPi.GPIO as GPIO
 from datetime import datetime, date
 
 #Creating a global server class
-class GlobalServer:
+class GlobalServerApp:
     #The constructor
     def __init__(self, port, app_ip_addrs, debug):
         #Setting port
@@ -292,10 +292,10 @@ class GlobalServer:
 def main():
     DEBUG = True
     #Create GlobalServer object (port, room_ip_addrs, app_ip_addrs, DEBUG)
-    globalServer = GlobalServer(8008,'192.168.137.102', DEBUG)
+    globalServer = GlobalServerApp(8008,'192.168.137.102', DEBUG)
     while True:
         #receive
-        data = globalServer.receive()
+        data = GlobalServerApp.receive()
         if (data ==  None):
             #If length of buffer is <1, try receiving again
             continue
@@ -303,22 +303,22 @@ def main():
             message = data[0] #The loaded buffer version
             #User wants to update notes table
             if (message.get('opcode') == "1"):
-                globalServer.updateUserNotesTable(message)
+                GlobalServerApp.updateUserNotesTable(message)
             #User wants to add a pot with a room and owner
             if (message.get('opcode') == "2"): 
                 #Set default thresholds for that potID
-                globalServer.setDefaultThresholds(str(message.get("potID")))
+                GlobalServerApp.setDefaultThresholds(str(message.get("potID")))
                 #Update user plants table
-                globalServer.updateUserPlantsTable(message)
+                GlobalServerApp.updateUserPlantsTable(message)
             #If user wants to set thresholds to requested ones
             if (message.get('opcode') == "3"): 
-                globalServer.updateUserThresholdsTable(message)
+                GlobalServerApp.updateUserThresholdsTable(message)
             #If user wants to view stats
             if (message.get('opcode') == "5"):
                 rowNumbers = message.get("rowNumbers")
                 sensors = message.get("sensorType")
                 potID = message.get("potID")
-                globalServer.send_stats(rowNumbers, sensors, potID)      
+                GlobalServerApp.send_stats(rowNumbers, sensors, potID)      
     self.__soc_recv.shutdown(1)
     self.__soc_send.shutdown(1)
     self.__cursor.close()
