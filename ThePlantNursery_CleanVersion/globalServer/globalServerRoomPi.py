@@ -1,5 +1,5 @@
 #Author: Abeer Rafiq
-#Modified: 11/28/2019 2:04pm
+#Modified: 12/6/2019 11:40am
 
 #Importing Packages
 import socket, sys, time, json, sqlite3
@@ -7,7 +7,7 @@ import RPi.GPIO as GPIO
 from datetime import datetime, date
 
 #Creating a global server class
-class GlobalServer:
+class GlobalServerRoomPi:
     #The constructor
     def __init__(self, roomPort, appPort, room_ip_addrs, app_ip_addrs, debug):
         #Setting port
@@ -251,50 +251,7 @@ class GlobalServer:
                 #Failed to receive ack within a endTime amount of time
                 return False
         return
-        
-    #To compare current sensor data to threshold values
-    def checkUserThresholds(self):
-        #Notification json      
-        lightNotfn = '{"opcode" : "D", "sensorArray" : "1, 0, 0, 0, 0, 0, 0, 0, 0, 0"}'        
-        roomHumidityNotfn = '{"opcode" : "D", "sensorArray" : "0, 1, 0, 0, 0, 0, 0, 0, 0, 0"}'
-        roomTemperatureNotfn = '{"opcode" : "D", "sensorArray" : "0, 0, 1, 0, 0, 0, 0, 0, 0, 0"}'
-        soilMoistureNotfn = '{"opcode" : "D", "sensorArray" : "0, 0, 0, 1, 0, 0, 0, 0, 0, 0"}'
-        #Tuples of sensor data to easily neatly compare current measurements to thresholds
-        light = (self.__currentLight, self.__lightThreshold, self.__lightLessGreaterThan, lightNotfn)
-        soilMoisture = (self.__currentSoilMoisture, self.__soilMoistureThreshold, \
-                        self.__soilMoistureLessGreaterThan, soilMoistureNotfn, self.__waterPumpDuration)
-        roomHumidity = (self.__currentRoomHumidity, self.__roomHumidityThreshold, \
-                        self.__roomHumidityLessGreaterThan, roomHumidityNotfn)
-        roomTemperature = (self.__currentRoomTemperature, self.__roomTemperatureThreshold, \
-                            self.__roomTemperatureLessGreaterThan, roomTemperatureNotfn)
-        #Combined tuples for sensors
-        sensorArr = [light, roomHumidity, roomTemperature, soilMoisture]
-        #For each sensor compare current sensor value with threshold value
-        for sensor in sensorArr:
-            if sensor[2] == ">":
-                #Threshold is met, notify user
-                if sensor[0] > sensor[1]:
-                    self.notifyApp(sensor[3])
-                    if(len(sensor) == 5 and self.__runPump == True):
-                        #Soil moisture's threshold is met, then start water pump, notify user for starting pump
-                        startPumpStr = '{"opcode" : "4", "pumpDuration" : "' + str(self.__waterPumpDuration) + '"}'
-                        self.startWaterPump(startPumpStr) 
-                        self.notifyApp(startPumpStr) 
-                        self.__runPump = False
-            elif sensor[2] == "<":
-                #Threshold is met, notify user
-                if sensor[0] < sensor[1]:
-                    self.notifyApp(sensor[3])
-                    if(len(sensor) == 5 and self.__runPump == True):
-                        #Soil moisture's threshold is met, then start water pump, notify user for starting pump
-                        startPumpStr = '{"opcode" : "4", "pumpDuration" : "' + str(self.__waterPumpDuration) + '"}'
-                        self.startWaterPump(startPumpStr) 
-                        self.notifyApp(startPumpStr) 
-                        self.__runPump = False
-        if (self.__DEBUG):
-            print("\nThresholds Compared")
-        return
-    
+     
     #To notifcations msgs to the app
     def notifyApp(self, message):
         #If ack received, try sending again for certain number of times
@@ -357,7 +314,7 @@ class GlobalServer:
         return
     
     #To update thresholds variables to the new thresholds sent
-    def updateUserThresholdsTable(self, threshold):
+    def updateUserThresholdsVariables(self, threshold):
         potID = str(threshold.get("potID"))
         lessGreaterThan = str(threshold.get("lessGreaterThan"))
         thresholdValue = float(str(threshold.get("thresholdValue")))
@@ -386,7 +343,7 @@ class GlobalServer:
 def main():
     DEBUG = True
     #Create GlobalServer object (port, room_ip_addrs, app_ip_addrs, DEBUG)
-    globalServer = GlobalServer(1003, 8008, '192.168.137.103','192.168.137.102', DEBUG)
+    globalServer = GlobalServerRoomPi(1003, 8008, '192.168.137.103','192.168.137.102', DEBUG)
     startTime = time.time()
     pumpNotRunTime = 15
     while True:
@@ -406,10 +363,10 @@ def main():
             #If an error has occured in the room rpi or arduino
             if (message.get('opcode') == "D"):
                 globalServer.notifyApp(str(data[1])) #Sending unloaded version
-            #If room rpi sent all sensory data, update tables, compare values to thresholds as well
+            #If thresholds are sent by user, update the threshold variables
             if (message.get('opcode') == "3"): 
-                globalServer.updateUserThresholdsTable(message)
-            #If pot data is sent
+                globalServer.updateUserThresholdsVariables(message)
+            #If room rpi sent all sensory data, update tables, compare values to thresholds as well
             if (message.get('opcode') == "9"):
                 tdate = str(date.today())
                 ttime = str(datetime.now().strftime("%H:%M:%S"))
