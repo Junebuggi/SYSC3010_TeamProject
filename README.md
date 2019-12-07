@@ -65,11 +65,15 @@ How to Set-up the globalServer Raspberry Pi
 	
 3.Download globalServer folder\
 4.Unzip contents to Desktop\
-5.Navigate to the Desktop
+5.Open both globalServerApp.py and globalServerRoomPi.py. 
+6.In the globalServerApp.py file, go to line 295 and change the second parameter to the phone's IP address 
+7.In the globalServerRoomPi.py, go to line 346 and input the phone's IP address as the 4rth parameter
+and the roomPi's IP address as the 3rd parameter
+8.Navigate to the Desktop
 
 	pi@raspberry:~ $ cd \Desktop
 	
-6.Run the shell command to start the globalServerApp.py and the globalServerRoomPi.py scripts
+9.Run the shell command to start the globalServerApp.py and the globalServerRoomPi.py scripts
 
 	pi@raspberry:~ $ sudo sh globalServer.sh
 
@@ -80,11 +84,12 @@ How to Set-up the RoomPi Raspberry Pi
 1.Connect the hardware to the Raspberry Pi following the roomPi schematic
 1.Download roomPi folder\
 2.Unzip contents to Desktop\
-3.Navigate to the Desktop
+3.Go to line 327 in the roomPiManger.py file and change the second parameter to the Global Pi's IP address
+4.Navigate to the Desktop
 
 	pi@raspberry:~ $ cd \Desktop
 	
-4.Open the terminal and run the following command:
+5.Open the terminal and run the following command:
 
 	pi@raspberry:~ $ sudo python roomPiManager.py
 	
