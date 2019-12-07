@@ -342,7 +342,7 @@ class GlobalServerRoomPi:
 #Main function which receives json data and invokes methods based on opcode received
 def main():
     DEBUG = True
-    #Create GlobalServer object (port, room_ip_addrs, app_ip_addrs, DEBUG)
+    #Create GlobalServer object (roomPort, appPort, room_ip_addrs, app_ip_addrs, DEBUG)
     globalServer = GlobalServerRoomPi(1003, 8008, '192.168.137.103','192.168.137.102', DEBUG)
     startTime = time.time()
     pumpNotRunTime = 15
