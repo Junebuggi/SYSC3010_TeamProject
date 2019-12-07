@@ -291,7 +291,7 @@ class GlobalServerApp:
 #Main function which receives json data and invokes methods based on opcode received
 def main():
     DEBUG = True
-    #Create GlobalServer object (port, room_ip_addrs, app_ip_addrs, DEBUG)
+    #Create GlobalServer object (port, app_ip_addrs, DEBUG)
     globalServer = GlobalServerApp(8008,'192.168.137.102', DEBUG)
     while True:
         #receive
